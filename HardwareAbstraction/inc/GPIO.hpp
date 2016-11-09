@@ -21,13 +21,22 @@
 
 /**
  * @brief GPIO Definition structure
- * DO NOT USE in another file (can't be private)
+ * Used to define GPIO port, pin, mode and, in case of input,
+ * specific necessary definitions to initialize external interrupt
  */
 typedef struct
 {
-	GPIO_TypeDef * 		PORT;
-	uint16_t			PIN;
-	GPIOMode_TypeDef	MODE;
+	GPIO_TypeDef * 		PORT;		/**< GPIO Port */
+	uint16_t			PIN;		/**< GPIO Pin number */
+	GPIOMode_TypeDef	MODE;		/**< GPIO Mode */
+
+	// Interrupt definitions - INPUTS ONLY
+	uint8_t 			INT_PORTSOURCE;		/**< Interrupt Port */
+	uint8_t				INT_PINSOURCE;		/**< Interrupt Pin */
+	uint32_t			INT_LINE;			/**< Interrupt Line */
+	uint32_t			INT_TRIGGER;		/**< Interrupt trigger */
+	uint8_t				INT_PRIORITY;		/**< Interrupt priority, 0 to 15, 0 is the highest priority */
+	uint8_t				INT_CHANNEL;		/**< Interrupt IRQ Channel */
 }GPIO_DEF;
 
 /*----------------------------------------------------------------------------*/
