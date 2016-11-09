@@ -13,7 +13,7 @@
 #ifndef INC_GPIO_HPP_
 #define INC_GPIO_HPP_
 
-#include "../../STM32_Driver/inc/stm32f4xx.h"
+#include "stm32f4xx.h"
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
@@ -141,7 +141,7 @@ namespace HAL
 		 * @brief GPIO private constructor
 		 * @param id : GPIO ID
 		 */
-		GPIO (enum GPIO::ID id);
+		GPIO (enum ID id);
 
 		/**
 		 * @private

@@ -145,7 +145,7 @@ static GPIO_DEF _getGPIOStruct (enum GPIO::ID id)
  * @brief Initialize peripheral for a specified GPIO
  * @param id : GPIO ID
  */
-static void _hardwareInit (enum HAL::GPIO::ID id)
+static void _hardwareInit (enum GPIO::ID id)
 {
 	GPIO_InitTypeDef GPIOStruct;
 	GPIO_DEF gpio;
