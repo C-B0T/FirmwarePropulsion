@@ -107,56 +107,56 @@ static GPIO_DEF _getGPIOStruct (enum GPIO::ID id)
 	switch(id)
 	{
 	case HAL::GPIO::GPIO0:
-		gpio.PORT			=	GPIO0_PORT;
-		gpio.PIN			=	GPIO0_PIN;
-		gpio.INT_PORTSOURCE	=	GPIO0_INT_PORTSOURCE;
-		gpio.INT_PINSOURCE	=	GPIO0_INT_PINSOURCE;
-		gpio.INT_LINE		=	GPIO0_INT_LINE;
-		gpio.INT_TRIGGER	=	GPIO0_INT_TRIGGER;
-		gpio.INT_CHANNEL	=	GPIO0_INT_CHANNEL;
-		gpio.INT_PRIORITY	=	GPIO0_INT_PRIORITY;
+		gpio.IO.PORT		=	GPIO0_PORT;
+		gpio.IO.PIN			=	GPIO0_PIN;
+		gpio.INT.PORTSOURCE	=	GPIO0_INT_PORTSOURCE;
+		gpio.INT.PINSOURCE	=	GPIO0_INT_PINSOURCE;
+		gpio.INT.LINE		=	GPIO0_INT_LINE;
+		gpio.INT.TRIGGER	=	GPIO0_INT_TRIGGER;
+		gpio.INT.CHANNEL	=	GPIO0_INT_CHANNEL;
+		gpio.INT.PRIORITY	=	GPIO0_INT_PRIORITY;
 		break;
 	case HAL::GPIO::GPIO1:
-		gpio.PORT	=	GPIO1_PORT;
-		gpio.PIN	=	GPIO1_PIN;
+		gpio.IO.PORT	=	GPIO1_PORT;
+		gpio.IO.PIN		=	GPIO1_PIN;
 		break;
 	case HAL::GPIO::GPIO2:
-		gpio.PORT	=	GPIO2_PORT;
-		gpio.PIN	=	GPIO2_PIN;
+		gpio.IO.PORT	=	GPIO2_PORT;
+		gpio.IO.PIN		=	GPIO2_PIN;
 		break;
 	case HAL::GPIO::GPIO3:
-		gpio.PORT			=	GPIO3_PORT;
-		gpio.PIN			=	GPIO3_PIN;
-		gpio.INT_PORTSOURCE	=	GPIO3_INT_PORTSOURCE;
-		gpio.INT_PINSOURCE	=	GPIO3_INT_PINSOURCE;
-		gpio.INT_LINE		=	GPIO3_INT_LINE;
-		gpio.INT_TRIGGER	=	GPIO3_INT_TRIGGER;
-		gpio.INT_CHANNEL	=	GPIO3_INT_CHANNEL;
-		gpio.INT_PRIORITY	=	GPIO3_INT_PRIORITY;
+		gpio.IO.PORT		=	GPIO3_PORT;
+		gpio.IO.PIN			=	GPIO3_PIN;
+		gpio.INT.PORTSOURCE	=	GPIO3_INT_PORTSOURCE;
+		gpio.INT.PINSOURCE	=	GPIO3_INT_PINSOURCE;
+		gpio.INT.LINE		=	GPIO3_INT_LINE;
+		gpio.INT.TRIGGER	=	GPIO3_INT_TRIGGER;
+		gpio.INT.CHANNEL	=	GPIO3_INT_CHANNEL;
+		gpio.INT.PRIORITY	=	GPIO3_INT_PRIORITY;
 		break;
 	case HAL::GPIO::GPIO4:
-		gpio.PORT	=	GPIO4_PORT;
-		gpio.PIN	=	GPIO4_PIN;
+		gpio.IO.PORT	=	GPIO4_PORT;
+		gpio.IO.PIN		=	GPIO4_PIN;
 		break;
 	case HAL::GPIO::GPIO5:
-		gpio.PORT	=	GPIO5_PORT;
-		gpio.PIN	=	GPIO5_PIN;
+		gpio.IO.PORT	=	GPIO5_PORT;
+		gpio.IO.PIN		=	GPIO5_PIN;
 		break;
 	case HAL::GPIO::GPIO6:
-		gpio.PORT	=	GPIO6_PORT;
-		gpio.PIN	=	GPIO6_PIN;
+		gpio.IO.PORT	=	GPIO6_PORT;
+		gpio.IO.PIN		=	GPIO6_PIN;
 		break;
 	case HAL::GPIO::GPIO7:
-		gpio.PORT	=	GPIO7_PORT;
-		gpio.PIN	=	GPIO7_PIN;
+		gpio.IO.PORT	=	GPIO7_PORT;
+		gpio.IO.PIN		=	GPIO7_PIN;
 		break;
 	case HAL::GPIO::GPIO8:
-		gpio.PORT	=	GPIO8_PORT;
-		gpio.PIN	=	GPIO8_PIN;
+		gpio.IO.PORT	=	GPIO8_PORT;
+		gpio.IO.PIN		=	GPIO8_PIN;
 		break;
 	case HAL::GPIO::GPIO9:
-		gpio.PORT	=	GPIO9_PORT;
-		gpio.PIN	=	GPIO9_PIN;
+		gpio.IO.PORT	=	GPIO9_PORT;
+		gpio.IO.PIN		=	GPIO9_PIN;
 		break;
 	default:
 		break;
@@ -185,30 +185,30 @@ static void _hardwareInit (enum GPIO::ID id)
 	GPIOStruct.GPIO_OType 	= 	GPIO_OType_PP;
 	GPIOStruct.GPIO_PuPd	=	GPIO_PuPd_NOPULL;
 	GPIOStruct.GPIO_Speed	=	GPIO_High_Speed;
-	GPIOStruct.GPIO_Pin		=	gpio.PIN;
-	GPIOStruct.GPIO_Mode	=	gpio.MODE;
+	GPIOStruct.GPIO_Pin		=	gpio.IO.PIN;
+	GPIOStruct.GPIO_Mode	=	gpio.IO.MODE;
 
-	GPIO_Init(gpio.PORT, &GPIOStruct);
+	GPIO_Init(gpio.IO.PORT, &GPIOStruct);
 
 	// INT Init
-	if(gpio.MODE == GPIO_Mode_IN)
+	if(gpio.IO.MODE == GPIO_Mode_IN)
 	{
 		// Connect INT Line to GPIO pin
-		SYSCFG_EXTILineConfig(gpio.INT_PORTSOURCE, gpio.INT_PINSOURCE);
+		SYSCFG_EXTILineConfig(gpio.INT.PORTSOURCE, gpio.INT.PINSOURCE);
 
 		// Init INT
-		EXTIStruct.EXTI_Line		= 	gpio.INT_LINE;
-		EXTIStruct.EXTI_Trigger		=	(EXTITrigger_TypeDef)gpio.INT_TRIGGER;
+		EXTIStruct.EXTI_Line		= 	gpio.INT.LINE;
+		EXTIStruct.EXTI_Trigger		=	(EXTITrigger_TypeDef)gpio.INT.TRIGGER;
 		EXTIStruct.EXTI_Mode		=	EXTI_Mode_Interrupt;
 		EXTIStruct.EXTI_LineCmd		=	ENABLE;
 
-		EXTI_ClearITPendingBit(gpio.INT_LINE);
+		EXTI_ClearITPendingBit(gpio.INT.LINE);
 
 		EXTI_Init(&EXTIStruct);
 
 		// Init NVIC
-		NVICStruct.NVIC_IRQChannel						=	gpio.INT_CHANNEL;
-		NVICStruct.NVIC_IRQChannelPreemptionPriority 	= 	gpio.INT_PRIORITY;
+		NVICStruct.NVIC_IRQChannel						=	gpio.INT.CHANNEL;
+		NVICStruct.NVIC_IRQChannelPreemptionPriority 	= 	gpio.INT.PRIORITY;
 		NVICStruct.NVIC_IRQChannelSubPriority 			= 	0;
 		NVICStruct.NVIC_IRQChannelCmd					=	ENABLE;
 
@@ -255,7 +255,7 @@ namespace HAL
 		enum GPIO::State state = GPIO::Low;
 		BitAction bit = Bit_RESET;
 
-		bit = (BitAction)GPIO_ReadInputDataBit(this->gpio.PORT, this->gpio.PIN);
+		bit = (BitAction)GPIO_ReadInputDataBit(this->gpio.IO.PORT, this->gpio.IO.PIN);
 
 		if(bit == Bit_SET)
 		{
@@ -269,20 +269,23 @@ namespace HAL
 	{
 		BitAction bit = Bit_RESET;
 
-		if(this->gpio.MODE == GPIO_Mode_OUT)
+		if(this->gpio.IO.MODE == GPIO_Mode_OUT)
 		{
 			if(state == GPIO::High)
 			{
 				bit = Bit_SET;
 			}
 
-			GPIO_WriteBit(this->gpio.PORT, this->gpio.PIN, bit);
+			GPIO_WriteBit(this->gpio.IO.PORT, this->gpio.IO.PIN, bit);
 		}
 	}
 
 	void GPIO::Toggle ()
 	{
-		GPIO_ToggleBits(this->gpio.PORT, this->gpio.PIN);
+		if(this->gpio.IO.MODE == GPIO_Mode_OUT)
+		{
+			GPIO_ToggleBits(this->gpio.IO.PORT, this->gpio.IO.PIN);
+		}
 	}
 }
 

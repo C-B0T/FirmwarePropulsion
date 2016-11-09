@@ -26,17 +26,23 @@
  */
 typedef struct
 {
-	GPIO_TypeDef * 		PORT;		/**< GPIO Port */
-	uint16_t			PIN;		/**< GPIO Pin number */
-	GPIOMode_TypeDef	MODE;		/**< GPIO Mode */
+	struct Pin
+	{
+		GPIO_TypeDef * 		PORT;		/**< GPIO Port */
+		uint16_t			PIN;		/**< GPIO Pin number */
+		GPIOMode_TypeDef	MODE;		/**< GPIO Mode */
+	}IO;
 
 	// Interrupt definitions - INPUTS ONLY
-	uint8_t 			INT_PORTSOURCE;		/**< Interrupt Port */
-	uint8_t				INT_PINSOURCE;		/**< Interrupt Pin */
-	uint32_t			INT_LINE;			/**< Interrupt Line */
-	uint32_t			INT_TRIGGER;		/**< Interrupt trigger */
-	uint8_t				INT_PRIORITY;		/**< Interrupt priority, 0 to 15, 0 is the highest priority */
-	uint8_t				INT_CHANNEL;		/**< Interrupt IRQ Channel */
+	struct Interrupt
+	{
+		uint8_t 	PORTSOURCE;		/**< Interrupt Port */
+		uint8_t		PINSOURCE;		/**< Interrupt Pin */
+		uint32_t	LINE;			/**< Interrupt Line */
+		uint32_t	TRIGGER;		/**< Interrupt trigger */
+		uint8_t		PRIORITY;		/**< Interrupt priority, 0 to 15, 0 is the highest priority */
+		uint8_t		CHANNEL;		/**< Interrupt IRQ Channel */
+	}INT;
 }GPIO_DEF;
 
 /*----------------------------------------------------------------------------*/
