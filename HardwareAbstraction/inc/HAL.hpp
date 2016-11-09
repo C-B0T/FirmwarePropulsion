@@ -8,10 +8,6 @@
 #ifndef INC_HAL_HPP_
 #define INC_HAL_HPP_
 
-/**
- * @defgroup HAL Hardware Abstraction Layer
- */
-
 #include "GPIO.hpp"
 
 

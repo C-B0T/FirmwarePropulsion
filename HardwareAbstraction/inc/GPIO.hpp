@@ -43,7 +43,8 @@ typedef struct
 /* Class										                              */
 /*----------------------------------------------------------------------------*/
 /**
- * @addtogroup HAL
+ * @namespace HAL
+ * Hardware Abstraction Layer
  */
 namespace HAL
 {
