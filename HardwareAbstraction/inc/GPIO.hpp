@@ -83,8 +83,8 @@ namespace HAL
 		 */
 		enum State
 		{
-			Low = 0,//!< Low
-			High    //!< High
+			Low = 0,//!< Logic '0'
+			High    //!< Logic '1'
 		};
 
 		/**
