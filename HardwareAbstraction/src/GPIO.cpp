@@ -86,7 +86,9 @@ using namespace HAL;
 /* Private Members                                                            */
 /*----------------------------------------------------------------------------*/
 
-// GPIO instances
+/**
+ * @brief GPIO instances
+ */
 GPIO* _gpio[GPIO::GPIO_MAX] = {NULL};
 
 /*----------------------------------------------------------------------------*/
@@ -94,7 +96,7 @@ GPIO* _gpio[GPIO::GPIO_MAX] = {NULL};
 /*----------------------------------------------------------------------------*/
 
 /**
- * @brief Retrieve GPIO definition from GPIO ID
+ * @brief Retrieve GPIO definitions from GPIO ID
  * @param id : GPIO ID
  * @return GPIO_DEF structure
  */
@@ -109,6 +111,7 @@ static GPIO_DEF _getGPIOStruct (enum GPIO::ID id)
 	case HAL::GPIO::GPIO0:
 		gpio.IO.PORT		=	GPIO0_PORT;
 		gpio.IO.PIN			=	GPIO0_PIN;
+		gpio.IO.MODE		=	GPIO0_MODE;
 		gpio.INT.PORTSOURCE	=	GPIO0_INT_PORTSOURCE;
 		gpio.INT.PINSOURCE	=	GPIO0_INT_PINSOURCE;
 		gpio.INT.LINE		=	GPIO0_INT_LINE;
@@ -119,10 +122,12 @@ static GPIO_DEF _getGPIOStruct (enum GPIO::ID id)
 	case HAL::GPIO::GPIO1:
 		gpio.IO.PORT	=	GPIO1_PORT;
 		gpio.IO.PIN		=	GPIO1_PIN;
+		gpio.IO.MODE	=	GPIO1_MODE;
 		break;
 	case HAL::GPIO::GPIO2:
 		gpio.IO.PORT	=	GPIO2_PORT;
 		gpio.IO.PIN		=	GPIO2_PIN;
+		gpio.IO.MODE	=	GPIO2_MODE;
 		break;
 	case HAL::GPIO::GPIO3:
 		gpio.IO.PORT		=	GPIO3_PORT;
@@ -133,30 +138,37 @@ static GPIO_DEF _getGPIOStruct (enum GPIO::ID id)
 		gpio.INT.TRIGGER	=	GPIO3_INT_TRIGGER;
 		gpio.INT.CHANNEL	=	GPIO3_INT_CHANNEL;
 		gpio.INT.PRIORITY	=	GPIO3_INT_PRIORITY;
+		gpio.IO.MODE		=	GPIO3_MODE;
 		break;
 	case HAL::GPIO::GPIO4:
 		gpio.IO.PORT	=	GPIO4_PORT;
 		gpio.IO.PIN		=	GPIO4_PIN;
+		gpio.IO.MODE	=	GPIO4_MODE;
 		break;
 	case HAL::GPIO::GPIO5:
 		gpio.IO.PORT	=	GPIO5_PORT;
 		gpio.IO.PIN		=	GPIO5_PIN;
+		gpio.IO.MODE	=	GPIO5_MODE;
 		break;
 	case HAL::GPIO::GPIO6:
 		gpio.IO.PORT	=	GPIO6_PORT;
 		gpio.IO.PIN		=	GPIO6_PIN;
+		gpio.IO.MODE	=	GPIO6_MODE;
 		break;
 	case HAL::GPIO::GPIO7:
 		gpio.IO.PORT	=	GPIO7_PORT;
 		gpio.IO.PIN		=	GPIO7_PIN;
+		gpio.IO.MODE	=	GPIO7_MODE;
 		break;
 	case HAL::GPIO::GPIO8:
 		gpio.IO.PORT	=	GPIO8_PORT;
 		gpio.IO.PIN		=	GPIO8_PIN;
+		gpio.IO.MODE	=	GPIO8_MODE;
 		break;
 	case HAL::GPIO::GPIO9:
 		gpio.IO.PORT	=	GPIO9_PORT;
 		gpio.IO.PIN		=	GPIO9_PIN;
+		gpio.IO.MODE	=	GPIO9_MODE;
 		break;
 	default:
 		break;
@@ -226,7 +238,7 @@ namespace HAL
 		assert(id < GPIO::GPIO_MAX);
 
 		// if GPIO instance already exists
-		if(_gpio[id]->instance != NULL)
+		if(_gpio[id] != NULL)
 		{
 			return *_gpio[id];
 		}

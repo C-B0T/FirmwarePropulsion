@@ -36,7 +36,7 @@ static void HardwareInit (void)
  */
 void TASKHANDLER_Test (void * obj)
 {
-	GPIO led = GPIO::GetInstance(GPIO::GPIO0);
+	GPIO led = GPIO::GetInstance(GPIO::GPIO6);
 
 	while(1)
 	{
