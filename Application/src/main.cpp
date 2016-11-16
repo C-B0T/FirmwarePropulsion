@@ -31,7 +31,7 @@ static void HardwareInit (void)
 						    ENABLE);
 
 	// Enable Timer clock
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5,
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 | RCC_APB1Periph_TIM5,
 						   ENABLE);
 }
 

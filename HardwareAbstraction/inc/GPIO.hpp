@@ -81,8 +81,6 @@ namespace HAL
 			GPIO7,		//!< LED2
 			GPIO8,		//!< LED3
 			GPIO9,		//!< LED4
-			GPIO10,		//!< ENC_IND0
-			GPIO11,		//!< ENC_IND1
 			GPIO_MAX
 		};
 
