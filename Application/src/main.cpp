@@ -29,6 +29,10 @@ static void HardwareInit (void)
 			 	 	 	 	RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOF |
 							RCC_AHB1Periph_GPIOG | RCC_AHB1Periph_GPIOH | RCC_AHB1Periph_GPIOI),
 						    ENABLE);
+
+	// Enable Timer clock
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5,
+						   ENABLE);
 }
 
 /**

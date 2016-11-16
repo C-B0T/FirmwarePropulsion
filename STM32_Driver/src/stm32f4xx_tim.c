@@ -664,6 +664,38 @@ void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState)
   */
 
 /**
+  * @brief  Initializes the TIMx Channelx according to the specified parameters in
+  *         the TIM_OCInitStruct.
+  * @param  TIMx: where x can be 1 to 14 except 6 and 7, to select the TIM peripheral.
+  * @param  TIM_OCInitStruct: pointer to a TIM_OCInitTypeDef structure that contains
+  *         the configuration information for the specified TIM peripheral.
+  * @param	TIM_Channel_x : Timer Channel where x is between 1 to 4
+  * @retval None
+  */
+void TIM_OCxInit(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct, uint16_t TIM_Channel_x)
+{
+	assert_param(IS_TIM_CHANNEL(TIM_Channel_x));
+
+	switch(TIM_Channel_x)
+	{
+	case TIM_Channel_1:
+		TIM_OC1Init(TIMx, TIM_OCInitStruct);
+		break;
+	case TIM_Channel_2:
+		TIM_OC2Init(TIMx, TIM_OCInitStruct);
+		break;
+	case TIM_Channel_3:
+		TIM_OC3Init(TIMx, TIM_OCInitStruct);
+		break;
+	case TIM_Channel_4:
+		TIM_OC4Init(TIMx, TIM_OCInitStruct);
+		break;
+	default:
+		break;
+	}
+}
+
+/**
   * @brief  Initializes the TIMx Channel1 according to the specified parameters in
   *         the TIM_OCInitStruct.
   * @param  TIMx: where x can be 1 to 14 except 6 and 7, to select the TIM peripheral.
@@ -1055,6 +1087,36 @@ void TIM_SelectOCxM(TIM_TypeDef* TIMx, uint16_t TIM_Channel, uint16_t TIM_OCMode
 /**
   * @brief  Sets the TIMx Capture Compare1 Register value
   * @param  TIMx: where x can be 1 to 14 except 6 and 7, to select the TIM peripheral.
+  * @param  Compare: specifies the Capture Compare register new value.
+  * @param	TIM_Channel_x : Timer Channel where x is between 1 to 4
+  * @retval None
+  */
+void TIM_SetCompareX(TIM_TypeDef* TIMx, uint32_t Compare, uint16_t TIM_Channel_x)
+{
+	assert_param(IS_TIM_CHANNEL(TIM_Channel_x));
+
+	switch(TIM_Channel_x)
+	{
+	case TIM_Channel_1:
+		TIM_SetCompare1(TIMx, Compare);
+		break;
+	case TIM_Channel_2:
+		TIM_SetCompare2(TIMx, Compare);
+		break;
+	case TIM_Channel_3:
+		TIM_SetCompare3(TIMx, Compare);
+		break;
+	case TIM_Channel_4:
+		TIM_SetCompare4(TIMx, Compare);
+		break;
+	default:
+		break;
+	}
+}
+
+/**
+  * @brief  Sets the TIMx Capture Compare1 Register value
+  * @param  TIMx: where x can be 1 to 14 except 6 and 7, to select the TIM peripheral.
   * @param  Compare1: specifies the Capture Compare1 register new value.
   * @retval None
   */
@@ -1111,6 +1173,39 @@ void TIM_SetCompare4(TIM_TypeDef* TIMx, uint32_t Compare4)
 
   /* Set the Capture Compare4 Register value */
   TIMx->CCR4 = Compare4;
+}
+
+/**
+  * @brief  Forces the TIMx output x waveform to active or inactive level.
+  * @param  TIMx: where x can be 1 to 14 except 6 and 7, to select the TIM peripheral.
+  * @param  TIM_ForcedAction: specifies the forced Action to be set to the output waveform.
+  *          This parameter can be one of the following values:
+  *            @arg TIM_ForcedAction_Active: Force active level on OCxREF
+  *            @arg TIM_ForcedAction_InActive: Force inactive level on OCxREF.
+  * @param	TIM_Channel_x : Timer Channel where x is between 1 to 4
+  * @retval None
+  */
+void TIM_ForcedOCxConfig(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction, uint16_t TIM_Channel_x)
+{
+	assert_param(IS_TIM_CHANNEL(TIM_Channel_x));
+
+	switch(TIM_Channel_x)
+	{
+	case TIM_Channel_1:
+		TIM_ForcedOC1Config(TIMx, TIM_ForcedAction);
+		break;
+	case TIM_Channel_2:
+		TIM_ForcedOC2Config(TIMx, TIM_ForcedAction);
+		break;
+	case TIM_Channel_3:
+		TIM_ForcedOC3Config(TIMx, TIM_ForcedAction);
+		break;
+	case TIM_Channel_4:
+		TIM_ForcedOC4Config(TIMx, TIM_ForcedAction);
+		break;
+	default:
+		break;
+	}
 }
 
 /**
@@ -1225,6 +1320,39 @@ void TIM_ForcedOC4Config(TIM_TypeDef* TIMx, uint16_t TIM_ForcedAction)
 
   /* Write to TIMx CCMR2 register */
   TIMx->CCMR2 = tmpccmr2;
+}
+
+/**
+  * @brief  Enables or disables the TIMx peripheral Preload register on CCRx.
+  * @param  TIMx: where x can be 1 to 14 except 6 and 7, to select the TIM peripheral.
+  * @param  TIM_OCPreload: new state of the TIMx peripheral Preload register
+  *          This parameter can be one of the following values:
+  *            @arg TIM_OCPreload_Enable
+  *            @arg TIM_OCPreload_Disable
+  * @param	TIM_Channel_x : Timer Channel where x is between 1 to 4
+  * @retval None
+  */
+void TIM_OCxPreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload, uint16_t TIM_Channel_x)
+{
+	assert_param(IS_TIM_CHANNEL(TIM_Channel_x));
+
+	switch(TIM_Channel_x)
+	{
+	case TIM_Channel_1:
+		TIM_OC1PreloadConfig(TIMx, TIM_OCPreload);
+		break;
+	case TIM_Channel_2:
+		TIM_OC2PreloadConfig(TIMx, TIM_OCPreload);
+		break;
+	case TIM_Channel_3:
+		TIM_OC3PreloadConfig(TIMx, TIM_OCPreload);
+		break;
+	case TIM_Channel_4:
+		TIM_OC4PreloadConfig(TIMx, TIM_OCPreload);
+		break;
+	default:
+		break;
+	}
 }
 
 /**
@@ -1351,6 +1479,39 @@ void TIM_OC4PreloadConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPreload)
   *          This parameter can be one of the following values:
   *            @arg TIM_OCFast_Enable: TIM output compare fast enable
   *            @arg TIM_OCFast_Disable: TIM output compare fast disable
+  * @param	TIM_Channel_x : Timer Channel where x is between 1 to 4
+  * @retval None
+  */
+void TIM_OCxFastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast, uint16_t TIM_Channel_x)
+{
+	assert_param(IS_TIM_CHANNEL(TIM_Channel_x));
+
+	switch(TIM_Channel_x)
+	{
+	case TIM_Channel_1:
+		TIM_OC1FastConfig(TIMx, TIM_OCFast);
+		break;
+	case TIM_Channel_2:
+		TIM_OC2FastConfig(TIMx, TIM_OCFast);
+		break;
+	case TIM_Channel_3:
+		TIM_OC3FastConfig(TIMx, TIM_OCFast);
+		break;
+	case TIM_Channel_4:
+		TIM_OC4FastConfig(TIMx, TIM_OCFast);
+		break;
+	default:
+		break;
+	}
+}
+
+/**
+  * @brief  Configures the TIMx Output Compare 1 Fast feature.
+  * @param  TIMx: where x can be 1 to 14 except 6 and 7, to select the TIM peripheral.
+  * @param  TIM_OCFast: new state of the Output Compare Fast Enable Bit.
+  *          This parameter can be one of the following values:
+  *            @arg TIM_OCFast_Enable: TIM output compare fast enable
+  *            @arg TIM_OCFast_Disable: TIM output compare fast disable
   * @retval None
   */
 void TIM_OC1FastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast)
@@ -1463,6 +1624,39 @@ void TIM_OC4FastConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCFast)
 
   /* Write to TIMx CCMR2 */
   TIMx->CCMR2 = tmpccmr2;
+}
+
+/**
+  * @brief  Clears or safeguards the OCREFx signal on an external event
+  * @param  TIMx: where x can be 1 to 14 except 6 and 7, to select the TIM peripheral.
+  * @param  TIM_OCClear: new state of the Output Compare Clear Enable Bit.
+  *          This parameter can be one of the following values:
+  *            @arg TIM_OCClear_Enable: TIM Output clear enable
+  *            @arg TIM_OCClear_Disable: TIM Output clear disable
+  * @param	TIM_Channel_x : Timer Channel where x is between 1 to 4
+  * @retval None
+  */
+void TIM_ClearOCxRef(TIM_TypeDef* TIMx, uint16_t TIM_OCClear, uint16_t TIM_Channel_x)
+{
+	assert_param(IS_TIM_CHANNEL(TIM_Channel_x));
+
+	switch(TIM_Channel_x)
+	{
+	case TIM_Channel_1:
+		TIM_ClearOC1Ref(TIMx, TIM_OCClear);
+		break;
+	case TIM_Channel_2:
+		TIM_ClearOC2Ref(TIMx, TIM_OCClear);
+		break;
+	case TIM_Channel_3:
+		TIM_ClearOC3Ref(TIMx, TIM_OCClear);
+		break;
+	case TIM_Channel_4:
+		TIM_ClearOC4Ref(TIMx, TIM_OCClear);
+		break;
+	default:
+		break;
+	}
 }
 
 /**
@@ -1583,6 +1777,39 @@ void TIM_ClearOC4Ref(TIM_TypeDef* TIMx, uint16_t TIM_OCClear)
 }
 
 /**
+  * @brief  Configures the TIMx channel x polarity.
+  * @param  TIMx: where x can be 1 to 14 except 6 and 7, to select the TIM peripheral.
+  * @param  TIM_OCPolarity: specifies the OC1 Polarity
+  *          This parameter can be one of the following values:
+  *            @arg TIM_OCPolarity_High: Output Compare active high
+  *            @arg TIM_OCPolarity_Low: Output Compare active low
+  * @param	TIM_Channel_x : Timer Channel where x is between 1 to 4
+  * @retval None
+  */
+void TIM_OCxPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity, uint16_t TIM_Channel_x)
+{
+	assert_param(IS_TIM_CHANNEL(TIM_Channel_x));
+
+	switch(TIM_Channel_x)
+	{
+	case TIM_Channel_1:
+		TIM_OC1PolarityConfig(TIMx, TIM_OCPolarity);
+		break;
+	case TIM_Channel_2:
+		TIM_OC2PolarityConfig(TIMx, TIM_OCPolarity);
+		break;
+	case TIM_Channel_3:
+		TIM_OC3PolarityConfig(TIMx, TIM_OCPolarity);
+		break;
+	case TIM_Channel_4:
+		TIM_OC4PolarityConfig(TIMx, TIM_OCPolarity);
+		break;
+	default:
+		break;
+	}
+}
+
+/**
   * @brief  Configures the TIMx channel 1 polarity.
   * @param  TIMx: where x can be 1 to 14 except 6 and 7, to select the TIM peripheral.
   * @param  TIM_OCPolarity: specifies the OC1 Polarity
@@ -1604,32 +1831,6 @@ void TIM_OC1PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity)
   /* Set or Reset the CC1P Bit */
   tmpccer &= (uint16_t)(~TIM_CCER_CC1P);
   tmpccer |= TIM_OCPolarity;
-
-  /* Write to TIMx CCER register */
-  TIMx->CCER = tmpccer;
-}
-
-/**
-  * @brief  Configures the TIMx Channel 1N polarity.
-  * @param  TIMx: where x can be 1 or 8 to select the TIM peripheral.
-  * @param  TIM_OCNPolarity: specifies the OC1N Polarity
-  *          This parameter can be one of the following values:
-  *            @arg TIM_OCNPolarity_High: Output Compare active high
-  *            @arg TIM_OCNPolarity_Low: Output Compare active low
-  * @retval None
-  */
-void TIM_OC1NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity)
-{
-  uint16_t tmpccer = 0;
-  /* Check the parameters */
-  assert_param(IS_TIM_LIST4_PERIPH(TIMx));
-  assert_param(IS_TIM_OCN_POLARITY(TIM_OCNPolarity));
-   
-  tmpccer = TIMx->CCER;
-
-  /* Set or Reset the CC1NP Bit */
-  tmpccer &= (uint16_t)~TIM_CCER_CC1NP;
-  tmpccer |= TIM_OCNPolarity;
 
   /* Write to TIMx CCER register */
   TIMx->CCER = tmpccer;
@@ -1664,33 +1865,6 @@ void TIM_OC2PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity)
 }
 
 /**
-  * @brief  Configures the TIMx Channel 2N polarity.
-  * @param  TIMx: where x can be 1 or 8 to select the TIM peripheral.
-  * @param  TIM_OCNPolarity: specifies the OC2N Polarity
-  *          This parameter can be one of the following values:
-  *            @arg TIM_OCNPolarity_High: Output Compare active high
-  *            @arg TIM_OCNPolarity_Low: Output Compare active low
-  * @retval None
-  */
-void TIM_OC2NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity)
-{
-  uint16_t tmpccer = 0;
-
-  /* Check the parameters */
-  assert_param(IS_TIM_LIST4_PERIPH(TIMx));
-  assert_param(IS_TIM_OCN_POLARITY(TIM_OCNPolarity));
-  
-  tmpccer = TIMx->CCER;
-
-  /* Set or Reset the CC2NP Bit */
-  tmpccer &= (uint16_t)~TIM_CCER_CC2NP;
-  tmpccer |= (uint16_t)(TIM_OCNPolarity << 4);
-
-  /* Write to TIMx CCER register */
-  TIMx->CCER = tmpccer;
-}
-
-/**
   * @brief  Configures the TIMx channel 3 polarity.
   * @param  TIMx: where x can be 1, 2, 3, 4, 5 or 8 to select the TIM peripheral.
   * @param  TIM_OCPolarity: specifies the OC3 Polarity
@@ -1718,33 +1892,6 @@ void TIM_OC3PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity)
 }
 
 /**
-  * @brief  Configures the TIMx Channel 3N polarity.
-  * @param  TIMx: where x can be 1 or 8 to select the TIM peripheral.
-  * @param  TIM_OCNPolarity: specifies the OC3N Polarity
-  *          This parameter can be one of the following values:
-  *            @arg TIM_OCNPolarity_High: Output Compare active high
-  *            @arg TIM_OCNPolarity_Low: Output Compare active low
-  * @retval None
-  */
-void TIM_OC3NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity)
-{
-  uint16_t tmpccer = 0;
- 
-  /* Check the parameters */
-  assert_param(IS_TIM_LIST4_PERIPH(TIMx));
-  assert_param(IS_TIM_OCN_POLARITY(TIM_OCNPolarity));
-    
-  tmpccer = TIMx->CCER;
-
-  /* Set or Reset the CC3NP Bit */
-  tmpccer &= (uint16_t)~TIM_CCER_CC3NP;
-  tmpccer |= (uint16_t)(TIM_OCNPolarity << 8);
-
-  /* Write to TIMx CCER register */
-  TIMx->CCER = tmpccer;
-}
-
-/**
   * @brief  Configures the TIMx channel 4 polarity.
   * @param  TIMx: where x can be 1, 2, 3, 4, 5 or 8 to select the TIM peripheral.
   * @param  TIM_OCPolarity: specifies the OC4 Polarity
@@ -1766,6 +1913,116 @@ void TIM_OC4PolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCPolarity)
   /* Set or Reset the CC4P Bit */
   tmpccer &= (uint16_t)~TIM_CCER_CC4P;
   tmpccer |= (uint16_t)(TIM_OCPolarity << 12);
+
+  /* Write to TIMx CCER register */
+  TIMx->CCER = tmpccer;
+}
+
+/**
+  * @brief  Configures the TIMx Channel 1N polarity.
+  * @param  TIMx: where x can be 1 or 8 to select the TIM peripheral.
+  * @param  TIM_OCNPolarity: specifies the OC1N Polarity
+  *          This parameter can be one of the following values:
+  *            @arg TIM_OCNPolarity_High: Output Compare active high
+  *            @arg TIM_OCNPolarity_Low: Output Compare active low
+  * @param	TIM_Channel_x : Timer Channel where x is between 1 to 3
+  * @retval None
+  */
+void TIM_OCxNPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity, uint16_t TIM_Channel_x)
+{
+	assert_param(IS_TIM_CHANNEL(TIM_Channel_x));
+
+	switch(TIM_Channel_x)
+	{
+	case TIM_Channel_1:
+		TIM_OC2NPolarityConfig(TIMx, TIM_OCNPolarity);
+		break;
+	case TIM_Channel_2:
+		TIM_OC1NPolarityConfig(TIMx, TIM_OCNPolarity);
+		break;
+	case TIM_Channel_3:
+		TIM_OC3NPolarityConfig(TIMx, TIM_OCNPolarity);
+		break;
+	default:
+		break;
+	}
+}
+
+/**
+  * @brief  Configures the TIMx Channel 1N polarity.
+  * @param  TIMx: where x can be 1 or 8 to select the TIM peripheral.
+  * @param  TIM_OCNPolarity: specifies the OC1N Polarity
+  *          This parameter can be one of the following values:
+  *            @arg TIM_OCNPolarity_High: Output Compare active high
+  *            @arg TIM_OCNPolarity_Low: Output Compare active low
+  * @retval None
+  */
+void TIM_OC1NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity)
+{
+  uint16_t tmpccer = 0;
+  /* Check the parameters */
+  assert_param(IS_TIM_LIST4_PERIPH(TIMx));
+  assert_param(IS_TIM_OCN_POLARITY(TIM_OCNPolarity));
+
+  tmpccer = TIMx->CCER;
+
+  /* Set or Reset the CC1NP Bit */
+  tmpccer &= (uint16_t)~TIM_CCER_CC1NP;
+  tmpccer |= TIM_OCNPolarity;
+
+  /* Write to TIMx CCER register */
+  TIMx->CCER = tmpccer;
+}
+
+/**
+  * @brief  Configures the TIMx Channel 2N polarity.
+  * @param  TIMx: where x can be 1 or 8 to select the TIM peripheral.
+  * @param  TIM_OCNPolarity: specifies the OC2N Polarity
+  *          This parameter can be one of the following values:
+  *            @arg TIM_OCNPolarity_High: Output Compare active high
+  *            @arg TIM_OCNPolarity_Low: Output Compare active low
+  * @retval None
+  */
+void TIM_OC2NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity)
+{
+  uint16_t tmpccer = 0;
+
+  /* Check the parameters */
+  assert_param(IS_TIM_LIST4_PERIPH(TIMx));
+  assert_param(IS_TIM_OCN_POLARITY(TIM_OCNPolarity));
+  
+  tmpccer = TIMx->CCER;
+
+  /* Set or Reset the CC2NP Bit */
+  tmpccer &= (uint16_t)~TIM_CCER_CC2NP;
+  tmpccer |= (uint16_t)(TIM_OCNPolarity << 4);
+
+  /* Write to TIMx CCER register */
+  TIMx->CCER = tmpccer;
+}
+
+/**
+  * @brief  Configures the TIMx Channel 3N polarity.
+  * @param  TIMx: where x can be 1 or 8 to select the TIM peripheral.
+  * @param  TIM_OCNPolarity: specifies the OC3N Polarity
+  *          This parameter can be one of the following values:
+  *            @arg TIM_OCNPolarity_High: Output Compare active high
+  *            @arg TIM_OCNPolarity_Low: Output Compare active low
+  * @retval None
+  */
+void TIM_OC3NPolarityConfig(TIM_TypeDef* TIMx, uint16_t TIM_OCNPolarity)
+{
+  uint16_t tmpccer = 0;
+ 
+  /* Check the parameters */
+  assert_param(IS_TIM_LIST4_PERIPH(TIMx));
+  assert_param(IS_TIM_OCN_POLARITY(TIM_OCNPolarity));
+    
+  tmpccer = TIMx->CCER;
+
+  /* Set or Reset the CC3NP Bit */
+  tmpccer &= (uint16_t)~TIM_CCER_CC3NP;
+  tmpccer |= (uint16_t)(TIM_OCNPolarity << 8);
 
   /* Write to TIMx CCER register */
   TIMx->CCER = tmpccer;

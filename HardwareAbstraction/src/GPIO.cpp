@@ -257,7 +257,6 @@ namespace HAL
 		this->intState = false;
 		this->InterruptCallback = NULL;
 		this->gpio = _getGPIOStruct(id);
-		this->instance = this;
 
 		_hardwareInit(id);
 	}

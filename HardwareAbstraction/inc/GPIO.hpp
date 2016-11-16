@@ -161,12 +161,6 @@ namespace HAL
 
 		/**
 		 * @private
-		 * @brief GPIO instance
-		 */
-		GPIO* instance;
-
-		/**
-		 * @private
 		 * @brief GPIO ID
 		 */
 		enum ID id;
