@@ -2,9 +2,12 @@
  * @file	Encoder.cpp
  * @author	Kevin WYSOCKI
  * @date	18 nov. 2016
- * @brief	
+ * @brief	Encoder abstraction class
  *
- *
+ * HOWTO :
+ * - Get Encoder instance with Encoder::GetInstance()
+ * - Use GetAbsoluteValue() and GetRelativeValue() methods to know
+ *   absolute or relative (since last call) position
  */
 
 #include <stddef.h>
