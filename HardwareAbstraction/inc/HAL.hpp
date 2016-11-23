@@ -9,8 +9,8 @@
 #define INC_HAL_HPP_
 
 #include "GPIO.hpp"
-
-
-
+#include "PWM.hpp"
+#include "Serial.hpp"
+#include "Encoder.hpp"
 
 #endif /* INC_HAL_HPP_ */
