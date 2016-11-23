@@ -403,52 +403,55 @@ namespace HAL
 /* Interrupt Handler                                                          */
 /*----------------------------------------------------------------------------*/
 
-/**
- * @brief USART1 IRQ Handler
- */
-void USART1_IRQHandler (void)
+extern "C"
 {
-	Serial serial = Serial::GetInstance(Serial::SERIAL0);
-
-	if(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == SET)
+	/**
+	 * @brief USART1 IRQ Handler
+	 */
+	void USART1_IRQHandler (void)
 	{
-		serial.INTERNAL_InterruptCallback(USART_FLAG_TXE);
+		Serial serial = Serial::GetInstance(Serial::SERIAL0);
+
+		if(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == SET)
+		{
+			serial.INTERNAL_InterruptCallback(USART_FLAG_TXE);
+		}
+		else if(USART_GetFlagStatus(USART1, USART_FLAG_TC) == SET)
+		{
+			serial.INTERNAL_InterruptCallback(USART_FLAG_TC);
+
+			USART_ClearFlag(USART1, USART_FLAG_TC);
+		}
+		else if(USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == SET)
+		{
+			serial.INTERNAL_InterruptCallback(USART_FLAG_RXNE);
+
+			USART_ClearFlag(USART1, USART_FLAG_RXNE);
+		}
 	}
-	else if(USART_GetFlagStatus(USART1, USART_FLAG_TC) == SET)
+
+	/**
+	 * @brief USART3 IRQ Handler
+	 */
+	void USART3_IRQHandler (void)
 	{
-		serial.INTERNAL_InterruptCallback(USART_FLAG_TC);
+		Serial serial = Serial::GetInstance(Serial::SERIAL1);
 
-		USART_ClearFlag(USART1, USART_FLAG_TC);
-	}
-	else if(USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == SET)
-	{
-		serial.INTERNAL_InterruptCallback(USART_FLAG_RXNE);
+		if(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == SET)
+		{
+			serial.INTERNAL_InterruptCallback(USART_FLAG_TXE);
+		}
+		else if(USART_GetFlagStatus(USART3, USART_FLAG_TC) == SET)
+		{
+			serial.INTERNAL_InterruptCallback(USART_FLAG_TC);
 
-		USART_ClearFlag(USART1, USART_FLAG_RXNE);
-	}
-}
+			USART_ClearFlag(USART3, USART_FLAG_TC);
+		}
+		else if(USART_GetFlagStatus(USART3, USART_FLAG_RXNE) == SET)
+		{
+			serial.INTERNAL_InterruptCallback(USART_FLAG_RXNE);
 
-/**
- * @brief USART3 IRQ Handler
- */
-void USART3_IRQHandler (void)
-{
-	Serial serial = Serial::GetInstance(Serial::SERIAL1);
-
-	if(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == SET)
-	{
-		serial.INTERNAL_InterruptCallback(USART_FLAG_TXE);
-	}
-	else if(USART_GetFlagStatus(USART3, USART_FLAG_TC) == SET)
-	{
-		serial.INTERNAL_InterruptCallback(USART_FLAG_TC);
-
-		USART_ClearFlag(USART3, USART_FLAG_TC);
-	}
-	else if(USART_GetFlagStatus(USART3, USART_FLAG_RXNE) == SET)
-	{
-		serial.INTERNAL_InterruptCallback(USART_FLAG_RXNE);
-
-		USART_ClearFlag(USART3, USART_FLAG_RXNE);
+			USART_ClearFlag(USART3, USART_FLAG_RXNE);
+		}
 	}
 }
