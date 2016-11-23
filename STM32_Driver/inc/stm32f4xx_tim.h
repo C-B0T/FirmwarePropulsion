@@ -324,9 +324,21 @@ typedef struct
                                    ((MODE) == TIM_CounterMode_CenterAligned1) || \
                                    ((MODE) == TIM_CounterMode_CenterAligned2) || \
                                    ((MODE) == TIM_CounterMode_CenterAligned3))
+
 /**
   * @}
   */ 
+
+/**
+ * @defgroup TIM_Direction
+ * @param TIMx
+ */
+#define TIM_Direction_CounterUpcounting			((uint8_t)0x00)
+#define TIM_Direction_CounterDowncounting		((uint8_t)0x01)
+/**
+  * @}
+  */
+
 
 /** @defgroup TIM_Output_Compare_Polarity 
   * @{
@@ -1038,6 +1050,7 @@ void TIM_ARRPreloadConfig(TIM_TypeDef* TIMx, FunctionalState NewState);
 void TIM_SelectOnePulseMode(TIM_TypeDef* TIMx, uint16_t TIM_OPMode);
 void TIM_SetClockDivision(TIM_TypeDef* TIMx, uint16_t TIM_CKD);
 void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState);
+uint8_t TIM_GetCounterDirection (TIM_TypeDef* TIMx);
 
 /* Output Compare management **************************************************/
 void TIM_OCxInit(TIM_TypeDef* TIMx, TIM_OCInitTypeDef* TIM_OCInitStruct, uint16_t TIM_Channel_x);

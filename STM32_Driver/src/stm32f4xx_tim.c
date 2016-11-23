@@ -607,6 +607,31 @@ void TIM_Cmd(TIM_TypeDef* TIMx, FunctionalState NewState)
     TIMx->CR1 &= (uint16_t)~TIM_CR1_CEN;
   }
 }
+
+/**
+  * @brief  Get counter direction
+  * @param  TIMx: where x can be 1 to 14 to select the TIMx peripheral.
+  * @retval @ref TIM_Direction_CounterDowncounting or @ref TIM_Direction_CounterUpcounting
+  */
+uint8_t TIM_GetCounterDirection (TIM_TypeDef* TIMx)
+{
+  uint8_t direction = TIM_Direction_CounterDowncounting;
+
+  /* Check the parameters */
+  assert_param(IS_TIM_ALL_PERIPH(TIMx));
+
+  if(TIMx->CR1 & TIM_CR1_DIR)
+  {
+    direction = TIM_Direction_CounterDowncounting;
+  }
+  else
+  {
+    direction = TIM_Direction_CounterUpcounting;
+  }
+
+  return direction;
+}
+
 /**
   * @}
   */
