@@ -304,36 +304,38 @@ namespace HAL
 /* Interrupt Handler                                                          */
 /*----------------------------------------------------------------------------*/
 
-/**
- * @brief INT Line 9 to 5 Interrupt Handler
- */
-void INT9_5_IRQHandler(void)
+extern "C"
 {
-	if(EXTI_GetFlagStatus(GPIO0_INT_LINE) == SET)
+	/**
+	 * @brief INT Line 9 to 5 Interrupt Handler
+	 */
+	void INT9_5_IRQHandler(void)
 	{
-		EXTI_ClearFlag(GPIO0_INT_LINE);
-
-		GPIO gpio = GPIO::GetInstance(GPIO::GPIO0);
-
-		// GPIO0 interrupt is enabled and callback exists ?
-		if((gpio.GetInterruptState() == true) &&
-		   (gpio.InterruptCallback != NULL))
+		if(EXTI_GetFlagStatus(GPIO0_INT_LINE) == SET)
 		{
-			gpio.InterruptCallback(gpio);
+			EXTI_ClearFlag(GPIO0_INT_LINE);
+
+			GPIO gpio = GPIO::GetInstance(GPIO::GPIO0);
+
+			// GPIO0 interrupt is enabled and callback exists ?
+			if((gpio.GetInterruptState() == true) &&
+			   (gpio.InterruptCallback != NULL))
+			{
+				gpio.InterruptCallback(gpio);
+			}
 		}
-	}
-	else if(EXTI_GetFlagStatus(GPIO3_INT_LINE) == SET)
-	{
-		EXTI_ClearFlag(GPIO3_INT_LINE);
-
-		GPIO gpio = GPIO::GetInstance(GPIO::GPIO3);
-
-		// GPIO0 interrupt is enabled and callback exists ?
-		if((gpio.GetInterruptState() == true) &&
-		   (gpio.InterruptCallback != NULL))
+		else if(EXTI_GetFlagStatus(GPIO3_INT_LINE) == SET)
 		{
-			gpio.InterruptCallback(gpio);
+			EXTI_ClearFlag(GPIO3_INT_LINE);
+
+			GPIO gpio = GPIO::GetInstance(GPIO::GPIO3);
+
+			// GPIO0 interrupt is enabled and callback exists ?
+			if((gpio.GetInterruptState() == true) &&
+			   (gpio.InterruptCallback != NULL))
+			{
+				gpio.InterruptCallback(gpio);
+			}
 		}
 	}
 }
-
