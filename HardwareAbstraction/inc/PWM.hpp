@@ -57,12 +57,12 @@ typedef struct
 /*----------------------------------------------------------------------------*/
 /**
  * @namespace HAL
- * Hardware Abstraction Layer
  */
 namespace HAL
 {
 	/**
 	 * @class PWM
+	 * @brief PWM Abstraction Class
 	 *
 	 * HOWTO :
 	 * - Get PWM instance with PWM::GetInstance()

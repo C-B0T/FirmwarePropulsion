@@ -50,11 +50,11 @@ typedef struct
 /*----------------------------------------------------------------------------*/
 /**
  * @namespace HAL
- * Hardware Abstraction Layer
  */
 namespace HAL
 {
 	/**
+	 * @class GPIO
 	 * @brief GPIO Abstraction class
 	 *
 	 * HOWTO :

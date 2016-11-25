@@ -8,6 +8,12 @@
 #ifndef INC_HAL_HPP_
 #define INC_HAL_HPP_
 
+/**
+ * @namespace HAL
+ * @brief Hardware Abstraction Layer
+ *
+ * This namespace contains objects used to abstract hardware dependencies (such as electronic platform)
+ */
 #include "GPIO.hpp"
 #include "PWM.hpp"
 #include "Serial.hpp"

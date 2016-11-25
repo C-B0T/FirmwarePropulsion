@@ -57,8 +57,20 @@ typedef struct
 /* Class declaration	                                                      */
 /*----------------------------------------------------------------------------*/
 
+/**
+ * @namespace HAL
+ */
 namespace HAL
 {
+	/**
+	 * @class Encoder
+	 * @brief Encoder abstraction class
+	 *
+	 * HOWTO :
+	 * - Get Encoder instance with Encoder::GetInstance()
+	 * - Use GetAbsoluteValue() and GetRelativeValue() methods to know
+	 *   absolute or relative (since last call) position
+	 */
 	class Encoder
 	{
 	public:

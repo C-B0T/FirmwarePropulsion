@@ -63,12 +63,12 @@ typedef struct
 
 /**
  * @namespace HAL
- * Hardware Abstraction Layer
  */
 namespace HAL
 {
 	/**
 	 * @class Serial
+	 * @brief Serial Communication Abstraction Class
 	 *
 	 * HOWTO :
 	 * - Get Serial instance with Serial::GetInstance()
