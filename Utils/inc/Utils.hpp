@@ -2,9 +2,7 @@
  * @file	Utils.hpp
  * @author	kevin.wysocki
  * @date	25 nov. 2016
- * @brief	
- *
- *
+ * @brief	Utils namespace include file
  */
 
 #ifndef INC_UTILS_HPP_

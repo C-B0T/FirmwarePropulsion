@@ -3,12 +3,6 @@
  * @author	Kevin WYSOCKI
  * @date	18 nov. 2016
  * @brief	PID Controller class
- *
- * HOWTO :
- * - Create a new PID with PID()
- * - Call Reset() to reset errors
- * - Call SetSetpoint() to set controller setpoint
- * - Call Get() to get the new output from a feedback value
  */
 
 #ifndef INC_PID_HPP_
@@ -31,6 +25,8 @@ namespace Utils
 {
 	/**
 	 * @class PID
+	 * @brief Proportionnal-Integral-Derivative controller class
+	 *
 	 * HOWTO :
 	 * - Create a new PID with PID()
 	 * - Call Reset() to reset errors

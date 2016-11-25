@@ -3,12 +3,6 @@
  * @author	Kevin WYSOCKI
  * @date	24 nov. 2016
  * @brief	Observable class
- *
- *HOWTO :
- * Abstract Observable class can be used to notify objects called "obervers".\n
- * To be notified, an "observer" has to register itself by calling Subscribe() method
- * passing as argument a callback which will be called when the observable notify its obersvers.
- * Unsubscription can be achieved by calling Unsubscribe() method.
  */
 
 #include "Observable.hpp"

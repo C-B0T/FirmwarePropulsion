@@ -3,12 +3,6 @@
  * @author	Kevin WYSOCKI
  * @date	24 nov. 2016
  * @brief	Observable class
- *
- *HOWTO :
- * Abstract Observable class can be used to notify objects called "obervers".\n
- * To be notified, an "observer" has to register itself by calling Subscribe() method
- * passing as argument a callback which will be called when the observable notify its obersvers.
- * Unsubscription can be achieved by calling Unsubscribe() method.
  */
 
 #ifndef INC_OBSERVABLE_HPP_
@@ -38,8 +32,9 @@ namespace Utils
 {
 	/**
 	 * @class Observable
+	 * @brief Abstract Observable class can be used to notify objects called "obervers"
 	 *
-	 * Abstract Observable class can be used to notify objects called "obervers".\n
+	 * HOWTO :
 	 * To be notified, an "observer" has to register itself by calling Subscribe() method
 	 * passing as argument a callback which will be called when the observable notify its obersvers.
 	 * Unsubscription can be achieved by calling Unsubscribe() method.
@@ -54,17 +49,10 @@ namespace Utils
 		Observable();
 
 		/**
-		 * @pure
-		 * @brief Virtual pure destructor
-		 */
-		virtual ~Observable() = 0;
-
-		/**
 		 * @brief Subscribe to observable notifications
 		 * @param cb : Callback to call on observable notifications
 		 */
 		void Subscribe (ObserverCallback cb);
-
 
 		/**
 		 * @brief Unsubscribe to observable notifications
@@ -73,6 +61,12 @@ namespace Utils
 		void Unsubscribe (ObserverCallback cb);
 
 	protected:
+
+		/**
+		 * @pure
+		 * @brief Virtual pure destructor
+		 */
+		virtual ~Observable() = 0;
 
 		/**
 		 * @brief Notification method - Used by child class

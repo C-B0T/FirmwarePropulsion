@@ -3,12 +3,6 @@
  * @author	Kevin WYSOCKI
  * @date	18 nov. 2016
  * @brief	PID Controller class
- *
- * HOWTO :
- * - Create a new PID with PID()
- * - Call Reset() to reset errors
- * - Call SetSetpoint() to set controller setpoint
- * - Call Get() to get the new output from a feedback value *
  */
 
 #include "PID.hpp"
