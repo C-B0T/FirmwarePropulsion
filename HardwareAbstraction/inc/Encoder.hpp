@@ -3,11 +3,6 @@
  * @author	Kevin WYSOCKI
  * @date	16 nov. 2016
  * @brief	Encoder abstraction class
- *
- * HOWTO :
- * - Get Encoder instance with Encoder::GetInstance()
- * - Use GetAbsoluteValue() and GetRelativeValue() methods to know
- *   absolute or relative (since last call) position
  */
 
 #ifndef INC_ENCODER_HPP_

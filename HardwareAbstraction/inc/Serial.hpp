@@ -3,13 +3,6 @@
  * @author	Kevin WYSOCKI
  * @date	9 nov. 2016
  * @brief	Serial Communication Abstraction Class
- *
- * HOWTO :
- * - Get Serial instance with Serial::GetInstance()
- * - Use Send() methods to send data
- * - Use Read() to peek one or more data
- * - OnDataReceivedCallback or OnEndOfTransmissionCallback can be used to
- * be notified of data received or end of transmission event
  */
 
 #ifndef INC_SERIAL_HPP_

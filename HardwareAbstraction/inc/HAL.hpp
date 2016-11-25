@@ -18,5 +18,6 @@
 #include "PWM.hpp"
 #include "Serial.hpp"
 #include "Encoder.hpp"
+#include "Timer.hpp"
 
 #endif /* INC_HAL_HPP_ */

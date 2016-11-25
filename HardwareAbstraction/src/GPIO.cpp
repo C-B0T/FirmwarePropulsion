@@ -3,11 +3,6 @@
  * @author	Kevin WYSOCKI
  * @date	8 nov. 2016
  * @brief	GPIO Abstraction Class
- *
- *	HOWTO :
- *	- Get GPIO instance with GPIO::GetInstance()
- *	- Get() and Set() can be use to retrieve or set GPIO state
- *	- InterruptCallback can be used to set a function called when interrupt is raised
  */
 
 #include <stdio.h>

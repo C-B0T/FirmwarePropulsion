@@ -3,12 +3,6 @@
  * @author	Kevin WYSOCKI
  * @date	14 nov. 2016
  * @brief	PWM Abstraction class
- *
- * HOWTO :
- * - Get PWM instance with PWM::GetInstance()
- * - Use SetDutyCycle() methods to update PWM duty cycle
- * - Use SetFrequency() method to update PWM frequency
- * - Use SetState() method to enable or disable PWM
  */
 
 #include <stddef.h>
