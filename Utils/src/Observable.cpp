@@ -12,6 +12,7 @@
  */
 
 #include "Observable.hpp"
+#include "common.h"
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
@@ -34,6 +35,10 @@ namespace Utils
 	Observable::Observable()
 	{
 		this->observerCallbackList = std::vector<ObserverCallback>();
+	}
+
+	Observable::~Observable()
+	{
 	}
 
 	void Observable::Subscribe(ObserverCallback cb)
