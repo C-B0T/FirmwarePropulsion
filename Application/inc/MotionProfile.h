@@ -21,8 +21,12 @@ public:
     void setPoint(float point); // target and time in seconds
     float update(float time);   // time in seconds
 
+	bool isFinished();
+
 protected:
     void init();
+
+	bool finished;
 
     void calculateCustomTrapezoidalProfile(float t);
     void calculateTrapezoidalProfile(float t);

@@ -24,10 +24,12 @@ public:
     ~TrajectoryPlanning();
 
     //Orders:
-    void goLinear(float linear) // linear in meters
-    void goAngular(float angular) // angular in radian
+    void goLinear(float linear)      // linear in meters
+    void goAngular(float angular)    // angular in radian
     void stop();
-    void gotoXY(float X, float Y);    // X,Y in meters
+    void gotoXY(float X, float Y);   // X,Y in meters
+    int stallX(int stallMode);       // stallMode allow to choose side to side contact (upTable to backBot, upTable to frontBot, downTable to backBot, downTable to frontBot)
+    int stallY(int stallMode);       // stallMode allow to choose side to side contact (leftTable to backBot, leftTable to frontBot, rightTable to backBot, rightTable to frontBot)
     // others orders...
 
     float update();
@@ -35,7 +37,7 @@ public:
     float getSuggestedAngularPosition();
 
 protected:
-    enum state_t {LINEAR, ANGULAR, STOP, KEEP, LINEARPLAN, CURVEPLAN};
+    enum state_t {FREE=0, LINEAR, ANGULAR, STOP, KEEP, LINEARPLAN, CURVEPLAN, STALLX, STALLY};
 
     void init();
 
@@ -44,9 +46,15 @@ protected:
     void calculateStop();
     void calculateLinearPlan();
     void calculateCurvePlan();
+    void calculateStallX();
+    void calculateStallY();
+
+	float 
 
     int state;
     int lstate;
+
+	int stallMode;
     
     float startTime;
     float startLinearPosition;  // 

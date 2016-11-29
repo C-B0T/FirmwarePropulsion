@@ -23,6 +23,10 @@ TrajectoryPlanning::~TrajectoryPlanning()
 
 void TrajectoryPlanning::init()
 {
+	state = FREE;
+	lstate = 0;
+
+	stallMode = 0;
 }
 
 void TrajectoryPlanning::goLinear(float linear) // linear in meters
@@ -33,7 +37,7 @@ void TrajectoryPlanning::goLinear(float linear) // linear in meters
     
     linearSign = (linear < 0.0) ? -1.0 : 1.0;
     
-    linearPosition->setPoint(abs(linear));
+    libearMotionProfile->setPoint(abs(linear));
     startLinearPosition = r.L;
     startAngularPosition = r.O;
     startTime = time;
@@ -52,7 +56,7 @@ void TrajectoryPlanning::goAngular(float angular) // angular in radian
     
     angularSign = (angular < 0.0) ? -1.0 : 1.0;
 
-    angularPosition->setPoint(abs(angular));
+    angularMotionProfile->setPoint(abs(angular));
     startLinearPosition = r.L;
     startAngularPosition = r.O;
     startTime = time;
@@ -99,6 +103,43 @@ void TrajectoryPlanning::gotoXY(float X, float Y)
     lstate = 1;
 }
 
+int stallX(int stallMode)
+{ 
+	// TODO:Check the stallMode coherence (Ex1: if ur on the left side of the table don't exe rightTable side to side Mode)
+	//                                    (Ex2: if ur on the up side of the table don't exe downTable side to side Mode)
+
+    struct robot r;
+    Odometry_GetRobot(&r)
+
+    startLinearPosition = r.L;
+    startAngularPosition = r.O;
+
+	endLinearPosition = startLinearPosition - 0.0;
+    endAngularPosition = 0.0;
+
+    state = STALLX;
+    lstate = 1;
+}
+
+int stallY(int stallMode)
+{ 
+	// TODO:Check the stallMode coherence (Ex1: if ur on the left side of the table don't exe rightTable side to side Mode)
+	//                                    (Ex2: if ur on the up side of the table don't exe downTable side to side Mode)
+
+    struct robot r;
+    Odometry_GetRobot(&r)
+
+    startLinearPosition = r.L;
+    startAngularPosition = r.O;
+
+	endLinearPosition = startLinearPosition - 0.0;
+    endAngularPosition = _PI_/2.0;
+
+    state = STALLY;
+    lstate = 1;
+}
+
+
 float TrajectoryPlanning::udpate()
 {
     switch(state)
@@ -128,6 +169,14 @@ float TrajectoryPlanning::udpate()
         // complex mouvements
         case CURVEPLAN:
             calculateCurvePlan();
+            break;
+
+        // special mouvements
+        case STALLX:
+            calculateStallX(1);
+            break;
+        case STALLY:
+            calculateStallY(1);
             break;
 
         default:
@@ -199,20 +248,20 @@ void TrajectoryPlanning::calculateLinearPlan()
     switch (lstate)
     {
         case 1:
-            float profile = angularPosition->update(time);
+            float profile = angularMotionProfile->update(time);
             suggestedLinearPosition = startLinearPosition;
             suggestedAngularPosition = profile;
             break;
 
         case 2:
-            float profile = linearPosition->update(time);
+            float profile = linearMotionPosition->update(time);
             suggestedLinearPosition = profile; 
-            suggestedAngularPosition = AngularPosition;
+            suggestedAngularPosition = endAngularPosition;
             break;
 
         case 3:
-            suggestedLinearPosition = LinearPosition; 
-            suggestedAngularPosition = AngularPosition;
+            suggestedLinearPosition = endLinearPosition; 
+            suggestedAngularPosition = endAngularPosition;
             break;
 
         default:
@@ -224,5 +273,112 @@ void TrajectoryPlanning::calculateLinearPlan()
 
 void TrajectoryPlanning::calculateCurvePlan()
 {
+}
+
+
+void TrajectoryPlanning::calculateStallX()
+{
+	float time = getTime();
+	time -= startTime;
+
+	//TODO:Add stallMode gestion
+
+	switch (lstate)
+	{
+		case 1:
+			if(angularMotionProfile->isFinished())
+			{
+				lstate = 2;
+			}
+			break;
+		case 2:
+			if(jackBackLeft && jackBackLeft)
+			{
+				lstate = 3;
+			}
+			break;
+		case 3:
+			// X axis and Angular are calibrated
+			break;
+		default:
+			break;
+	}
+
+	switch (lstate)
+	{
+		case 1: // Rotate to 0 rad
+			float profile = angularMotionProfile->update(time);
+			suggestedLinearPosition = startLinearPosition;
+			suggestedAngularPosition = profile;
+			break;
+
+		case 2:
+            //TODO:Disable Angular asserv.
+			//TODO:Back and wait both jacks
+			break;
+
+		case 3:
+			//TODO:Modify X value in function of the mechanic 
+			Odometry_SetX(0.0);
+			Odometry_SetO(0.0);
+			break;
+
+		default:
+			break;
+	}
+
+}
+
+void TrajectoryPlanning::calculateStallY()
+{
+	float time = getTime();
+	time -= startTime;
+
+	//TODO:Add stallMode gestion
+
+	switch (lstate)
+	{
+		case 1:
+			if(angularMotionProfile->isFinished())
+			{
+				lstate = 2;
+			}
+			break;
+		case 2:
+			if(jackBackLeft && jackBackLeft)
+			{
+				lstate = 3;
+			}
+			break;
+		case 3:
+			// Y axis and Angular are calibrated
+			break;
+		default:
+			break;
+	}
+
+	switch (lstate)
+	{
+		case 1: // Rotate to pi/2 rad
+			float profile = angularMotionProfile->update(time);
+			suggestedLinearPosition = startLinearPosition;
+			suggestedAngularPosition = profile;
+			break;
+
+		case 2:
+            //TODO:Disable Angular asserv.
+			//TODO:Back and wait both jacks
+			break;
+
+		case 3:
+			//TODO:Modify Y value in function of the mechanic 
+			Odometry_SetY(0.0);
+			Odometry_SetO(0.0);
+			break;
+
+		default:
+			break;
+	}
+
 }
 
