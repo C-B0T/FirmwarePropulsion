@@ -1,8 +1,8 @@
 /**
  * @file    MotionProfile.cpp
- * @author    Jeremy ROULLAND
+ * @author  Jeremy ROULLAND
  * @date    12 nov. 2016
- * @brief    Motion profile (Trapezoidal, S-Curve, ...)
+ * @brief   Motion profile (Trapezoidal, S-Curve, ...)
  */
 
 #include "MotionProfile.h"
@@ -22,18 +22,14 @@ void MotionProfile::init()
 {
     setPoint = 0.0;
     factor = 0.0;
-
-    startTime = 0.0;
 }
 
 
-void MotionProfile::setPoint(float point, float time)
+void MotionProfile::setPoint(float point)
 {
     setPoint = point;
 
     factor = setPoint / 1.0;
-
-    startTime = time;
 }
 
 float MotionProfile::udpate(float time)
@@ -41,7 +37,7 @@ float MotionProfile::udpate(float time)
     float t;
     float r;
 
-    t = time - startTime;
+    t = time;
     t /= factor;
 
     if(t <= 1.0)
@@ -65,7 +61,7 @@ float MotionProfile::calculateTrapezoidalProfile(float t)
 
 float MotionProfile::calculatePolynomial5Profile(float t)
 {
-    return 10.0*pow(time,3)-15*pow(time,4)+6*pow(time,5);
+    return 10.0*pow(t,3)-15*pow(t,4)+6*pow(t,5);
 }
 
 

@@ -1,8 +1,8 @@
 /**
  * @file    TrajectoryPlanning.cpp
- * @author    Jeremy ROULLAND
+ * @author  Jeremy ROULLAND
  * @date    12 nov. 2016
- * @brief    Motion profile (Trapezoidal, S-Curve, ...)
+ * @brief   Motion profile (Trapezoidal, S-Curve, ...)
  */
 
 #include "TrajectoryPlanning.h"
@@ -33,7 +33,7 @@ void TrajectoryPlanning::goLinear(float linear) // linear in meters
     
     linearSign = (linear < 0.0) ? -1.0 : 1.0;
     
-    linearPosition->setPoint(abs(linear), time);
+    linearPosition->setPoint(abs(linear));
     startLinearPosition = r.L;
     startAngularPosition = r.O;
     startTime = time;
@@ -52,7 +52,7 @@ void TrajectoryPlanning::goAngular(float angular) // angular in radian
     
     angularSign = (angular < 0.0) ? -1.0 : 1.0;
 
-    angularPosition->setPoint(abs(angular), time);
+    angularPosition->setPoint(abs(angular));
     startLinearPosition = r.L;
     startAngularPosition = r.O;
     startTime = time;
@@ -83,14 +83,14 @@ void TrajectoryPlanning::gotoXY(float X, float Y)
     struct robot r;
     Odometry_GetRobot(&r)
 
+    float XX = pow((X - r.X_m),2);
+    float YY = pow((Y - r.Y_m),2);
+
     float dX = X - r.X_m;   // meters
     float dY = Y - r.Y_m;   // meters
 
-    float XX = pow((X - r.X_m),2);  // rad
-    float YY = pow((Y - r.Y_m),2);  // rad
-
-    endLinearPosition = sqrtl(XX + YY);
-    endAngularPosition = atan2f(dY,dX);
+    endLinearPosition = sqrtl(XX + YY);	// meters
+    endAngularPosition = atan2f(dY,dX); // radians
     
     startLinearPosition = r.L;
     startAngularPosition = r.O;
@@ -189,7 +189,7 @@ void TrajectoryPlanning::calculateLinearPlan()
             break;
 
         case 3:
-            // TODO: Freewheel robot
+            // KeepPosition robot
             break;
 
         default:
@@ -211,8 +211,8 @@ void TrajectoryPlanning::calculateLinearPlan()
             break;
 
         case 3:
-            // TODO: Freewheel robot
-            // Disable PIDs ?
+            suggestedLinearPosition = LinearPosition; 
+            suggestedAngularPosition = AngularPosition;
             break;
 
         default:

@@ -18,8 +18,8 @@ public:
     MotionProfile();
     ~MotionProfile();
 
-    void setPoint(float point, float time); // target and time in seconds
-    float update(float time);               // time in seconds
+    void setPoint(float point); // target and time in seconds
+    float update(float time);   // time in seconds
 
 protected:
     void init();
@@ -30,8 +30,6 @@ protected:
 
     float setPoint;
     float factor;
-
-    float startTime;    // time in seconds
 };
 
 
