@@ -92,7 +92,7 @@ namespace HAL
 		 * @param id : PWM ID
 		 * @return PWM instance
 		 */
-		static PWM& GetInstance (enum ID id);
+		static PWM* GetInstance (enum ID id);
 
 		/**
 		 * @brief Return instance ID

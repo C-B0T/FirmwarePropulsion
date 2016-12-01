@@ -11,6 +11,7 @@
 #include "stm32f4xx.h"
 #include <stdint.h>
 #include <string>
+#include "Event.hpp"
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
@@ -90,7 +91,7 @@ namespace HAL
 		 * @param id : Serial ID
 		 * @return Serial instance
 		 */
-		static Serial& GetInstance (enum ID id);
+		static Serial* GetInstance (enum ID id);
 
 		/**
 		 * @brief Return Serial ID
@@ -168,16 +169,14 @@ namespace HAL
 		std::string ReadLine ();
 
 		/**
-		 * @brief Function called when a byte is ready to be read
-		 * @param obj : Serial instance
+		 * @brief Data received event
 		 */
-		void (*OnDataReceivedCallback) 		(const Serial obj);
+		Utils::Event DataReceived;
 
 		/**
-		 * @brief Function called when all buffered bytes have been sent1
-		 * @param obj : Serial instance
+		 * @brief End of transmission event
 		 */
-		void (*OnEndOfTransmissionCallback)	(const Serial obj);
+		Utils::Event EndOfTransmission;
 
 		/**
 		 * @private
