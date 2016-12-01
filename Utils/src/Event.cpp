@@ -25,10 +25,6 @@
 
 namespace Utils
 {
-	Event::Event()
-	{
-	}
-
 	Event& Event::operator += (EventCallback cb)
 	{
 		this->Subscribe(cb);

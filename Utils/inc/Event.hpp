@@ -46,7 +46,10 @@ namespace Utils
 		/**
 		 * @brief Event constructor
 		 */
-		Event();
+		Event() : Observable()
+		{
+
+		}
 
 		/**
 		 * @brief Add a new event callback to the callback list
@@ -61,6 +64,17 @@ namespace Utils
 		 * @return Event object reference
 		 */
 		Event& operator -= (EventCallback cb);
+
+		/**
+		 * @brief Raise an event
+		 * @return Event object reference
+		 */
+		Event& operator () ()
+		{
+			this->notify(*this, NULL);
+
+			return *this;
+		}
 	};
 }
 
