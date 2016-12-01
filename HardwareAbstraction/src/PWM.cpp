@@ -20,22 +20,22 @@ using namespace HAL;
 #define PWM0_IO_PIN			(GPIO_Pin_0)
 #define PWM0_IO_PINSOURCE	(GPIO_PinSource0)
 #define PWM0_IO_AF			(GPIO_AF_TIM2)
-#define PWM0_FREQ			(25000)
+#define PWM0_FREQ			(10000)
 #define PWM0_DUTYCYCLE		(0.5f)
 #define PWM0_TIMER			(TIM2)
 #define PWM0_TIMER_CHANNEL	(TIM_Channel_1)
-#define PWM0_TIMER_FREQ		(SystemCoreClock / 4)	// TIM2 clock is derivated from APB1 clock
+#define PWM0_TIMER_FREQ		(SystemCoreClock / 2)	// TIM2 clock is derivated from APB1 clock
 
 // TIM2_CH3
 #define PWM1_IO_PORT		(GPIOA)
 #define PWM1_IO_PIN			(GPIO_Pin_2)
 #define PWM1_IO_PINSOURCE	(GPIO_PinSource2)
 #define PWM1_IO_AF			(GPIO_AF_TIM2)
-#define PWM1_FREQ			(25000)
+#define PWM1_FREQ			(10000)
 #define PWM1_DUTYCYCLE		(0.5f)
 #define PWM1_TIMER			(TIM2)
 #define PWM1_TIMER_CHANNEL	(TIM_Channel_3)
-#define PWM1_TIMER_FREQ		(SystemCoreClock / 4)	// TIM2 clock is derivated from APB1 clock
+#define PWM1_TIMER_FREQ		(SystemCoreClock / 2)	// TIM2 clock is derivated from APB1 clock
 
 /*----------------------------------------------------------------------------*/
 /* Private Members                                                            */
@@ -149,21 +149,21 @@ static void _hardwareInit (enum PWM::ID id)
 
 namespace HAL
 {
-	PWM& PWM::GetInstance (enum PWM::ID id)
+	PWM* PWM::GetInstance (enum PWM::ID id)
 	{
 		assert(id < PWM::PWM_MAX);
 
 		// if PWM instance already exists
 		if(_pwm[id] != NULL)
 		{
-			return *_pwm[id];
+			return _pwm[id];
 		}
 		else
 		{
 			// Create PWM instance
 			_pwm[id] = new PWM(id);
 
-			return *_pwm[id];
+			return _pwm[id];
 		}
 	}
 
@@ -181,6 +181,15 @@ namespace HAL
 	void PWM::SetDutyCycle (float32_t percent)
 	{
 		uint32_t ARR = 0u, CCR = 0u;
+
+		if(percent > 1.0f)
+		{
+			percent = 1.0f;
+		}
+		else if(percent < 0.0f)
+		{
+			percent = 0.0f;
+		}
 
 		// 1. Get ARRx and CCRx value
 		ARR = (PWM0_TIMER_FREQ / this->frequency) - 1u;

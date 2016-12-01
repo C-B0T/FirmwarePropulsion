@@ -168,7 +168,7 @@ static void _hardwareInit (enum Serial::ID id)
 	USART_Init(serial.USART.PORT, &UARTStruct);
 
 	USART_ITConfig(serial.USART.PORT, USART_IT_RXNE, ENABLE);
-	USART_ITConfig(serial.USART.PORT, USART_IT_TXE, ENABLE);
+	//USART_ITConfig(serial.USART.PORT, USART_IT_TXE, ENABLE);
 
 	//NVIC Init
 	NVICStruct.NVIC_IRQChannelCmd					=	ENABLE;
@@ -185,29 +185,26 @@ static void _hardwareInit (enum Serial::ID id)
 
 namespace HAL
 {
-	Serial& Serial::GetInstance (enum Serial::ID id)
+	Serial* Serial::GetInstance (enum Serial::ID id)
 	{
 		assert(id < Serial::SERIAL_MAX);
 
 		// if Serial instance already exists
 		if(_serial[id] != NULL)
 		{
-			return *_serial[id];
+			return _serial[id];
 		}
 		else
 		{
 			// Create Serial instance
 			_serial[id] = new Serial(id);
 
-			return *_serial[id];
+			return _serial[id];
 		}
 	}
 
 	Serial::Serial (enum Serial::ID id)
 	{
-		this->OnDataReceivedCallback = NULL;
-		this->OnEndOfTransmissionCallback = NULL;
-
 		this->id = id;
 		this->def = _getSerialStruct(id);
 		this->rxBuffer.rdIndex = 0;
@@ -248,7 +245,8 @@ namespace HAL
 
 			this->txBuffer.wrIndex += length;
 
-			USART_SendData(this->def.USART.PORT, this->txBuffer.data[this->txBuffer.rdIndex++]);
+			USART_ITConfig(this->def.USART.PORT, USART_IT_TXE, ENABLE);
+			//USART_SendData(this->def.USART.PORT, this->txBuffer.data[this->txBuffer.rdIndex++]);
 
 			sent = true;
 		}
@@ -269,7 +267,8 @@ namespace HAL
 
 			this->txBuffer.wrIndex += length;
 
-			USART_SendData(this->def.USART.PORT, this->txBuffer.data[this->txBuffer.rdIndex++]);
+			USART_ITConfig(this->def.USART.PORT, USART_IT_TXE, ENABLE);
+			//USART_SendData(this->def.USART.PORT, this->txBuffer.data[this->txBuffer.rdIndex++]);
 		}
 
 		return sent;
@@ -286,7 +285,8 @@ namespace HAL
 
 			this->txBuffer.wrIndex += length;
 
-			USART_SendData(this->def.USART.PORT, this->txBuffer.data[this->txBuffer.rdIndex++]);
+			USART_ITConfig(this->def.USART.PORT, USART_IT_TXE, ENABLE);
+			//USART_SendData(this->def.USART.PORT, this->txBuffer.data[this->txBuffer.rdIndex++]);
 		}
 
 		return sent;
@@ -384,16 +384,17 @@ namespace HAL
 		// Manage end of transmission
 		else if(flag == USART_FLAG_TC)
 		{
-			if(this->OnEndOfTransmissionCallback != NULL)
-			{
-				this->OnEndOfTransmissionCallback(*this);
-			}
+			USART_ITConfig(this->def.USART.PORT, USART_IT_TXE, DISABLE);
+
+			this->EndOfTransmission();
 		}
 		else if(flag == USART_FLAG_RXNE)
 		{
 			if(this->rxBuffer.wrIndex < (SERIAL_BUFFER_SIZE - 1))
 			{
 				this->rxBuffer.data[this->rxBuffer.wrIndex++] = (uint8_t)USART_ReceiveData(this->def.USART.PORT);
+
+				this->DataReceived();
 			}
 		}
 	}
@@ -410,23 +411,23 @@ extern "C"
 	 */
 	void USART1_IRQHandler (void)
 	{
-		Serial serial = Serial::GetInstance(Serial::SERIAL0);
+		Serial* serial = Serial::GetInstance(Serial::SERIAL0);
 
 		if(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == SET)
 		{
-			serial.INTERNAL_InterruptCallback(USART_FLAG_TXE);
+			serial->INTERNAL_InterruptCallback(USART_FLAG_TXE);
 		}
 		else if(USART_GetFlagStatus(USART1, USART_FLAG_TC) == SET)
 		{
-			serial.INTERNAL_InterruptCallback(USART_FLAG_TC);
-
 			USART_ClearFlag(USART1, USART_FLAG_TC);
+
+			serial->INTERNAL_InterruptCallback(USART_FLAG_TC);
 		}
 		else if(USART_GetFlagStatus(USART1, USART_FLAG_RXNE) == SET)
 		{
-			serial.INTERNAL_InterruptCallback(USART_FLAG_RXNE);
-
 			USART_ClearFlag(USART1, USART_FLAG_RXNE);
+
+			serial->INTERNAL_InterruptCallback(USART_FLAG_RXNE);
 		}
 	}
 
@@ -435,21 +436,21 @@ extern "C"
 	 */
 	void USART3_IRQHandler (void)
 	{
-		Serial serial = Serial::GetInstance(Serial::SERIAL1);
+		Serial* serial = Serial::GetInstance(Serial::SERIAL1);
 
 		if(USART_GetFlagStatus(USART3, USART_FLAG_TXE) == SET)
 		{
-			serial.INTERNAL_InterruptCallback(USART_FLAG_TXE);
+			serial->INTERNAL_InterruptCallback(USART_FLAG_TXE);
 		}
 		else if(USART_GetFlagStatus(USART3, USART_FLAG_TC) == SET)
 		{
-			serial.INTERNAL_InterruptCallback(USART_FLAG_TC);
+			serial->INTERNAL_InterruptCallback(USART_FLAG_TC);
 
 			USART_ClearFlag(USART3, USART_FLAG_TC);
 		}
 		else if(USART_GetFlagStatus(USART3, USART_FLAG_RXNE) == SET)
 		{
-			serial.INTERNAL_InterruptCallback(USART_FLAG_RXNE);
+			serial->INTERNAL_InterruptCallback(USART_FLAG_RXNE);
 
 			USART_ClearFlag(USART3, USART_FLAG_RXNE);
 		}
