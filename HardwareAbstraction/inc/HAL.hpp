@@ -14,10 +14,15 @@
  *
  * This namespace contains objects used to abstract hardware dependencies (such as electronic platform)
  */
+
+// STM32F4xx peripherals
 #include "GPIO.hpp"
 #include "PWM.hpp"
 #include "Serial.hpp"
 #include "Encoder.hpp"
 #include "Timer.hpp"
+
+// Other hardware objects
+#include "BrushlessMotorDriver.hpp"
 
 #endif /* INC_HAL_HPP_ */
