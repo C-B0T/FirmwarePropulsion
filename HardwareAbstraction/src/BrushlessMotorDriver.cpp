@@ -120,9 +120,18 @@ namespace HAL
 
 	void BrushlessMotorDriver::SetSpeed(float32_t percent)
 	{
-		this->speed = speed;
+		if(percent > 1.0f)
+		{
+			percent = 1.0f;
+		}
+		else if (percent < 0.0f)
+		{
+			percent = 0.0f;
+		}
 
-		this->enablePin->SetDutyCycle(speed);
+		this->speed = percent;
+
+		this->enablePin->SetDutyCycle(percent);
 	}
 
 	void BrushlessMotorDriver::SetDirection(enum BrushlessMotorDriver::Direction direction)
@@ -140,18 +149,23 @@ namespace HAL
 	void BrushlessMotorDriver::Brake()
 	{
 		this->enablePin->SetDutyCycle(0.0f);
+		this->enablePin->SetState(PWM::DISABLED);
 		this->brakePin->Set(GPIO::Low);
 	}
 
 	void BrushlessMotorDriver::Move()
 	{
-		this->brakePin->Set(GPIO::High);
 		this->enablePin->SetDutyCycle(this->speed);
+		this->enablePin->SetState(PWM::ENABLED);
+		this->brakePin->Set(GPIO::High);
+
 	}
 
 	void BrushlessMotorDriver::Freewheel()
 	{
-		this->brakePin->Set(GPIO::High);
 		this->enablePin->SetDutyCycle(0.0f);
+		this->enablePin->SetState(PWM::DISABLED);
+		this->brakePin->Set(GPIO::High);
+
 	}
 }

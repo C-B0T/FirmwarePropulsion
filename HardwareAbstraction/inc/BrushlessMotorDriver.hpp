@@ -65,7 +65,7 @@ namespace HAL
 		 * @param id : Brushless motor driver identifier
 		 * @return BrushlessMotorDriver instance
 		 */
-		BrushlessMotorDriver* GetInstance (enum ID id);
+		static BrushlessMotorDriver* GetInstance (enum ID id);
 
 		/**
 		 * @brief Set motor speed in percent (0.0 to 1.0)
