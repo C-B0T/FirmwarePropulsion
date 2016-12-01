@@ -15,6 +15,7 @@
 #include "HAL.hpp"
 
 using namespace HAL;
+using namespace Utils;
 
 /**
  * @brief Initialize hardware
@@ -40,13 +41,40 @@ static void HardwareInit (void)
  */
 void TASKHANDLER_Test (void * obj)
 {
-	GPIO led = GPIO::GetInstance(GPIO::GPIO6);
+	float32_t speed = 0.0f;
+
+	BrushlessMotorDriver* leftMotor = BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::LEFT_MOTOR);
+	BrushlessMotorDriver* rightMotor = BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::RIGHT_MOTOR);
+
+	leftMotor->SetDirection(BrushlessMotorDriver::FORWARD);
+	rightMotor->SetDirection(BrushlessMotorDriver::BACKWARD);
+
+	vTaskDelay(5000u);
+
+	leftMotor->Move();
+	rightMotor->Move();
 
 	while(1)
 	{
-		led.Toggle();
+		leftMotor->SetSpeed(speed);
+		rightMotor->SetSpeed(speed);
 
-		vTaskDelay(1000);
+		vTaskDelay(200);
+
+		speed += 0.1f;
+
+		if(speed > 1.0f)
+		{
+			speed = 0.0f;
+
+			leftMotor->Brake();
+			rightMotor->Brake();
+
+			vTaskDelay(2000u);
+
+			leftMotor->Move();
+			rightMotor->Move();
+		}
 	}
 }
 
