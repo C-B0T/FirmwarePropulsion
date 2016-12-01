@@ -228,21 +228,21 @@ static void _hardwareInit (enum GPIO::ID id)
 /*----------------------------------------------------------------------------*/
 namespace HAL
 {
-	GPIO& GPIO::GetInstance (enum GPIO::ID id)
+	GPIO* GPIO::GetInstance (enum GPIO::ID id)
 	{
 		assert(id < GPIO::GPIO_MAX);
 
 		// if GPIO instance already exists
 		if(_gpio[id] != NULL)
 		{
-			return *_gpio[id];
+			return _gpio[id];
 		}
 		else
 		{
 			// Create GPIO instance
 			_gpio[id] = new GPIO(id);
 
-			return *_gpio[id];
+			return _gpio[id];
 		}
 	}
 
@@ -250,8 +250,7 @@ namespace HAL
 	{
 		this->id = id;
 		this->intState = false;
-		this->InterruptCallback = NULL;
-		this->gpio = _getGPIOStruct(id);
+		this->def = _getGPIOStruct(id);
 
 		_hardwareInit(id);
 	}
@@ -261,7 +260,7 @@ namespace HAL
 		enum GPIO::State state = GPIO::Low;
 		BitAction bit = Bit_RESET;
 
-		bit = (BitAction)GPIO_ReadInputDataBit(this->gpio.IO.PORT, this->gpio.IO.PIN);
+		bit = (BitAction)GPIO_ReadInputDataBit(this->def.IO.PORT, this->def.IO.PIN);
 
 		if(bit == Bit_SET)
 		{
@@ -275,22 +274,30 @@ namespace HAL
 	{
 		BitAction bit = Bit_RESET;
 
-		if(this->gpio.IO.MODE == GPIO_Mode_OUT)
+		if(this->def.IO.MODE == GPIO_Mode_OUT)
 		{
 			if(state == GPIO::High)
 			{
 				bit = Bit_SET;
 			}
 
-			GPIO_WriteBit(this->gpio.IO.PORT, this->gpio.IO.PIN, bit);
+			GPIO_WriteBit(this->def.IO.PORT, this->def.IO.PIN, bit);
 		}
 	}
 
 	void GPIO::Toggle ()
 	{
-		if(this->gpio.IO.MODE == GPIO_Mode_OUT)
+		if(this->def.IO.MODE == GPIO_Mode_OUT)
 		{
-			GPIO_ToggleBits(this->gpio.IO.PORT, this->gpio.IO.PIN);
+			GPIO_ToggleBits(this->def.IO.PORT, this->def.IO.PIN);
+		}
+	}
+
+	void GPIO::INTERNAL_InterruptCallback()
+	{
+		if(this->def.IO.MODE == GPIO_Mode_IN)
+		{
+			this->StateChanged();
 		}
 	}
 }
@@ -310,27 +317,17 @@ extern "C"
 		{
 			EXTI_ClearFlag(GPIO0_INT_LINE);
 
-			GPIO gpio = GPIO::GetInstance(GPIO::GPIO0);
+			GPIO* gpio = GPIO::GetInstance(GPIO::GPIO0);
 
-			// GPIO0 interrupt is enabled and callback exists ?
-			if((gpio.GetInterruptState() == true) &&
-			   (gpio.InterruptCallback != NULL))
-			{
-				gpio.InterruptCallback(gpio);
-			}
+			gpio->INTERNAL_InterruptCallback();
 		}
 		else if(EXTI_GetFlagStatus(GPIO3_INT_LINE) == SET)
 		{
 			EXTI_ClearFlag(GPIO3_INT_LINE);
 
-			GPIO gpio = GPIO::GetInstance(GPIO::GPIO3);
+			GPIO* gpio = GPIO::GetInstance(GPIO::GPIO3);
 
-			// GPIO0 interrupt is enabled and callback exists ?
-			if((gpio.GetInterruptState() == true) &&
-			   (gpio.InterruptCallback != NULL))
-			{
-				gpio.InterruptCallback(gpio);
-			}
+			gpio->INTERNAL_InterruptCallback();
 		}
 	}
 }
