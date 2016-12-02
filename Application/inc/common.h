@@ -11,6 +11,17 @@
 #include <stdint.h>
 
 /*----------------------------------------------------------------------------*/
+/* Doc		                                                                  */
+/*----------------------------------------------------------------------------*/
+
+/**
+ * @namespace MotionControl
+ * @brief Motion control objects
+ *
+ * This namespace contains objects used for motion control (speed regulation, odometry, trajectories planning, etc..)
+ */
+
+/*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
 /*----------------------------------------------------------------------------*/
 
