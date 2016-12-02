@@ -56,14 +56,14 @@ namespace Utils
 		 * @param cb : Event callback
 		 * @return Event object reference
 		 */
-		Event& operator += (EventCallback cb);
+		Event& operator += (EventCallback& cb);
 
 		/**
 		 * @brief Remove a callback from the callback list
 		 * @param cb : Event callback
 		 * @return Event object reference
 		 */
-		Event& operator -= (EventCallback cb);
+		Event& operator -= (EventCallback& cb);
 
 		/**
 		 * @brief Raise an event
