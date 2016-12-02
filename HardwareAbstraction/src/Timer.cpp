@@ -202,7 +202,6 @@ namespace HAL
 		if(flag == TIM_FLAG_Update)
 		{
 			this->TimerElapsed();
-			//this->notify(this->TimerElapsed, this);
 		}
 	}
 }
