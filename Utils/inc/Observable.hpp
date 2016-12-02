@@ -15,11 +15,19 @@
 /* Definitions                                                                */
 /*----------------------------------------------------------------------------*/
 
-/**
- * @brief Observer callback
- * @param obj : any object instance
- */
-typedef void (*ObserverCallback) (void * obj);
+typedef struct
+{
+	/**
+	 * @brief Observer callback
+	 * @param obj : any object instance
+	 */
+	typedef void (*ObserverCallback) (void * obj);
+
+	/**
+	 * @brief Observer instance
+	 */
+	void * obj;
+}Observer;
 
 /*----------------------------------------------------------------------------*/
 /* Class declaration	                                                      */
@@ -52,13 +60,13 @@ namespace Utils
 		 * @brief Subscribe to observable notifications
 		 * @param cb : Callback to call on observable notifications
 		 */
-		void Subscribe (ObserverCallback cb);
+		void Subscribe (void * observer, Observer::ObserverCallback cb);
 
 		/**
 		 * @brief Unsubscribe to observable notifications
 		 * @param cb : Callback which where called on observable notifications
 		 */
-		void Unsubscribe (ObserverCallback cb);
+		void Unsubscribe (void * observer, Observer::ObserverCallback cb);
 
 	protected:
 
@@ -73,14 +81,21 @@ namespace Utils
 		 * @param observable
 		 * @param obj
 		 */
-		void notify (Observable& observable, void * obj);
+		//void notify (Observable& observable);
+		void notify ();
 	private:
 
 		/**
 		 * @private
 		 * @brief Observer callback list used by notifications
 		 */
-		std::vector<ObserverCallback> observerCallbackList;
+		std::vector<Observer::ObserverCallback> observerCallbackList;
+
+		/**
+		 * @private
+		 * @brief Observer instance lsit used by notifications
+		 */
+		std::vector<void*> observerInstanceList;
 	};
 }
 
