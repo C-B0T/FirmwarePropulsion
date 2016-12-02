@@ -111,14 +111,16 @@ namespace HAL
 
 		Utils::Event OverCurrentDetected;
 
-	private :
+	protected :
 
 		/**
-		 * @private
+		 * @protected
 		 * @brief Private constructor
 		 * @param id : BrushlessMotorDriver identifier
 		 */
 		BrushlessMotorDriver (enum ID id);
+
+	private:
 
 		/**
 		 * @private
