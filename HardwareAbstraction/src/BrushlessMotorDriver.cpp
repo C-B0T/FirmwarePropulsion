@@ -71,7 +71,9 @@ static BLMOTDRV_DEF _getDefStructure (BrushlessMotorDriver::ID id)
 
 static void _diagStateChanged (void * obj)
 {
+	BrushlessMotorDriver* instance = static_cast<BrushlessMotorDriver*>(obj);
 
+	instance->OverCurrentDetected();
 }
 
 /*----------------------------------------------------------------------------*/
@@ -119,7 +121,7 @@ namespace HAL
 
 		// Get diag pin instance
 		this->diagPin = GPIO::GetInstance(this->def.DiagPinID);
-		this->diagPin->StateChanged += _diagStateChanged;
+		this->diagPin->StateChanged.Subscribe(this, _diagStateChanged);
 	}
 
 	void BrushlessMotorDriver::SetSpeed(float32_t percent)
