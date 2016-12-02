@@ -36,6 +36,10 @@ static BrushlessMotorDriver* _drivers[BrushlessMotorDriver::MOTOR_MAX] = {NULL};
 /* Private Functions                                                          */
 /*----------------------------------------------------------------------------*/
 
+/**
+ * @brief Get hardware definition structure
+ * @param id : BrushlessMotorDriver identifier
+ */
 static BLMOTDRV_DEF _getDefStructure (BrushlessMotorDriver::ID id)
 {
 	BLMOTDRV_DEF def;
@@ -148,23 +152,32 @@ namespace HAL
 
 	void BrushlessMotorDriver::Brake()
 	{
-		this->enablePin->SetDutyCycle(0.0f);
-		this->enablePin->SetState(PWM::DISABLED);
+		// Make sure the ENABLE pin is high, unless H-Bridge is disabled
+		this->enablePin->SetDutyCycle(1.0f);
+		this->enablePin->SetState(PWM::ENABLED);
+
+		// Turn on all high-side MOSFET
 		this->brakePin->Set(GPIO::Low);
 	}
 
 	void BrushlessMotorDriver::Move()
 	{
+		// Set PWM duty cycle with last speed value
 		this->enablePin->SetDutyCycle(this->speed);
 		this->enablePin->SetState(PWM::ENABLED);
+
+		// Turn off braking function
 		this->brakePin->Set(GPIO::High);
 
 	}
 
 	void BrushlessMotorDriver::Freewheel()
 	{
+		// Disable h-bridge
 		this->enablePin->SetDutyCycle(0.0f);
 		this->enablePin->SetState(PWM::DISABLED);
+
+		// Turn off braking function
 		this->brakePin->Set(GPIO::High);
 
 	}
