@@ -135,7 +135,7 @@ static void _hardwareInit (enum PWM::ID id)
 	TIMOCStruct.TIM_OCIdleState		=	TIM_OCIdleState_Reset;
 	TIMOCStruct.TIM_OCNIdleState	=	TIM_OCNIdleState_Reset;
 	TIMOCStruct.TIM_OCNPolarity		=	TIM_OCNPolarity_High;
-	TIMOCStruct.TIM_OCPolarity		=	TIM_OCNPolarity_High;
+	TIMOCStruct.TIM_OCPolarity		=	TIM_OCPolarity_High;
 	TIMOCStruct.TIM_OutputNState	=	TIM_OutputNState_Enable;
 	TIMOCStruct.TIM_OutputState		=	TIM_OutputState_Enable;
 	TIMOCStruct.TIM_Pulse			=	(uint32_t)((float32_t)TIMBaseStruct.TIM_Period * pwm.PWM.DEFAULT_DUTYCYCLE);
