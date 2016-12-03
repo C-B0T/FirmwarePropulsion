@@ -23,10 +23,10 @@ TrajectoryPlanning::~TrajectoryPlanning()
 
 void TrajectoryPlanning::init()
 {
-	state = FREE;
-	lstate = 0;
+    state = FREE;
+    lstate = 0;
 
-	stallMode = 0;
+    stallMode = 0;
 }
 
 void TrajectoryPlanning::goLinear(float linear) // linear in meters
@@ -93,7 +93,7 @@ void TrajectoryPlanning::gotoXY(float X, float Y)
     float dX = X - r.X_m;   // meters
     float dY = Y - r.Y_m;   // meters
 
-    endLinearPosition = sqrtl(XX + YY);	// meters
+    endLinearPosition = sqrtl(XX + YY);    // meters
     endAngularPosition = atan2f(dY,dX); // radians
     
     startLinearPosition = r.L;
@@ -105,8 +105,8 @@ void TrajectoryPlanning::gotoXY(float X, float Y)
 
 int stallX(int stallMode)
 { 
-	// TODO:Check the stallMode coherence (Ex1: if ur on the left side of the table don't exe rightTable side to side Mode)
-	//                                    (Ex2: if ur on the up side of the table don't exe downTable side to side Mode)
+    // TODO:Check the stallMode coherence (Ex1: if ur on the left side of the table don't exe rightTable side to side Mode)
+    //                                    (Ex2: if ur on the up side of the table don't exe downTable side to side Mode)
 
     struct robot r;
     Odometry_GetRobot(&r)
@@ -114,7 +114,7 @@ int stallX(int stallMode)
     startLinearPosition = r.L;
     startAngularPosition = r.O;
 
-	endLinearPosition = startLinearPosition - 0.0;
+    endLinearPosition = startLinearPosition - 0.0;
     endAngularPosition = 0.0;
 
     state = STALLX;
@@ -123,8 +123,8 @@ int stallX(int stallMode)
 
 int stallY(int stallMode)
 { 
-	// TODO:Check the stallMode coherence (Ex1: if ur on the left side of the table don't exe rightTable side to side Mode)
-	//                                    (Ex2: if ur on the up side of the table don't exe downTable side to side Mode)
+    // TODO:Check the stallMode coherence (Ex1: if ur on the left side of the table don't exe rightTable side to side Mode)
+    //                                    (Ex2: if ur on the up side of the table don't exe downTable side to side Mode)
 
     struct robot r;
     Odometry_GetRobot(&r)
@@ -132,7 +132,7 @@ int stallY(int stallMode)
     startLinearPosition = r.L;
     startAngularPosition = r.O;
 
-	endLinearPosition = startLinearPosition - 0.0;
+    endLinearPosition = startLinearPosition - 0.0;
     endAngularPosition = _PI_/2.0;
 
     state = STALLY;
@@ -278,107 +278,107 @@ void TrajectoryPlanning::calculateCurvePlan()
 
 void TrajectoryPlanning::calculateStallX()
 {
-	float time = getTime();
-	time -= startTime;
+    float time = getTime();
+    time -= startTime;
 
-	//TODO:Add stallMode gestion
+    //TODO:Add stallMode gestion
 
-	switch (lstate)
-	{
-		case 1:
-			if(angularMotionProfile->isFinished())
-			{
-				lstate = 2;
-			}
-			break;
-		case 2:
-			if(jackBackLeft && jackBackLeft)
-			{
-				lstate = 3;
-			}
-			break;
-		case 3:
-			// X axis and Angular are calibrated
-			break;
-		default:
-			break;
-	}
+    switch (lstate)
+    {
+        case 1:
+            if(angularMotionProfile->isFinished())
+            {
+                lstate = 2;
+            }
+            break;
+        case 2:
+            if(jackBackLeft && jackBackLeft)
+            {
+                lstate = 3;
+            }
+            break;
+        case 3:
+            // X axis and Angular are calibrated
+            break;
+        default:
+            break;
+    }
 
-	switch (lstate)
-	{
-		case 1: // Rotate to 0 rad
-			float profile = angularMotionProfile->update(time);
-			suggestedLinearPosition = startLinearPosition;
-			suggestedAngularPosition = profile;
-			break;
+    switch (lstate)
+    {
+        case 1: // Rotate to 0 rad
+            float profile = angularMotionProfile->update(time);
+            suggestedLinearPosition = startLinearPosition;
+            suggestedAngularPosition = profile;
+            break;
 
-		case 2:
+        case 2:
             //TODO:Disable Angular asserv.
-			//TODO:Back and wait both jacks
-			break;
+            //TODO:Back and wait both jacks
+            break;
 
-		case 3:
-			//TODO:Modify X value in function of the mechanic 
-			Odometry_SetX(0.0);
-			Odometry_SetO(0.0);
-			break;
+        case 3:
+            //TODO:Modify X value in function of the mechanic 
+            Odometry_SetX(0.0);
+            Odometry_SetO(0.0);
+            break;
 
-		default:
-			break;
-	}
+        default:
+            break;
+    }
 
 }
 
 void TrajectoryPlanning::calculateStallY()
 {
-	float time = getTime();
-	time -= startTime;
+    float time = getTime();
+    time -= startTime;
 
-	//TODO:Add stallMode gestion
+    //TODO:Add stallMode gestion
 
-	switch (lstate)
-	{
-		case 1:
-			if(angularMotionProfile->isFinished())
-			{
-				lstate = 2;
-			}
-			break;
-		case 2:
-			if(jackBackLeft && jackBackLeft)
-			{
-				lstate = 3;
-			}
-			break;
-		case 3:
-			// Y axis and Angular are calibrated
-			break;
-		default:
-			break;
-	}
+    switch (lstate)
+    {
+        case 1:
+            if(angularMotionProfile->isFinished())
+            {
+                lstate = 2;
+            }
+            break;
+        case 2:
+            if(jackBackLeft && jackBackLeft)
+            {
+                lstate = 3;
+            }
+            break;
+        case 3:
+            // Y axis and Angular are calibrated
+            break;
+        default:
+            break;
+    }
 
-	switch (lstate)
-	{
-		case 1: // Rotate to pi/2 rad
-			float profile = angularMotionProfile->update(time);
-			suggestedLinearPosition = startLinearPosition;
-			suggestedAngularPosition = profile;
-			break;
+    switch (lstate)
+    {
+        case 1: // Rotate to pi/2 rad
+            float profile = angularMotionProfile->update(time);
+            suggestedLinearPosition = startLinearPosition;
+            suggestedAngularPosition = profile;
+            break;
 
-		case 2:
+        case 2:
             //TODO:Disable Angular asserv.
-			//TODO:Back and wait both jacks
-			break;
+            //TODO:Back and wait both jacks
+            break;
 
-		case 3:
-			//TODO:Modify Y value in function of the mechanic 
-			Odometry_SetY(0.0);
-			Odometry_SetO(0.0);
-			break;
+        case 3:
+            //TODO:Modify Y value in function of the mechanic 
+            Odometry_SetY(0.0);
+            Odometry_SetO(0.0);
+            break;
 
-		default:
-			break;
-	}
+        default:
+            break;
+    }
 
 }
 

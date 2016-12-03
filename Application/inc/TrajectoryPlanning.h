@@ -49,12 +49,12 @@ protected:
     void calculateStallX();
     void calculateStallY();
 
-	float 
+    float 
 
     int state;
     int lstate;
 
-	int stallMode;
+    int stallMode;
     
     float startTime;
     float startLinearPosition;  // 
