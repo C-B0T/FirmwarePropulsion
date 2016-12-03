@@ -60,7 +60,7 @@ namespace HAL
 	 *  - Start, stop or restart timer with Start(), Stop(), Restart() methods
 	 *  - Register to Timer Elapsed event by add your callback to TimerElapsed Event
 	 */
-	class Timer : protected Utils::Observable
+	class Timer //: protected Utils::Observable
 	{
 	public:
 
@@ -78,7 +78,7 @@ namespace HAL
 		 * @param id : Timer identifier
 		 * @return Timer instance
 		 */
-		static Timer& GetInstance (enum ID id);
+		static Timer* GetInstance (enum ID id);
 
 		/**
 		 * @brief Return Timer identifier
@@ -121,6 +121,7 @@ namespace HAL
 		 * @param flag : interrupt flag
 		 */
 		void INTERNAL_InterruptCallback (uint16_t flag);
+
 	private:
 
 		/**

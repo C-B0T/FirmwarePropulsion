@@ -86,7 +86,7 @@ namespace HAL
 		 * @return Encoder
 		 *  instance
 		 */
-		static Encoder& GetInstance (Encoder::ID id);
+		static Encoder* GetInstance (Encoder::ID id);
 
 		/**
 		 * @brief Reset position and turn counter

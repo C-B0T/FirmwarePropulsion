@@ -56,6 +56,7 @@ static TIM_DEF _getTimerStruct (enum Timer::ID id)
 		tim.TIMER.TIMER		=	TIMER0_TIMER;
 		tim.TIMER.PERIOD	=	TIMER0_PERIOD_US;
 		tim.TIMER.FREQ		=	TIMER0_FREQUENCY;
+		tim.TIMER.CLOCKFREQ	=	TIMER0_TIMER_FREQ;
 		tim.INT.CHANNEL		=	TIMER0_INT_CHANNEL;
 		tim.INT.PRIORITY	=	TIMER0_INT_PRIORITY;
 		break;
@@ -123,21 +124,21 @@ static void _hardwareInit (enum Timer::ID id)
 /*----------------------------------------------------------------------------*/
 namespace HAL
 {
-	Timer& Timer::GetInstance (enum Timer::ID id)
+	Timer* Timer::GetInstance (enum Timer::ID id)
 	{
 		assert(id < Timer::TIMER_MAX);
 
 		// if Timer instance already exists
 		if(_timer[id] != NULL)
 		{
-			return *_timer[id];
+			return _timer[id];
 		}
 		else
 		{
 			// Create Timer instance
 			_timer[id] = new Timer(id);
 
-			return *_timer[id];
+			return _timer[id];
 		}
 	}
 
@@ -147,15 +148,16 @@ namespace HAL
 		this->def = _getTimerStruct(id);
 		this->period_us = this->def.TIMER.PERIOD;
 
-		this->TimerElapsed = Event();
-
 		_hardwareInit(id);
 	}
 
 	void Timer::SetPeriod(uint32_t period_us)
 	{
 		TIM_TimeBaseInitTypeDef TIMBaseStruct;
-		uint32_t minFrequency = 0, prescaler = 0u;
+		uint32_t prescaler = 0u;
+		float32_t frequency = 0.0f, minFrequency = 0.0f;
+
+		frequency = 1000000.0 / (float32_t)period_us;
 
 		TIMBaseStruct.TIM_ClockDivision		=	TIM_CKD_DIV1;
 		TIMBaseStruct.TIM_CounterMode		=	TIM_CounterMode_Up;
@@ -163,16 +165,16 @@ namespace HAL
 
 		minFrequency = this->def.TIMER.CLOCKFREQ / (TIMER_COUNTER_MAX_VALUE + 1u);
 
-		if(this->def.TIMER.FREQ > minFrequency)
+		if(frequency > minFrequency)
 		{
 			TIMBaseStruct.TIM_Prescaler	= 	0u;
-			TIMBaseStruct.TIM_Period	=	(this->def.TIMER.CLOCKFREQ / this->def.TIMER.FREQ) - 1u;
+			TIMBaseStruct.TIM_Period	=	(this->def.TIMER.CLOCKFREQ / frequency) - 1u;
 		}
 		else
 		{
-			prescaler = (minFrequency / this->def.TIMER.FREQ) + 1u;
+			prescaler = (uint32_t)((minFrequency / frequency) + 1.0f);
 			TIMBaseStruct.TIM_Prescaler	= 	prescaler - 1u;
-			TIMBaseStruct.TIM_Period	=	((this->def.TIMER.CLOCKFREQ / prescaler) / this->def.TIMER.FREQ) - 1u;
+			TIMBaseStruct.TIM_Period	=	((this->def.TIMER.CLOCKFREQ / prescaler) / frequency) - 1u;
 		}
 
 		TIM_TimeBaseInit(this->def.TIMER.TIMER, &TIMBaseStruct);
@@ -199,7 +201,7 @@ namespace HAL
 	{
 		if(flag == TIM_FLAG_Update)
 		{
-			this->notify(this->TimerElapsed, this);
+			this->TimerElapsed();
 		}
 	}
 }
@@ -215,13 +217,13 @@ extern "C"
 	 */
 	void TIM4_IRQHandler(void)
 	{
-		if(TIM_GetFlagStatus(TIM5, TIM_FLAG_Update) == SET)
+		if(TIM_GetFlagStatus(TIM4, TIM_FLAG_Update) == SET)
 		{
-			TIM_ClearFlag(TIM5, TIM_FLAG_Update);
+			TIM_ClearFlag(TIM4, TIM_FLAG_Update);
 
-			Timer tim = Timer::GetInstance(Timer::TIMER0);
+			Timer* tim = Timer::GetInstance(Timer::TIMER0);
 
-			tim.INTERNAL_InterruptCallback(TIM_FLAG_Update);
+			tim->INTERNAL_InterruptCallback(TIM_FLAG_Update);
 		}
 	}
 }

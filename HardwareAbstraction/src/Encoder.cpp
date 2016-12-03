@@ -157,21 +157,21 @@ static void _hardwareInit (enum Encoder::ID id)
 
 namespace HAL
 {
-	Encoder& Encoder::GetInstance (Encoder::ID id)
+	Encoder* Encoder::GetInstance (Encoder::ID id)
 	{
 		assert(id < Encoder::ENCODER_MAX);
 
 		// if PWM instance already exists
 		if(_enc[id] != NULL)
 		{
-			return *_enc[id];
+			return _enc[id];
 		}
 		else
 		{
 			// Create PWM instance
 			_enc[id] = new Encoder(id);
 
-			return *_enc[id];
+			return _enc[id];
 		}
 	}
 

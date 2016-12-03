@@ -10,6 +10,8 @@
 
 #include "stm32f4xx.h"
 
+#include "Event.hpp"
+
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
 /*----------------------------------------------------------------------------*/
@@ -93,7 +95,7 @@ namespace HAL
 		 * @param id : GPIO ID
 		 * @return GPIO instance
 		 */
-		static GPIO& GetInstance (enum ID id);
+		static GPIO* GetInstance (enum ID id);
 
 		/**
 		 * @brief Return GPIO ID
@@ -114,15 +116,6 @@ namespace HAL
 		}
 
 		/**
-		 * @brief Enable GPIO interrupt (if GPIO is an input)
-		 * @param state : true if interrupt must be enabled, false else
-		 */
-		void EnableInterrupt (bool state)
-		{
-			this->intState = state;
-		}
-
-		/**
 		 * @brief Return GPIO state
 		 * @return Low if GPIO is '0' logic, High else
 		 */
@@ -140,11 +133,16 @@ namespace HAL
 		void Toggle();
 
 		/**
-		 * @brief Interrupt callback (only called if GPIO is an input).
-		 * Default initialized at NULL
-		 * @param obj : GPIO instance that may have raised the interrupt
+		 * @brief State changed event
+		 * INPUT ONLY !
 		 */
-		void (*InterruptCallback) (const GPIO obj);
+		Utils::Event StateChanged;
+
+		/**
+		 * @private
+		 * @brief Internal interrupt callback. DO NOT CALL !!
+		 */
+		void INTERNAL_InterruptCallback ();
 
 	private:
 		/**
@@ -170,7 +168,7 @@ namespace HAL
 		 * @private
 		 * @brief GPIO definition
 		 */
-		GPIO_DEF gpio;
+		GPIO_DEF def;
 	};
 }
 #endif /* INC_GPIO_HPP_ */

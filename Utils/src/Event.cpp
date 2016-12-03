@@ -25,20 +25,16 @@
 
 namespace Utils
 {
-	Event::Event()
-	{
-	}
-
 	Event& Event::operator += (EventCallback cb)
 	{
-		this->Subscribe(cb);
+		this->Subscribe(NULL, cb);
 
 		return *this;
 	}
 
 	Event& Event::operator -= (EventCallback cb)
 	{
-		this->Unsubscribe(cb);
+		this->Unsubscribe(NULL, cb);
 
 		return *this;
 	}

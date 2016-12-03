@@ -20,7 +20,7 @@
 /**
  * @brief Redefine observer callback
  */
-typedef ObserverCallback EventCallback;
+typedef Observer::ObserverCallback EventCallback;
 
 /*----------------------------------------------------------------------------*/
 /* Class declaration	                                                      */
@@ -38,18 +38,25 @@ namespace Utils
 	 * HOWTO:
 	 * 	An object can subscribe to an event raised by another object using "+=" operator
 	 * 	and unsubscribe to it using '-=' operator.
+	 *
 	 */
-	class Event : protected Utils::Observable
+	class Event : public Utils::Observable
 	{
 	public:
 
 		/**
 		 * @brief Event constructor
 		 */
-		Event();
+		Event() : Observable()
+		{
+		}
 
 		/**
 		 * @brief Add a new event callback to the callback list
+		 *
+		 * This method shouldn't be used if you expect your object instance passed as argument
+		 * when event is raised. Use subscribe() method instead.
+		 *
 		 * @param cb : Event callback
 		 * @return Event object reference
 		 */
@@ -61,6 +68,21 @@ namespace Utils
 		 * @return Event object reference
 		 */
 		Event& operator -= (EventCallback cb);
+
+		/**
+		 * @brief Raise an event
+		 * @return Event object reference
+		 */
+		Event& operator () ()
+		{
+			//this->notify(*this);
+			this->notify();
+
+			return *this;
+		}
+
+	private:
+
 	};
 }
 
