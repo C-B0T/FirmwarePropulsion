@@ -28,8 +28,6 @@ namespace Utils
 
 	PID::PID(float32_t kp, float32_t ki, float32_t kd, float32_t dt) : PID()
 	{
-		assert(dt > 0.0f);
-
 		this->kp	=	kp;
 		this->ki	=	ki;
 		this->kd	=	kd;
