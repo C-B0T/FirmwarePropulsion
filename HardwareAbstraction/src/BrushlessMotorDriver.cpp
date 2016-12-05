@@ -102,6 +102,7 @@ namespace HAL
 
 	BrushlessMotorDriver::BrushlessMotorDriver(BrushlessMotorDriver::ID id)
 	{
+		this->id = id;
 		this->speed = 0.0f;
 		this->direction = BrushlessMotorDriver::FORWARD;
 		this->def = _getDefStructure(id);
