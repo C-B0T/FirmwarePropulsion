@@ -46,9 +46,9 @@ namespace HAL
 		 */
 		enum ID
 		{
-			LEFT_MOTOR, //!< LEFT_MOTOR
-			RIGHT_MOTOR,//!< RIGHT_MOTOR
-			MOTOR_MAX   //!< MOTOR_MAX
+			DRIVER0 = 0,	//!< LEFT_MOTOR
+			DRIVER1,		//!< RIGHT_MOTOR
+			DRIVER_MAX   	//!< MOTOR_MAX
 		};
 
 		/**
