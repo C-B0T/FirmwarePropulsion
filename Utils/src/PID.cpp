@@ -59,4 +59,11 @@ namespace Utils
 
 		return this->output;
 	}
+
+	float32_t PID::Get(float32_t feedback, float32_t period)
+	{
+		this->dt = period;
+
+		return this->Get(feedback);
+	}
 }
