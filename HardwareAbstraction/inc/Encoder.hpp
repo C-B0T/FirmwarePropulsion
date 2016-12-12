@@ -37,6 +37,7 @@ typedef struct
 	{
 		TIM_TypeDef *	TIMER;
 		uint16_t		RELOAD_VAL;
+		int8_t			COUNTER_DIR;
 	}TIMER;
 
 	// Interrupt definitions

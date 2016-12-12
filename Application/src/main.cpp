@@ -13,9 +13,11 @@
 #include "task.h"
 
 #include "HAL.hpp"
+#include "Odometry.hpp"
 
 using namespace HAL;
 using namespace Utils;
+using namespace Location;
 
 /**
  * @brief Initialize hardware
@@ -43,41 +45,36 @@ static void HardwareInit (void)
  */
 void TASKHANDLER_Test (void * obj)
 {
-	float32_t speed = 0.0f;
+	long index;
+	float32_t velocity[400];
 
 	BrushlessMotorDriver* leftMotor = BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::DRIVER0);
 	BrushlessMotorDriver* rightMotor = BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::DRIVER1);
 
+	Odometry *odometry = Odometry::GetInstance();
+
 	leftMotor->SetDirection(BrushlessMotorDriver::FORWARD);
-	rightMotor->SetDirection(BrushlessMotorDriver::REVERSE);
+	rightMotor->SetDirection(BrushlessMotorDriver::FORWARD);
 
 	vTaskDelay(5000u);
 
 	leftMotor->Move();
 	rightMotor->Move();
 
-	while(1)
+	leftMotor->SetSpeed(0.2);
+	rightMotor->SetSpeed(0.2);
+
+	for (index = 0; index < 400; index++)
 	{
-		leftMotor->SetSpeed(speed);
-		rightMotor->SetSpeed(speed);
-
-		vTaskDelay(200);
-
-		speed += 0.1f;
-
-		if(speed > 1.0f)
-		{
-			speed = 0.0f;
-
-			leftMotor->Brake();
-			rightMotor->Brake();
-
-			vTaskDelay(2000u);
-
-			leftMotor->Move();
-			rightMotor->Move();
-		}
+		odometry->Compute();
+		velocity[index]=odometry->Data.AngularVelocity;
+		vTaskDelay(5);
 	}
+
+	leftMotor->Brake();
+	rightMotor->Brake();
+
+	while(1);
 }
 
 /**
@@ -89,12 +86,14 @@ int main(void)
 
 	xTaskCreate(&TASKHANDLER_Test,
 				"Test Task",
-				128,
+				1024,
 				NULL,
 				1,
 				NULL);
 
 	vTaskStartScheduler();
+
+	while(1);
 
 	return 0;
 }

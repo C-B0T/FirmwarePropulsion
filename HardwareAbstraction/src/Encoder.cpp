@@ -24,6 +24,7 @@ using namespace HAL;
 #define ENC0_CH_B_PINSOURCE		(GPIO_PinSource11)
 #define ENC0_IO_AF				(GPIO_AF_TIM5)
 #define ENC0_RELOAD_VALUE		(4095)			// Number of steps per encoder turn minus one
+#define ENC0_COUNTER_DIR		(1)
 #define ENC0_TIMER				(TIM5)
 #define ENC0_INT_CHANNEL		(TIM5_IRQn)
 #define ENC0_INT_PRIORITY		(0u)
@@ -37,6 +38,7 @@ using namespace HAL;
 #define ENC1_CH_B_PINSOURCE		(GPIO_PinSource6)
 #define ENC1_IO_AF				(GPIO_AF_TIM8)
 #define ENC1_RELOAD_VALUE		(4095)			// Number of steps per encoder turn minus one
+#define ENC1_COUNTER_DIR		(-1)
 #define ENC1_TIMER				(TIM8)
 #define ENC1_INT_CHANNEL		(TIM8_UP_TIM13_IRQn)
 #define ENC1_INT_PRIORITY		(0u)
@@ -79,9 +81,28 @@ static ENC_DEF _getENCStruct (enum Encoder::ID id)
 
 		enc.TIMER.TIMER			=	ENC0_TIMER;
 		enc.TIMER.RELOAD_VAL	=	ENC0_RELOAD_VALUE;
+		enc.TIMER.COUNTER_DIR	=	ENC0_COUNTER_DIR;
 
 		enc.INT.PRIORITY		=	ENC0_INT_PRIORITY;
 		enc.INT.CHANNEL			=	ENC0_INT_CHANNEL;
+		break;
+
+	case Encoder::ENCODER1:
+		enc.CH_A.PORT			=	ENC1_CH_A_PORT;
+		enc.CH_A.PIN			=	ENC1_CH_A_PIN;
+		enc.CH_A.PINSOURCE		=	ENC1_CH_A_PINSOURCE;
+		enc.CH_A.AF				=	ENC1_IO_AF;
+		enc.CH_B.PORT			=	ENC1_CH_B_PORT;
+		enc.CH_B.PIN			=	ENC1_CH_B_PIN;
+		enc.CH_B.PINSOURCE		=	ENC1_CH_B_PINSOURCE;
+		enc.CH_B.AF				=	ENC1_IO_AF;
+
+		enc.TIMER.TIMER			=	ENC1_TIMER;
+		enc.TIMER.RELOAD_VAL	=	ENC1_RELOAD_VALUE;
+		enc.TIMER.COUNTER_DIR	=	ENC1_COUNTER_DIR;
+
+		enc.INT.PRIORITY		=	ENC1_INT_PRIORITY;
+		enc.INT.CHANNEL			=	ENC1_INT_CHANNEL;
 		break;
 	default:
 		break;
@@ -190,16 +211,16 @@ namespace HAL
 	int64_t Encoder::GetAbsoluteValue()
 	{
 		this->prevAbsValue	= 	this->absolutePos;
-		this->absolutePos 	= 	(this->def.TIMER.RELOAD_VAL * this->turnCounter) + TIM_GetCounter(this->def.TIMER.TIMER);
+		this->absolutePos 	= 	(int64_t)((int32_t)(this->def.TIMER.RELOAD_VAL) * this->turnCounter) + this->def.TIMER.COUNTER_DIR*(int32_t)TIM_GetCounter(this->def.TIMER.TIMER);
 		this->relativePos 	= 	this->absolutePos - this->prevAbsValue;
 
-		return this->absolutePos;
+		return this->relativePos;
 	}
 
 	int32_t Encoder::GetRelativeValue()
 	{
 		this->prevAbsValue	= 	this->absolutePos;
-		this->absolutePos 	= 	(this->def.TIMER.RELOAD_VAL * this->turnCounter) + TIM_GetCounter(this->def.TIMER.TIMER);
+		this->absolutePos 	= 	(int64_t)((int32_t)(this->def.TIMER.RELOAD_VAL) * this->turnCounter) + this->def.TIMER.COUNTER_DIR*(int32_t)TIM_GetCounter(this->def.TIMER.TIMER);
 		this->relativePos 	= 	this->absolutePos - this->prevAbsValue;
 
 		return this->relativePos;
@@ -209,11 +230,11 @@ namespace HAL
 	{
 		if(flag == TIM_Direction_CounterDowncounting)
 		{
-			this->turnCounter--;
+			this->turnCounter-=this->def.TIMER.COUNTER_DIR;
 		}
 		else
 		{
-			this->turnCounter++;
+			this->turnCounter+=this->def.TIMER.COUNTER_DIR;
 		}
 	}
 }
@@ -252,7 +273,7 @@ extern "C"
 
 		if(TIM_GetFlagStatus(TIM8, TIM_FLAG_Update) == SET)
 		{
-			flag = TIM_GetCounterDirection(TIM5);
+			flag = TIM_GetCounterDirection(TIM8);
 
 			TIM_ClearFlag(TIM8, TIM_FLAG_Update);
 
