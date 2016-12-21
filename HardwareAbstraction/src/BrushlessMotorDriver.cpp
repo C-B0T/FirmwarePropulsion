@@ -14,15 +14,15 @@ using namespace HAL;
 /* Definitions                                                                */
 /*----------------------------------------------------------------------------*/
 
-#define L_MOT_BRAKE_GPIO_ID		(GPIO::GPIO2)
-#define L_MOT_DIR_GPIO_ID		(GPIO::GPIO1)
-#define L_MOT_DIAG_GPIO_ID		(GPIO::GPIO0)
-#define L_MOT_ENABLE_PWM_ID		(PWM::PWM0)
+#define DRV0_BRAKE_GPIO_ID		(GPIO::GPIO2)
+#define DRV0_DIR_GPIO_ID		(GPIO::GPIO1)
+#define DRV0_DIAG_GPIO_ID		(GPIO::GPIO0)
+#define DRV0_ENABLE_PWM_ID		(PWM::PWM0)
 
-#define R_MOT_BRAKE_GPIO_ID		(GPIO::GPIO5)
-#define R_MOT_DIR_GPIO_ID		(GPIO::GPIO4)
-#define R_MOT_DIAG_GPIO_ID		(GPIO::GPIO3)
-#define R_MOT_ENABLE_PWM_ID		(PWM::PWM1)
+#define DRV1_BRAKE_GPIO_ID		(GPIO::GPIO5)
+#define DRV1_DIR_GPIO_ID		(GPIO::GPIO4)
+#define DRV1_DIAG_GPIO_ID		(GPIO::GPIO3)
+#define DRV1_ENABLE_PWM_ID		(PWM::PWM1)
 
 #define ENABLE_PWM_FREQ			(10000u)
 
@@ -30,7 +30,7 @@ using namespace HAL;
 /* Private Members                                                            */
 /*----------------------------------------------------------------------------*/
 
-static BrushlessMotorDriver* _drivers[BrushlessMotorDriver::MOTOR_MAX] = {NULL};
+static BrushlessMotorDriver* _drivers[BrushlessMotorDriver::DRIVER_MAX] = {NULL};
 
 /*----------------------------------------------------------------------------*/
 /* Private Functions                                                          */
@@ -44,22 +44,22 @@ static BLMOTDRV_DEF _getDefStructure (BrushlessMotorDriver::ID id)
 {
 	BLMOTDRV_DEF def;
 
-	assert(id < BrushlessMotorDriver::MOTOR_MAX);
+	assert(id < BrushlessMotorDriver::DRIVER_MAX);
 
 	switch(id)
 	{
-	case BrushlessMotorDriver::LEFT_MOTOR:
-		def.BrakePinID	=	L_MOT_BRAKE_GPIO_ID;
-		def.DirPinID	=	L_MOT_DIR_GPIO_ID;
-		def.DiagPinID	=	L_MOT_DIAG_GPIO_ID;
-		def.EnablePinID	=	L_MOT_ENABLE_PWM_ID;
+	case BrushlessMotorDriver::DRIVER0:
+		def.BrakePinID	=	DRV0_BRAKE_GPIO_ID;
+		def.DirPinID	=	DRV0_DIR_GPIO_ID;
+		def.DiagPinID	=	DRV0_DIAG_GPIO_ID;
+		def.EnablePinID	=	DRV0_ENABLE_PWM_ID;
 		break;
 
-	case BrushlessMotorDriver::RIGHT_MOTOR:
-		def.BrakePinID	=	R_MOT_BRAKE_GPIO_ID;
-		def.DirPinID	=	R_MOT_DIR_GPIO_ID;
-		def.DiagPinID	=	R_MOT_DIAG_GPIO_ID;
-		def.EnablePinID	=	R_MOT_ENABLE_PWM_ID;
+	case BrushlessMotorDriver::DRIVER1:
+		def.BrakePinID	=	DRV1_BRAKE_GPIO_ID;
+		def.DirPinID	=	DRV1_DIR_GPIO_ID;
+		def.DiagPinID	=	DRV1_DIAG_GPIO_ID;
+		def.EnablePinID	=	DRV1_ENABLE_PWM_ID;
 		break;
 
 	default:
@@ -84,7 +84,7 @@ namespace HAL
 {
 	BrushlessMotorDriver* BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::ID id)
 	{
-		assert(id < BrushlessMotorDriver::MOTOR_MAX);
+		assert(id < BrushlessMotorDriver::DRIVER_MAX);
 
 		// if instance already exists
 		if(_drivers[id] != NULL)
@@ -102,6 +102,7 @@ namespace HAL
 
 	BrushlessMotorDriver::BrushlessMotorDriver(BrushlessMotorDriver::ID id)
 	{
+		this->id = id;
 		this->speed = 0.0f;
 		this->direction = BrushlessMotorDriver::FORWARD;
 		this->def = _getDefStructure(id);

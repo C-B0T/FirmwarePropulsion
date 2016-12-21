@@ -28,8 +28,6 @@ namespace Utils
 
 	PID::PID(float32_t kp, float32_t ki, float32_t kd, float32_t dt) : PID()
 	{
-		assert(dt > 0.0f);
-
 		this->kp	=	kp;
 		this->ki	=	ki;
 		this->kd	=	kd;
@@ -58,5 +56,12 @@ namespace Utils
 		this->output = (this->kp * this->err) + (this->ki * this->intErr * this->dt) + (this->kd * this->diffErr / this->dt);
 
 		return this->output;
+	}
+
+	float32_t PID::Get(float32_t feedback, float32_t period)
+	{
+		this->dt = period;
+
+		return this->Get(feedback);
 	}
 }

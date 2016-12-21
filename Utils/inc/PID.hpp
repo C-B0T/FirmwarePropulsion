@@ -78,6 +78,21 @@ namespace Utils
 		 */
 		float32_t Get (float32_t feedback);
 
+		/**
+		 * @brief Compute PID
+		 * @param feedback : System feedback value
+		 * @param period : dT period
+		 * @return PID filter output
+		 *
+		 * The filter output is normalized to the setpoint :
+		 * - 0.0 means 0% of the setpoint
+		 * - 1.0 means 100% of the sepoint
+		 *
+		 * This is usefull to controll processes in duty cycle
+		 *
+				 */
+		float32_t Get (float32_t feedback, float32_t period);
+
 	private:
 
 		/**

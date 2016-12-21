@@ -83,6 +83,23 @@ static ENC_DEF _getENCStruct (enum Encoder::ID id)
 		enc.INT.PRIORITY		=	ENC0_INT_PRIORITY;
 		enc.INT.CHANNEL			=	ENC0_INT_CHANNEL;
 		break;
+
+	case Encoder::ENCODER1:
+		enc.CH_A.PORT			=	ENC1_CH_A_PORT;
+		enc.CH_A.PIN			=	ENC1_CH_A_PIN;
+		enc.CH_A.PINSOURCE		=	ENC1_CH_A_PINSOURCE;
+		enc.CH_A.AF				=	ENC1_IO_AF;
+		enc.CH_B.PORT			=	ENC1_CH_B_PORT;
+		enc.CH_B.PIN			=	ENC1_CH_B_PIN;
+		enc.CH_B.PINSOURCE		=	ENC1_CH_B_PINSOURCE;
+		enc.CH_B.AF				=	ENC1_IO_AF;
+
+		enc.TIMER.TIMER			=	ENC1_TIMER;
+		enc.TIMER.RELOAD_VAL	=	ENC1_RELOAD_VALUE;
+
+		enc.INT.PRIORITY		=	ENC1_INT_PRIORITY;
+		enc.INT.CHANNEL			=	ENC1_INT_CHANNEL;
+		break;
 	default:
 		break;
 	}

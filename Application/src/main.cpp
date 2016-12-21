@@ -34,6 +34,8 @@ static void HardwareInit (void)
 	// Enable Timer clock
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 | RCC_APB1Periph_TIM5,
 						   ENABLE);
+	RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM8,
+						   ENABLE);
 }
 
 /**
@@ -43,11 +45,11 @@ void TASKHANDLER_Test (void * obj)
 {
 	float32_t speed = 0.0f;
 
-	BrushlessMotorDriver* leftMotor = BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::LEFT_MOTOR);
-	BrushlessMotorDriver* rightMotor = BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::RIGHT_MOTOR);
+	BrushlessMotorDriver* leftMotor = BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::DRIVER0);
+	BrushlessMotorDriver* rightMotor = BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::DRIVER1);
 
 	leftMotor->SetDirection(BrushlessMotorDriver::FORWARD);
-	rightMotor->SetDirection(BrushlessMotorDriver::BACKWARD);
+	rightMotor->SetDirection(BrushlessMotorDriver::REVERSE);
 
 	vTaskDelay(5000u);
 

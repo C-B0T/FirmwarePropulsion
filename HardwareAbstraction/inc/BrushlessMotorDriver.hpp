@@ -46,9 +46,9 @@ namespace HAL
 		 */
 		enum ID
 		{
-			LEFT_MOTOR, //!< LEFT_MOTOR
-			RIGHT_MOTOR,//!< RIGHT_MOTOR
-			MOTOR_MAX   //!< MOTOR_MAX
+			DRIVER0 = 0,	//!< LEFT_MOTOR
+			DRIVER1,		//!< RIGHT_MOTOR
+			DRIVER_MAX   	//!< MOTOR_MAX
 		};
 
 		/**
@@ -57,7 +57,7 @@ namespace HAL
 		enum Direction
 		{
 			FORWARD,//!< FORWARD
-			BACKWARD//!< BACKWARD
+			REVERSE//!< REVERSE
 		};
 
 		/**
@@ -119,6 +119,12 @@ namespace HAL
 		 * @param id : BrushlessMotorDriver identifier
 		 */
 		BrushlessMotorDriver (enum ID id);
+
+		/**
+		 * @protected
+		 * @brief Motor driver identifier
+		 */
+		enum ID id;
 
 	private:
 
