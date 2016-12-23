@@ -178,14 +178,14 @@ namespace HAL
 	{
 		assert(id < Encoder::ENCODER_MAX);
 
-		// if PWM instance already exists
+		// if encoder instance already exists
 		if(_enc[id] != NULL)
 		{
 			return _enc[id];
 		}
 		else
 		{
-			// Create PWM instance
+			// Create encoder instance
 			_enc[id] = new Encoder(id);
 
 			return _enc[id];
@@ -269,7 +269,7 @@ extern "C"
 
 		if(TIM_GetFlagStatus(TIM8, TIM_FLAG_Update) == SET)
 		{
-			flag = TIM_GetCounterDirection(TIM5);
+			flag = TIM_GetCounterDirection(TIM8);
 
 			TIM_ClearFlag(TIM8, TIM_FLAG_Update);
 
