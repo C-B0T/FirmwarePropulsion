@@ -2,136 +2,244 @@
  * @file    Odometry.cpp
  * @author  Jeremy ROULLAND
  * @date    3 dec. 2016
- * @brief   Odometry is the use to estimate position
+ * @brief   Odometry is use to estimate position
  */
 
-#include "Odometry.h"
+#include "Odometry.hpp"
 
-Odometry::Odometry()
+
+using namespace HAL;
+
+/*----------------------------------------------------------------------------*/
+/* Definitions                                                                */
+/*----------------------------------------------------------------------------*/
+
+#define L_ENCODER_ID	(Encoder::ENCODER0)
+#define R_ENCODER_ID	(Encoder::ENCODER1)
+
+#define WD          47.7                // Wheel diameter
+#define WC          1.0                 // Wheel correction (Difference between the (referent) right and left wheel)
+#define ER          4096                // Encoder resolution
+#define ADW         254.0               // Axial distance between wheels
+
+#define _PI_        3.14159265358979323846
+#define _2_PI_      6.28318530717958647692  // 2*PI
+
+#define TICK_BY_MM  27.3332765997653373295  // (ER/(_PI_*WD))
+#define ADW_TICK    6942.65225634039568170  // (ADW * TICK_BY_MM)
+
+
+#define ODO_TASK_STACK_SIZE     (64u)
+#define ODO_TASK_PRIORITY       (configMAX_PRIORITIES-1)    // Highest priority task
+
+#define ODO_LOOP_PERIOD_MS      (10u) // 10ms Odometry loop
+
+
+/*----------------------------------------------------------------------------*/
+/* Private Members                                                            */
+/*----------------------------------------------------------------------------*/
+
+static Odometry* _odometry = NULL;
+
+/*----------------------------------------------------------------------------*/
+/* Private Functions                                                          */
+/*----------------------------------------------------------------------------*/
+
+/*----------------------------------------------------------------------------*/
+/* Class Implementation	                                                      */
+/*----------------------------------------------------------------------------*/
+
+namespace Location
 {
-    robot.X = 0.0;
-    robot.Y = 0.0;
-    robot.O = 0.0;
-    robot.L = 0.0;
+    Odometry* Odometry::GetInstance()
+    {
+        if(_odometry != NULL)
+        {
+            return _odometry;
+        }
+        else
+        {
+            _odometry = new Odometry();
+            return _odometry;
+        }
+    }
 
-    robot.Xmm = 0.0;
-    robot.Ymm = 0.0;
-    robot.Omm = 0.0;
-    robot.Lmm = 0.0;
+    Odometry::Odometry()
+    {
+        this->name = "ODOMETRY";
+
+        // Init members
+        this->robot.X = 0.0;
+        this->robot.Y = 0.0;
+        this->robot.O = 0.0;
+        this->robot.L = 0.0;
+
+        this->robot.Xmm  = 0;
+        this->robot.Ymm  = 0;
+        this->robot.Odeg = 0.0;
+        this->robot.Lmm  = 0;
+
+        // Init encoders
+        this->leftEncoder  = Encoder::GetInstance(L_ENCODER_ID);
+        this->rightEncoder = Encoder::GetInstance(R_ENCODER_ID);
+
+        // Create task
+        xTaskCreate((TaskFunction_t)(&Odometry::taskHandler),
+                    this->name.c_str(),
+                    ODO_TASK_STACK_SIZE,
+                    (void*)this,
+                    ODO_TASK_PRIORITY,
+                    &this->taskHandle);
+    }
+
+
+    Odometry::Odometry(float32_t X, float32_t Y, float32_t O, float32_t L) : Odometry()
+    {
+        this->Init(X, Y, O, L);
+    }
+
+
+    Odometry::~Odometry()
+    {
+
+    }
+
+    Odometry::Init(float32_t X, float32_t Y, float32_t O, float32_t L)
+    {
+        this->robot.X = X;  // tick
+        this->robot.Y = Y;  // tick
+        this->robot.O = O;  // radian
+        this->robot.L = L;  // tick
+
+        this->robot.Xmm  = static_cast<int32_t>(X / TICK_BY_MM);
+        this->robot.Ymm  = static_cast<int32_t>(Y / TICK_BY_MM);
+        this->robot.Odeg = static_cast<float32_t>((180.0 * O) / _PI_);
+        this->robot.Lmm  = static_cast<int32_t>(L / TICK_BY_MM);
+    }
+
+    Odometry::GetRobot(robot_t *r)
+    {
+        r->X = this->robot.X;
+        r->Y = this->robot.Y;
+        r->O = this->robot.O;
+        r->L = this->robot.L;
+
+        r->AngularVelocity = this->robot.AngularVelocity;
+        r->LinearVelocity  = this->robot.LinearVelocity;
+
+        r->LeftVelocity  = this->robot.LeftVelocity;
+        r->RigthVelocity = this->robot.RigthVelocity;
+
+        r->Xmm  = this->robot.Xmm;
+        r->Ymm  = this->robot.Ymm;
+        r->Odeg = this->robot.Odeg;
+        r->Lmm  = this->robot.Lmm;
+    }
+
+    Odometry::SetXO(float32_t X, float32_t O)
+    {
+        this->robot.X = X;
+        this->robot.O = O;
+
+        this->robot.Xmm = X / TICK_BY_MM;
+        this->robot.Odeg = (180.0 * O) / _PI_;
+    }
+
+
+    Odometry::SetYO(float32_t Y, float32_t O)
+    {
+        this->robot.Y = Y;
+        this->robot.O = O;
+
+        this->robot.Ymm = Y / TICK_BY_MM;
+        this->robot.Odeg = (180.0 * O) / _PI_;
+    }
+
+
+    Odometry::Compute(float32_t period)
+    {
+        int32_t dl = 0;
+        int32_t dr = 0;
+
+        float32_t dX = 0.0;
+        float32_t dY = 0.0;
+
+        float32_t dO = 0.0;
+        float32_t dL = 0.0;
+
+        float32_t dlf = 0.0;
+        float32_t drf = 0.0;
+
+        /*@todo : Add interrupt lock to ensure both read at same time */
+        //Encoders.GetValues(&dl, &dr);
+        dl =  leftEncoder->GetRelativeValue();
+        dr = rightEncoder->GetRelativeValue();
+
+        dlf = static_cast<float32_t>(dl) * WC;
+        drf = static_cast<float32_t>(dr);
+
+        dO =  drf - dlf;
+        dL = (drf + dlf) / 2.0;
+
+        this->robot.O += (dO / ADW_TICK);
+        this->robot.L += dL;
+
+        this->robot.AngularVelocity = static_cast<int32_t>(dO);
+        this->robot.LinearVelocity  = static_cast<int32_t>(dL);
+
+        while(this->robot.O > _2_PI_)
+            this->robot.O -= _2_PI_;
+        while(this->robot.O < -_2_PI_)
+            this->robot.O += _2_PI_;
+
+        dX = cos(this->robot.O) * dL;
+        dY = sin(this->robot.O) * dL;
+
+        this->robot.X += dX;
+        this->robot.Y += dY;
+
+        this->robot.LeftVelocity  = dl;
+        this->robot.RigthVelocity = dr;
+
+        this->robot.Xmm  = static_cast<int32_t>(this->robot.X / TICK_BY_MM);
+        this->robot.Ymm  = static_cast<int32_t>(this->robot.Y / TICK_BY_MM);
+        this->robot.Odeg = static_cast<float32_t>((180.0 * O) / _PI_);
+        this->robot.Lmm  = static_cast<int32_t>(this->robot.L / TICK_BY_MM);
+    }
+
+    void Odometry::taskHandler(void* obj)
+    {
+        TickType_t xLastWakeTime;
+        const TickType_t xFrequency = pdMS_TO_TICKS(ODO_LOOP_PERIOD_MS);
+
+        Odometry* instance = (Odometry*)obj;
+        TickType_t prevTick = 0u,  tick = 0u;
+
+        float32_t period = 0.0f;
+
+        // 1. Initialise periodical task
+        xLastWakeTime = xTaskGetTickCount();
+
+        // 2. Get tick count
+        prevTick = xTaskGetTickCount();
+
+        while(1)
+        {
+            // 2. Wait until period elapse
+            vTaskDelayUntil(&xLastWakeTime, xFrequency);
+
+            // 3. Get tick
+            tick = xTaskGetTickCount();
+
+            period = static_cast<float32_t>(tick) -
+                     static_cast<float32_t>(prevTick);
+
+            //4. Compute location (Odometry)
+            instance->Compute(period);
+
+            // 5. Set previous tick
+            prevTick = tick;
+        }
+    }
+
 }
-
-
-Odometry::Odometry(float32_t X, float32_t Y, float32_t O, float32_t L)
-{
-    robot.X = X;
-    robot.Y = Y;
-    robot.O; = O;
-    robot.L; = L;
-
-    robot.Xmm = X*TICK_BY_MM;
-    robot.Ymm = Y*TICK_BY_MM;
-    robot.Odeg = O*TICK_BY_MM;
-    robot.Lmm = L*TICK_BY_MM;
-}
-
-
-Odometry::~Odometry()
-{
-
-}
-
-
-Odometry::getRobot(robot_t *r)
-{
-    r.X = robot.X;
-    r.Y = robot.Y;
-    r.O = robot.O;
-    r.L = robot.L;
-
-    r.AngularVelocity = robot.AngularVelocity;
-    r.LinearVelocity = robot.LinearVelocity;
-    
-    r.LeftVelocity = robot.LeftVelocity;
-    r.RigthVelocity = robot.RigthVelocity;
-
-    r.Xmm = robot.Xmm;
-    r.Ymm = robot.Ymm;
-    r.Odeg = robot.Odeg;
-    r.Lmm = robot.Lmm;
-}
-
-
-Odometry::setXY(float32_t X, float32_t Y)
-{
-    robot.X = X;
-    robot.Y = Y;
-
-    robot.Xmm = X*TICK_BY_MM;
-    robot.Ymm = Y*TICK_BY_MM;
-}
-
-
-Odometry::setXO(float32_t X, float32_t O)
-{
-    robot.X = X;
-    robot.O = O;
-
-    robot.Xmm = X*TICK_BY_MM;
-    robot.Odeg = (180.0* O) / _PI_;
-}
-
-
-Odometry::setYO(float32_t Y, float32_t O)
-{
-    robot.Y = Y;
-    robot.O = O;
-
-    robot.Ymm = Y*TICK_BY_MM;
-    robot.Odeg = (180.0* O) / _PI_;
-}
-
-
-Odometry::compute()
-{
-    int16_t dL = 0;
-    int16_t dR = 0;
-
-    float16_t dX = 0.0;
-    float16_t dY = 0.0;
-
-    float16_t Vo = 0.0;
-    float16_t Vl = 0.0;
-
-    float16_t dLf = 0.0;
-    float16_t dRf = 0.0;
-
-    Encoders.getValues(&dL, &dR);
-    
-    dLf = static_cast<float16_t>(dL) * WC;
-    dRf = static_cast<float16_t>(dR);
-
-    Vo =  dRf - dLf;
-    Vl = (dRf + dLf) / 2.0;
-
-    robot.O += Vo/AWD_TICK;    
-    robot.L += Vl;
-    
-    robot.AngularVelocity = static_cast<int16_t>(Vo);
-    robot.LinearVelocity  = static_cast<int16_t>(Vl);
-
-    while(robot.O > _2_PI_)
-        robot.O -= _2_PI_;
-    while(robot.O < -_2_PI_)
-        robot.O += _2_PI_;
-
-    dX = cosf(robot.O) * Vl;
-    dY = sinf(robot.O) * Vl;
-
-    robot.X += dX;
-    robot.Y += dY;
-    
-    robot.LeftVelocity  = dL;
-    robot.RigthVelocity = dR;
-}
-
-

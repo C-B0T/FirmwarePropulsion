@@ -32,6 +32,8 @@
 #define assert(expr) ((expr) ? (void)0 : assert_failed((uint8_t *)__FILE__, __LINE__))
 #define ASSERT_FAILED_MESSSAGE	("ERROR | Assertion failed in %s @ line %d\n")
 
+#define vTaskDelayMs(t)	vTaskDelay((t) / portTICK_PERIOD_MS)
+
 /*----------------------------------------------------------------------------*/
 /* Types										                              */
 /*----------------------------------------------------------------------------*/

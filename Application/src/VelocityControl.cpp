@@ -1,7 +1,7 @@
 /**
  * @file	VelocityControl.cpp
  * @author	Jeremy ROULLAND
- * @date	20 déc. 2016
+ * @date	20 dec. 2016
  * @brief	VelocityControl class
  *
  *

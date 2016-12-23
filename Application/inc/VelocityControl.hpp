@@ -1,7 +1,7 @@
 /**
  * @file	VelocityControl.hpp
  * @author	Jeremy ROULLAND
- * @date	20 déc. 2016
+ * @date	20 dec. 2016
  * @brief	VelocityControl class
  */
 
@@ -16,6 +16,7 @@
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
 /*----------------------------------------------------------------------------*/
+
 
 /*----------------------------------------------------------------------------*/
 /* Class declaration	                                                      */
@@ -37,97 +38,108 @@ namespace MotionControl
     class VelocityControl
     {
     public:
-    /**
-     * @brief Get instance method
-     * @return VelocityLoop instance
-     */
-    static VelocityControl* GetInstance ();
 
-    /**
-     * @brief Return instance name
-     */
-    std::string Name()
-    {
-    return this->name;
-    }
+        /**
+         * @brief Velocity Identifier List
+         */
+        enum ID
+        {
+            ANGULAR = 0,    //!< ANGULAR
+            LINEAR,         //!< LINEAR
+            VELOCITY_MAX    //!< VELOCITY_MAX
+        };
 
-    /**
-     * @brief Set the angular velocity
-     */
-    void SetAngularVelocity(float32_t angularVelocity)
-    {
-    this->angularVelocity = angularVelocity;
-    }
+        /**
+         * @brief Get instance method
+         * @return VelocityLoop instance
+         * @return BrushlessMotor instance
+         */
+        static VelocityControl* GetInstance ();
 
-    /**
-     * @brief Set the linear velocity
-     */
-    void SetLinearVelocity(float32_t linearVelocity)
-    {
-    this->linearVelocity = linearVelocity;
-    }
+        /**
+         * @brief Return instance name
+         */
+        std::string Name()
+        {
+        return this->name;
+        }
 
-    /**
-     * @brief Compute robot velocity (Should be called periodically)
-     */
-    Compute();
+        /**
+         * @brief Set the angular velocity
+         */
+        void SetAngularVelocity(float32_t angularVelocity)
+        {
+            this->angularVelocity = angularVelocity;
+        }
 
-    private:
+        /**
+         * @brief Set the linear velocity
+         */
+        void SetLinearVelocity(float32_t linearVelocity)
+        {
+            this->linearVelocity = linearVelocity;
+        }
 
-    /**
-     * @private
-     * @brief Private constructor
-     */
-    VelocityControl (void);
+        /**
+         * @brief Compute robot velocity
+         */
+        Compute();
 
-    /**
-     * @private
-     * @brief Instance name
-     */
-    std::string name;
+    protected:
 
-    /**
-     * @private
-     * @brief Angular velocity PID controller
-     */
-    Utils::PID	angularVelocityPID;
+        /**
+         * @protected
+         * @brief Private constructor
+         */
+        VelocityControl ();
 
-    /**
-     * @private
-     * @brief Linear velocity PID controller
-     */
-    Utils::PID	linearVelocityPID;
+        /**
+         * @protected
+         * @brief Instance name
+         */
+        std::string name;
 
-    /**
-     * @private
-     * @brief Odometry instance
-     */
-    Location::Odometry* odometry;
+        /**
+         * @protected
+         * @brief Angular velocity PID controller
+         */
+        Utils::PID	angularVelocityPID;
 
-    /**
-     * @private
-     * @brief Left motor brushless driver instance
-     */
-    HAL::BrushlessMotorDriver* leftMotor;
+        /**
+         * @protected
+         * @brief Linear velocity PID controller
+         */
+        Utils::PID	linearVelocityPID;
 
-    /**
-     * @private
-     * @brief Right motor brushless driver instance
-     */
-    HAL::BrushlessMotorDriver* rightMotor;
+        /**
+         * @protected
+         * @brief Odometry instance
+         */
+        Location::Odometry* odometry;
 
-    /**
-     * @private
-     * @brief Angular velocity setpoint
-     */
-    float32_t angularVelocity;
+        /**
+         * @protected
+         * @brief Left motor brushless driver instance
+         */
+        HAL::BrushlessMotorDriver* leftMotor;
 
-    /**
-     * @private
-     * @brief Linear velocity setpoint
-     */
-    float32_t linearVelocity;
+        /**
+         * @protected
+         * @brief Right motor brushless driver instance
+         */
+        HAL::BrushlessMotorDriver* rightMotor;
 
+        /**
+         * @protected
+         * @brief Angular velocity setpoint
+         */
+        float32_t angularVelocity;
+
+        /**
+         * @protected
+         * @brief Linear velocity setpoint
+         */
+        float32_t linearVelocity;
 
     };
 }

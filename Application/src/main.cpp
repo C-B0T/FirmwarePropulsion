@@ -43,40 +43,20 @@ static void HardwareInit (void)
  */
 void TASKHANDLER_Test (void * obj)
 {
-	float32_t speed = 0.0f;
+	TickType_t xLastWakeTime;
+	const TickType_t xFrequency = pdMS_TO_TICKS(100);
 
-	BrushlessMotorDriver* leftMotor = BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::DRIVER0);
-	BrushlessMotorDriver* rightMotor = BrushlessMotorDriver::GetInstance(BrushlessMotorDriver::DRIVER1);
-
-	leftMotor->SetDirection(BrushlessMotorDriver::FORWARD);
-	rightMotor->SetDirection(BrushlessMotorDriver::REVERSE);
-
-	vTaskDelay(5000u);
-
-	leftMotor->Move();
-	rightMotor->Move();
+	Odometry *odometry = Odometry::GetInstance();
+	robot_t r;
 
 	while(1)
 	{
-		leftMotor->SetSpeed(speed);
-		rightMotor->SetSpeed(speed);
+		vTaskDelayUntil(&xLastWakeTime, xFrequency);
 
-		vTaskDelay(200);
-
-		speed += 0.1f;
-
-		if(speed > 1.0f)
-		{
-			speed = 0.0f;
-
-			leftMotor->Brake();
-			rightMotor->Brake();
-
-			vTaskDelay(2000u);
-
-			leftMotor->Move();
-			rightMotor->Move();
-		}
+		odometry->GetRobot(&r);
+		printf("X:%ld\tY:%ld\tO:%f\r\n",(int32_t)r.X, (int32_t)r.Y, (float32_t)r.O);
+		printf("X:%ld\tY:%ld\tO:%f\r\n",(int32_t)r.X_mm, (int32_t)r.Y_mm, (float32_t)r.O_deg);
+		printf("\r\n");
 	}
 }
 
@@ -86,6 +66,15 @@ void TASKHANDLER_Test (void * obj)
 int main(void)
 {
 	HardwareInit();
+
+	// Start
+	GPIO *led1 = GPIO::GetInstace(GPIO::GPIO6);
+	led1->Set(GPIO::LOW);
+
+	// Welcome
+	printf("\r\n\r\nS/0 CarteProp Firmware V0.0 (" __DATE__ " - " __TIME__ ")\r\n");
+
+	Odometry *odometry = Odometry::GetInstance();
 
 	xTaskCreate(&TASKHANDLER_Test,
 				"Test Task",

@@ -2,36 +2,41 @@
  * @file    Odometry.hpp
  * @author  Jeremy ROULLAND
  * @date    3 dec. 2016
- * @brief   Odometry is the use to estimate position
+ * @brief   Odometry is use to estimate position
  */
 
 
-#ifndef INC_ODOMETRY_H_
-#define INC_ODOMETRY_H_
+#ifndef INC_ODOMETRY_HPP_
+#define INC_ODOMETRY_HPP_
 
 #include "common.h"
-#include "Encoder.hpp"
+#include "HAL.hpp"
 
 #include <math.h>
+
+// FreeRTOS
+#include "FreeRTOS.h"
+#include "task.h"
+#include "timers.h"
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
 /*----------------------------------------------------------------------------*/
 
-#define WD          41.1                // Wheel diameter
-#define WC          1.00000000000       // Wheel correction (Difference between the (referent) right and left wheel)
-#define ER          2048                // Encoder resolution
-#define ADW         230.35              // Axial distance between wheels
+typedef struct
+{
+    // Meca
+    struct
+    {
+        float32_t   wd;     /* Wheel diameter */
+        float32_t   wc;     /* Wheel correction */
+        int32_t     er;     /* Encorder resolution */
+        float32_t   adw;    /* Axial distance between wheels */
 
-//#define _PI_        3.14159265359         // PI
-#define _PI_        3.14159265358979323846
-//#define _PI_        3.141592653589793238462643383279502884L
-//#define _2_PI_      6.28318530718         // 2*PI
-#define _2_PI_      6.28318530717958647692  // 2*PI
-
-#define TICK_BY_MM  15.8612809466       // (ER/(_PI_*WD))
-#define AWD_TICK    3653.64606604       // (ADW * TICK_BY_MM)
-
+        float32_t   tbm;    /* Tick by mm (ER/(_PI_*WD)) */
+        float32_t   adwt;   /* Tick by mm (ER/(_PI_*WD)) */
+    }MECA;
+}MECA_DEF;
 
 typedef struct robot
 {
@@ -46,10 +51,10 @@ typedef struct robot
     int32_t LeftVelocity;
     int32_t RigthVelocity;
 
-    float32_t Xmm;
-    float32_t Ymm;
+    int32_t Xmm;
+    int32_t Ymm;
     float32_t Odeg;
-    float32_t Lmm;
+    int32_t Lmm;
 } robot_t;
 
 
@@ -63,15 +68,15 @@ typedef struct robot
 namespace Location
 {
     /**
-	 * @class PID
-	 * @brief Provides a singletron Odometry class
-	 *
-	 * HOWTO :
-	 * - Get Odometry instance with Location::Odometry::GetInstance()
-	 * - On init, Call Init() to init values
+     * @class PID
+     * @brief Provides a singletron Odometry class
+     *
+     * HOWTO :
+     * - Get Odometry instance with Location::Odometry::GetInstance()
+     * - On init, Call Init() to init values
      * - Call periodically Compute() to compute the robot location
-	 * - Call GetRobot() to get current location
-	 */
+     * - Call GetRobot() to get current location
+     */
 class Odometry
 {
 public:
@@ -82,6 +87,14 @@ public:
     *  instance
     */
     static Odometry* GetInstance ();
+
+    /**
+     * @brief Return instance name
+     */
+    std::string Name()
+    {
+        return this->name;
+    }
 
     /**
      * @brief Init coordinates
@@ -115,7 +128,7 @@ public:
     /**
      * @brief Compute robot location (Should be called periodically)
      */
-     Compute();
+     Compute(float32_t period);
 
 protected:
     /**
@@ -137,12 +150,60 @@ protected:
      */
     ~Odometry();
 
+    /**
+     * @protected
+     * @brief Instance name
+     */
+    std::string name;
+
+    /**
+     * @protected
+     * @brief data of robot
+     */
     robot_t robot;
 
+    /**
+     * @protected
+     * @brief Left wheel encoder
+     */
     HAL::Encoder* leftEncoder;
+
+    /**
+     * @protected
+     * @brief Right wheel encoder
+     */
     HAL::Encoder* rightEncoder;
+
+    /**
+     * @protected
+     * @brief Meca definitions
+     */
+    MECA_DEF def;
+
+    /**
+     * @protected
+     * @brief OS Task handle
+     *
+     * Used by speed control loop
+     */
+    TaskHandle_t taskHandle;
+
+    /**
+     * @protected
+     * @brief OS Timer Handle
+     *
+     * Used by odometry loop
+     */
+    TimerHandle_t loopTimer;
+
+    /**
+     * @protected
+     * @brief Odometry loop task handler
+     * @param obj : Always NULL
+     */
+    void taskHandler (void* obj);
 
 };
 
 
-#endif /* ODOMETRY_H_ */
+#endif /* INC_ODOMETRY_HPP_ */
