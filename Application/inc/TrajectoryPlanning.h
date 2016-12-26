@@ -9,10 +9,13 @@
 #ifndef TRAJECTORYPLANNING_H_
 #define TRAJECTORYPLANNING_H_
 
-#include <maths.h>
+#include <math.h>
 
-#include "Odometry.h"
+#include "Odometry.hpp"
 #include "MotionProfile.h"
+
+#define _PI_        3.14159265358979323846
+
 
 /**
  * Provides a trajectory generator

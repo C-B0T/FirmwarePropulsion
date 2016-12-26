@@ -18,7 +18,7 @@ public:
     MotionProfile();
     ~MotionProfile();
 
-    void setPoint(float point); // target and time in seconds
+    void SetsetPoint(float point); // target and time in seconds
     float update(float time);   // time in seconds
 
     bool isFinished();
@@ -28,9 +28,9 @@ protected:
 
     bool finished;
 
-    void calculateCustomTrapezoidalProfile(float t);
-    void calculateTrapezoidalProfile(float t);
-    void calculatePolynomial5Profile(float t);
+    float calculateCustomTrapezoidalProfile(float t);
+    float calculateTrapezoidalProfile(float t);
+    float calculatePolynomial5Profile(float t);
 
     float setPoint;
     float factor;

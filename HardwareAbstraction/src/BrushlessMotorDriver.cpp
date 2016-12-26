@@ -1,7 +1,7 @@
 /**
  * @file	BrushlessMotorDriver.cpp
  * @author	Kevin
- * @date	1 déc. 2016
+ * @date	1 dï¿½c. 2016
  * @brief	L6235 Brushless Motor Driver class
  */
 
@@ -123,6 +123,39 @@ namespace HAL
 		// Get diag pin instance
 		this->diagPin = GPIO::GetInstance(this->def.DiagPinID);
 		this->diagPin->StateChanged.Subscribe(this, _diagStateChanged);
+	}
+
+	void BrushlessMotorDriver::SetMotorSpeed(float32_t percent)
+	{
+		// Limits
+		if(percent > 1.0f)
+		{
+			percent = 1.0f;
+		}
+		//else if(percent < -1.0f)
+		else if(percent < -1.0f)
+		{
+			percent = -1.0f;
+		}
+
+		// Simple speed
+		if(percent > 0.0f)
+		{
+			this->SetDirection(BrushlessMotorDriver::FORWARD);
+			this->SetSpeed(percent);
+			this->Move();
+		}
+		else if(percent < 0.0f)
+		{
+			this->SetDirection(BrushlessMotorDriver::REVERSE);
+			this->SetSpeed(-percent);
+			this->Move();
+		}
+		else
+		{
+			this->SetSpeed(0.0f);
+			this->Freewheel();
+		}
 	}
 
 	void BrushlessMotorDriver::SetSpeed(float32_t percent)

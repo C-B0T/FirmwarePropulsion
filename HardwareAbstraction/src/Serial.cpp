@@ -34,7 +34,7 @@ using namespace HAL;
 #define SERIAL0_RX_PINSOURCE	(GPIO_PinSource7)
 #define SERIAL0_TX_PORT			(GPIOB)
 #define SERIAL0_TX_PIN			(GPIO_Pin_6)
-#define SERIAL0_TX_PINSOURCE	(GPIO_PinSource7)
+#define SERIAL0_TX_PINSOURCE	(GPIO_PinSource6)
 #define SERIAL0_IO_AF			(GPIO_AF_USART1)
 #define SERIAL0_BAUDRATE		(115200u)
 #define SERIAL0_PORT			(USART1)
@@ -157,6 +157,8 @@ static void _hardwareInit (enum Serial::ID id)
 	GPIO_PinAFConfig(serial.TX.PORT, serial.TX.PINSOURCE, serial.TX.AF);
 	GPIO_Init(serial.TX.PORT, &GPIOStruct);
 
+    USART_Cmd(serial.USART.PORT, ENABLE);
+
 	// UART Init
 	UARTStruct.USART_HardwareFlowControl	=	USART_HardwareFlowControl_None;
 	UARTStruct.USART_Mode					=	USART_Mode_Rx | USART_Mode_Tx;
@@ -167,7 +169,7 @@ static void _hardwareInit (enum Serial::ID id)
 
 	USART_Init(serial.USART.PORT, &UARTStruct);
 
-	USART_ITConfig(serial.USART.PORT, USART_IT_RXNE, ENABLE);
+//	USART_ITConfig(serial.USART.PORT, USART_IT_RXNE, ENABLE);
 	//USART_ITConfig(serial.USART.PORT, USART_IT_TXE, ENABLE);
 
 	//NVIC Init
@@ -176,7 +178,7 @@ static void _hardwareInit (enum Serial::ID id)
 	NVICStruct.NVIC_IRQChannelPreemptionPriority	=	serial.INT.PRIORITY;
 	NVICStruct.NVIC_IRQChannel						=	serial.INT.CHANNEL;
 
-	NVIC_Init(&NVICStruct);
+//	NVIC_Init(&NVICStruct);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -456,3 +458,40 @@ extern "C"
 		}
 	}
 }
+
+/*----------------------------------------------------------------------------*/
+/* ReRoute stdout                                                             */
+/*----------------------------------------------------------------------------*/
+
+extern "C"
+{
+	int _read (int file, char *ptr, int len)
+	{
+		int DataIdx;
+
+		for (DataIdx = 0; DataIdx < len; DataIdx++)
+		{
+			/* Loop until received data register is empty */
+			while ((USART1->SR & USART_SR_RXNE) == 0)
+			{}
+			*ptr++ = USART_ReceiveData(USART1);
+		}
+
+		return len;
+	}
+
+	int _write(int file, char *ptr, int len)
+	{
+		int DataIdx;
+
+		for (DataIdx = 0; DataIdx < len; DataIdx++)
+		{
+			USART_SendData(USART1, (uint8_t) (*ptr++));
+			/* Loop until transmit data register is empty */
+			while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+			{}
+		}
+		return len;
+	}
+}
+

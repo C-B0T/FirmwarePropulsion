@@ -1,7 +1,7 @@
 /**
  * @file	BrushlessMotorDriver.hpp
  * @author	Kevin WYSOCKI
- * @date	1 déc. 2016
+ * @date	1 dï¿½c. 2016
  * @brief	L6235 Brushless Motor Driver class
  */
 
@@ -68,6 +68,12 @@ namespace HAL
 		static BrushlessMotorDriver* GetInstance (enum ID id);
 
 		/**
+		 * @brief Set motor speed in percent (-1.0 to 1.0)
+		 * @param percent : Motor speed in percent
+		 */
+		void SetMotorSpeed (float32_t percent);
+
+		/**
 		 * @brief Set motor speed in percent (0.0 to 1.0)
 		 * @param percent : Motor speed in percent
 		 */
@@ -89,7 +95,7 @@ namespace HAL
 		/**
 		 * @brief Return current direction
 		 */
-		enum Direction GetDirection()
+		enum Direction GetDirection ()
 		{
 			return this->direction;
 		}

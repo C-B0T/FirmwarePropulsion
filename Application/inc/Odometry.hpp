@@ -9,7 +9,6 @@
 #ifndef INC_ODOMETRY_HPP_
 #define INC_ODOMETRY_HPP_
 
-#include "common.h"
 #include "HAL.hpp"
 
 #include <math.h>
@@ -45,11 +44,11 @@ typedef struct robot
     float32_t O;
     float32_t L;
 
-    int32_t AngularVelocity;
-    int32_t LinearVelocity;
+    float32_t AngularVelocity;
+    float32_t LinearVelocity;
 
-    int32_t LeftVelocity;
-    int32_t RigthVelocity;
+    float32_t LeftVelocity;
+    float32_t RightVelocity;
 
     int32_t Xmm;
     int32_t Ymm;
@@ -63,147 +62,187 @@ typedef struct robot
 /*----------------------------------------------------------------------------*/
 
 /**
- * @namespace Utils
+ * @namespace Location
  */
 namespace Location
 {
-    /**
-     * @class PID
-     * @brief Provides a singletron Odometry class
-     *
-     * HOWTO :
-     * - Get Odometry instance with Location::Odometry::GetInstance()
-     * - On init, Call Init() to init values
-     * - Call periodically Compute() to compute the robot location
-     * - Call GetRobot() to get current location
-     */
-class Odometry
-{
-public:
+	/**
+	 * @class Odometry
+	 * @brief Provides a singletron Odometry class
+	 *
+	 * HOWTO :
+	 * - Get Odometry instance with Location::Odometry::GetInstance()
+	 * - On init, Call Init() to init values
+	 * - Call periodically Compute() to compute the robot location
+	 * - Call GetRobot() to get current location
+	 */
+	class Odometry
+	{
+	public:
 
-    /**
-    * @brief Get instance method
-    * @return Odometry
-    *  instance
-    */
-    static Odometry* GetInstance ();
+		/**
+		* @brief Get instance method
+		* @return Odometry
+		*  instance
+		*/
+		static Odometry* GetInstance (bool standalone = true);
 
-    /**
-     * @brief Return instance name
-     */
-    std::string Name()
-    {
-        return this->name;
-    }
+		/**
+		 * @brief Return instance name
+		 */
+		std::string Name()
+		{
+			return this->name;
+		}
 
-    /**
-     * @brief Init coordinates
-     * @param X : X cartesian coordinate (X plane)
-     * @param Y : Y cartesian coordinate (Y plane)
-     * @param O : O polar coordinate (pole)
-     * @param L : L polar coordinate (axis)
-     */
-     Init(float32_t X, float32_t Y, float32_t O, float32_t L);
+		/**
+		 * @brief Init coordinates
+		 * @param X : X cartesian coordinate (X plane)
+		 * @param Y : Y cartesian coordinate (Y plane)
+		 * @param O : O polar coordinate (pole)
+		 * @param L : L polar coordinate (axis)
+		 */
+		 void Init(float32_t X, float32_t Y, float32_t O, float32_t L);
 
-    /**
-     * @brief Get current location
-     * @param r : robot struct
-     */
-     GetRobot(robot_t * r);
+		/**
+		 * @brief Get current location
+		 * @param r : robot struct
+		 */
+		 void GetRobot(robot_t * r);
 
-     /**
-      * @brief Set coordinate X and O during stall
-      * @param X : X cartesian coordinate (X plane)
-      * @param O : O polar coordinate (pole)
-      */
-    setXO(float32_t X, float32_t O);
+		/**
+		 * @brief Get Angular Position
+		 */
+		 float32_t GetAngularPosition()
+		 {
+			 return this->robot.O;
+		 }
 
-    /**
-     * @brief Set coordinate Y and O during stall
-     * @param Y : Y cartesian coordinate (Y plane)
-     * @param O : O polar coordinate (pole)
-     */
-    setYO(float32_t Y, float32_t O);
+		/**
+		 * @brief Get Linear Position
+		 */
+		 float32_t GetLinearPosition()
+		 {
+			 return this->robot.L;
+		 }
 
-    /**
-     * @brief Compute robot location (Should be called periodically)
-     */
-     Compute(float32_t period);
+		/**
+		 * @brief Get Angular Velocity
+		 * @param period : Velocity period required
+		 */
+		 float32_t GetAngularVelocity(float32_t period);
 
-protected:
-    /**
-     * @brief Odometry default constructor
-     */
-    Odometry();
+		/**
+		 * @brief Get Linear Velocity
+		 * @param period : Velocity period required
+		 */
+		 float32_t GetLinearVelocity(float32_t period);
 
-    /**
-     * @brief Odometry constructor
-     * @param X : X cartesian coordinate (X plane)
-     * @param Y : Y cartesian coordinate (Y plane)
-     * @param O : O polar coordinate (pole)
-     * @param L : L polar coordinate (axis)
-     */
-    Odometry(float32_t X, float32_t Y, float32_t O, float32_t L);
+		/**
+		 * @brief Get Left Velocity
+		 * @param period : Velocity period required
+		 */
+		 float32_t GetLeftVelocity(float32_t period);
 
-    /**
-     * @brief Odometry default destructor
-     */
-    ~Odometry();
+		/**
+		 * @brief Get Right Velocity
+		 * @param period : Velocity period required
+		 */
+		 float32_t GetRightVelocity(float32_t period);
 
-    /**
-     * @protected
-     * @brief Instance name
-     */
-    std::string name;
+		 /**
+		  * @brief Set coordinate X and O during stall
+		  * @param X : X cartesian coordinate (X plane)
+		  * @param O : O polar coordinate (pole)
+		  */
+		 void SetXO(float32_t X, float32_t O);
 
-    /**
-     * @protected
-     * @brief data of robot
-     */
-    robot_t robot;
+		/**
+		 * @brief Set coordinate Y and O during stall
+		 * @param Y : Y cartesian coordinate (Y plane)
+		 * @param O : O polar coordinate (pole)
+		 */
+		 void SetYO(float32_t Y, float32_t O);
 
-    /**
-     * @protected
-     * @brief Left wheel encoder
-     */
-    HAL::Encoder* leftEncoder;
+		/**
+		 * @brief Compute robot location (Should be called periodically)
+		 */
+		 void Compute(float32_t period);
 
-    /**
-     * @protected
-     * @brief Right wheel encoder
-     */
-    HAL::Encoder* rightEncoder;
+	protected:
+		/**
+		 * @brief Odometry default constructor
+		 */
+		Odometry(bool standalone);
 
-    /**
-     * @protected
-     * @brief Meca definitions
-     */
-    MECA_DEF def;
+		/**
+		 * @brief Odometry constructor
+		 * @param X : X cartesian coordinate (X plane)
+		 * @param Y : Y cartesian coordinate (Y plane)
+		 * @param O : O polar coordinate (pole)
+		 * @param L : L polar coordinate (axis)
+		 */
+		Odometry(float32_t X, float32_t Y, float32_t O, float32_t L);
 
-    /**
-     * @protected
-     * @brief OS Task handle
-     *
-     * Used by speed control loop
-     */
-    TaskHandle_t taskHandle;
+		/**
+		 * @brief Odometry default destructor
+		 */
+		~Odometry();
 
-    /**
-     * @protected
-     * @brief OS Timer Handle
-     *
-     * Used by odometry loop
-     */
-    TimerHandle_t loopTimer;
+		/**
+		 * @protected
+		 * @brief Instance name
+		 */
+		std::string name;
 
-    /**
-     * @protected
-     * @brief Odometry loop task handler
-     * @param obj : Always NULL
-     */
-    void taskHandler (void* obj);
+		/**
+		 * @protected
+		 * @brief data of robot
+		 */
+		robot_t robot;
 
-};
+		/**
+		 * @protected
+		 * @brief Left wheel encoder
+		 */
+		HAL::Encoder* leftEncoder;
 
+		/**
+		 * @protected
+		 * @brief Right wheel encoder
+		 */
+		HAL::Encoder* rightEncoder;
+
+		/**
+		 * @protected
+		 * @brief Meca definitions
+		 */
+		MECA_DEF def;
+
+		/**
+		 * @protected
+		 * @brief OS Task handle
+		 *
+		 * Used by speed control loop
+		 */
+		TaskHandle_t taskHandle;
+
+		/**
+		 * @protected
+		 * @brief OS Timer Handle
+		 *
+		 * Used by odometry loop
+		 */
+		TimerHandle_t loopTimer;
+
+		/**
+		 * @protected
+		 * @brief Odometry loop task handler
+		 * @param obj : Always NULL
+		 */
+		void taskHandler (void* obj);
+
+	};
+}
 
 #endif /* INC_ODOMETRY_HPP_ */

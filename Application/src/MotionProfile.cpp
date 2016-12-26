@@ -7,7 +7,7 @@
 
 #include "MotionProfile.h"
 
-#include <maths.h>
+#include <math.h>
 
 MotionProfile::MotionProfile()
 {
@@ -32,7 +32,7 @@ bool MotionProfile::isFinished()
 }
 
 
-void MotionProfile::setPoint(float point)
+void MotionProfile::SetsetPoint(float point)
 {
     setPoint = point;
 
@@ -41,7 +41,7 @@ void MotionProfile::setPoint(float point)
     finished = false;
 }
 
-float MotionProfile::udpate(float time)
+float MotionProfile::update(float time)
 {
     float t;
     float r;
