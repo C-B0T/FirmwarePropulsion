@@ -2,7 +2,7 @@
  * @file    Odometry.cpp
  * @author  Jeremy ROULLAND
  * @date    3 dec. 2016
- * @brief   Odometry is use to estimate position
+ * @brief   Odometry is use to estimate location
  */
 
 #include "Odometry.hpp"
@@ -15,25 +15,28 @@ using namespace HAL;
 /* Definitions                                                                */
 /*----------------------------------------------------------------------------*/
 
-#define L_ENCODER_ID	(Encoder::ENCODER0)
-#define R_ENCODER_ID	(Encoder::ENCODER1)
+#define L_ENCODER_ID    (Encoder::ENCODER0)
+#define R_ENCODER_ID    (Encoder::ENCODER1)
 
-#define WD          47.7                // Wheel diameter
-#define WC          1.0                 // Wheel correction (Difference between the (referent) right and left wheel)
-#define ER          4096                // Encoder resolution
-#define ADW         254.0               // Axial distance between wheels
+#define WD          47.7            // Wheel diameter
+#define WC          1.0             // Wheel correction (Difference between the (referent) right and left wheel)
+#define ER          4096            // Encoder resolution
+//#define ADW         254.0           // Axial distance between wheels
+#define ADW         252.68          // Axial distance between wheels
 
 #define _PI_        3.14159265358979323846
 #define _2_PI_      6.28318530717958647692  // 2*PI
 
 #define TICK_BY_MM  27.3332765997653373295  // (ER/(_PI_*WD))
-#define ADW_TICK    6942.65225634039568170  // (ADW * TICK_BY_MM)
+//#define ADW_TICK    6942.65225634039568170  // (ADW * TICK_BY_MM)
+#define ADW_TICK    6906.57233123  // (ADW * TICK_BY_MM)
+
 
 
 #define ODO_TASK_STACK_SIZE     (256u)
-#define ODO_TASK_PRIORITY       (configMAX_PRIORITIES-2)    // Highest priority task
+#define ODO_TASK_PRIORITY       (configMAX_PRIORITIES-2)
 
-#define ODO_LOOP_PERIOD_MS      (10u) // 10ms Odometry loop
+#define ODO_LOOP_PERIOD_MS      (5u) // 5ms Odometry loop
 
 
 /*----------------------------------------------------------------------------*/
@@ -47,7 +50,7 @@ static Location::Odometry* _odometry = NULL;
 /*----------------------------------------------------------------------------*/
 
 /*----------------------------------------------------------------------------*/
-/* Class Implementation	                                                      */
+/* Class Implementation                                                       */
 /*----------------------------------------------------------------------------*/
 
 namespace Location
@@ -68,6 +71,7 @@ namespace Location
     Odometry::Odometry(bool standalone)
     {
         this->name = "ODOMETRY";
+        this->taskHandle = NULL;
 
         // Init members
         this->robot.X = 0.0;
@@ -92,13 +96,13 @@ namespace Location
 
         if(standalone == true)
         {
-			// Create task
-			xTaskCreate((TaskFunction_t)(&Odometry::taskHandler),
-						this->name.c_str(),
-						ODO_TASK_STACK_SIZE,
-						NULL,
-						ODO_TASK_PRIORITY,
-						NULL);
+            // Create task
+            xTaskCreate((TaskFunction_t)(&Odometry::taskHandler),
+            this->name.c_str(),
+            ODO_TASK_STACK_SIZE,
+            NULL,
+            ODO_TASK_PRIORITY,
+            NULL);
         }
     }
 
@@ -146,49 +150,71 @@ namespace Location
         r->Lmm  = this->robot.Lmm;
     }
 
-	/**
-	 * @brief Get Angular Velocity
-	 * @param period : Velocity period required
-	 */
+     /**
+     * @brief Get Angular Position
+     * @return : Angular position in radian (S.I Unit)
+     */
+     float32_t Odometry::GetAngularPosition()
+     {
+         return this->robot.O;
+     }
+
+     /**
+     * @brief Get Linear Position
+     * @return : Linear position in meter (S.I Unit)
+     */
+     float32_t Odometry::GetLinearPosition()
+     {
+         return this->robot.L / (TICK_BY_MM * 1000.0);
+     }
+
+     /**
+     * @brief Get Angular Velocity
+     * @param period : Velocity period required
+     * @return : Angular Velocity in rad/s (S.I Units)
+     */
      float32_t Odometry::GetAngularVelocity(float32_t period)
-	 {
-		 float32_t odo_period = ODO_LOOP_PERIOD_MS;
+     {
+         float32_t odo_period = ODO_LOOP_PERIOD_MS;
 
-		 return (this->robot.AngularVelocity / odo_period) * period;
-	 }
+         return (this->robot.AngularVelocity / odo_period) * period;
+     }
 
-	/**
-	 * @brief Get Linear Velocity
-	 * @param period : Velocity period required
-	 */
+    /**
+     * @brief Get Linear Velocity
+     * @param period : Velocity period required
+     * @return : Linear Velocity in m/s (S.I Units)
+     */
      float32_t Odometry::GetLinearVelocity(float32_t period)
-	 {
-		 float32_t odo_period = ODO_LOOP_PERIOD_MS;
+     {
+         float32_t odo_period = ODO_LOOP_PERIOD_MS;
 
-		 return (this->robot.LinearVelocity / odo_period) * period;
-	 }
+         return ((this->robot.LinearVelocity / odo_period) * period) / (TICK_BY_MM * 1000.0);
+     }
 
-	/**
-	 * @brief Get Left Velocity
-	 * @param period : Velocity period required
-	 */
+    /**
+     * @brief Get Left Velocity
+     * @param period : Velocity period required
+     * @return : Left Velocity in m/s (S.I Units)
+     */
      float32_t Odometry::GetLeftVelocity(float32_t period)
-	 {
-		 float32_t odo_period = ODO_LOOP_PERIOD_MS;
+     {
+         float32_t odo_period = ODO_LOOP_PERIOD_MS;
 
-		 return (this->robot.LeftVelocity / odo_period) * period;
-	 }
+         return ((this->robot.LeftVelocity / odo_period) * period) / (TICK_BY_MM * 1000.0);
+     }
 
-	/**
-	 * @brief Get Right Velocity
-	 * @param period : Velocity period required
-	 */
+    /**
+     * @brief Get Right Velocity
+     * @param period : Velocity period required
+     * @return : Left Velocity in m/s (S.I Units)
+     */
      float32_t Odometry::GetRightVelocity(float32_t period)
-	 {
-		 float32_t odo_period = ODO_LOOP_PERIOD_MS;
+     {
+         float32_t odo_period = ODO_LOOP_PERIOD_MS;
 
-		 return (this->robot.RightVelocity / odo_period) * period;
-	 }
+         return ((this->robot.RightVelocity / odo_period) * period) / (TICK_BY_MM * 1000.0);
+     }
 
     void Odometry::SetXO(float32_t X, float32_t O)
     {
@@ -224,8 +250,6 @@ namespace Location
         float32_t dlf = 0.0;
         float32_t drf = 0.0;
 
-        /*@todo : Add interrupt lock to ensure both read at same time */
-        //Encoders.GetValues(&dl, &dr);
         dl = +  leftEncoder->GetRelativeValue();
         dr = - rightEncoder->GetRelativeValue();
 
@@ -238,7 +262,7 @@ namespace Location
         this->robot.O += (dO / ADW_TICK);
         this->robot.L += dL;
 
-        this->robot.AngularVelocity = dO;
+        this->robot.AngularVelocity = (dO / ADW_TICK);
         this->robot.LinearVelocity  = dL;
 
         while(this->robot.O > _2_PI_)

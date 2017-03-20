@@ -46,14 +46,8 @@ namespace Utils
 	{
 		float32_t err = 0.0;
 
-		if(this->setpoint != 0.0f)
-		{
-			err = (this->setpoint - feedback) / this->setpoint;
-		}
-		else
-		{
-			err = (this->setpoint - feedback) / 1.0f; // Reach Infini;
-		}
+		err = (this->setpoint - feedback) / 1.0;	// Filter output removed
+
 
 		this->intErr	=	err + this->intErr;
 		this->diffErr	=	err - this->err;

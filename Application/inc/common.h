@@ -53,7 +53,7 @@ typedef double float64_t;
 /* Functions export                                                           */
 /*----------------------------------------------------------------------------*/
 
-extern void assert_failed(uint8_t* file, uint32_t line);
+extern "C" void assert_failed(uint8_t* file, uint32_t line);
 
 
 #endif /* COMMON_H_ */

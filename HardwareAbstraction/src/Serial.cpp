@@ -469,6 +469,12 @@ extern "C"
 	{
 		int DataIdx;
 
+		if (len == 0)
+			return 0;
+
+		/* Force reading one by one */
+		len = 1;
+
 		for (DataIdx = 0; DataIdx < len; DataIdx++)
 		{
 			/* Loop until received data register is empty */
@@ -486,12 +492,11 @@ extern "C"
 
 		for (DataIdx = 0; DataIdx < len; DataIdx++)
 		{
-			USART_SendData(USART1, (uint8_t) (*ptr++));
 			/* Loop until transmit data register is empty */
-			while (USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET)
+			while (!(USART1->SR & USART_SR_TXE))
 			{}
+			USART_SendData(USART1, (uint8_t) (*ptr++));
 		}
 		return len;
 	}
 }
-

@@ -1,8 +1,8 @@
 /**
- * @file	VelocityControl.hpp
- * @author	Jeremy ROULLAND
- * @date	20 dec. 2016
- * @brief	VelocityControl class
+ * @file    VelocityControl.hpp
+ * @author  Jeremy ROULLAND
+ * @date    20 dec. 2016
+ * @brief   VelocityControl class
  */
 
 #ifndef INC_VELOCITYCONTROL_HPP_
@@ -12,32 +12,38 @@
 #include "Utils.hpp"
 #include "Odometry.hpp"
 
+// FreeRTOS
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include "task.h"
+#include "timers.h"
+
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
 /*----------------------------------------------------------------------------*/
 typedef struct
 {
-	// Motor
-	struct
-	{
-		HAL::BrushlessMotorDriver::ID ID_left;
-		HAL::BrushlessMotorDriver::ID ID_right;
-	}Motors;
+    // Motor
+    struct
+    {
+        HAL::BrushlessMotorDriver::ID ID_left;
+        HAL::BrushlessMotorDriver::ID ID_right;
+    }Motors;
 
-	// PID
-	struct vc_pid
-	{
-		float32_t	kp;
-		float32_t 	ki;
-		float32_t	kd;
-	}PID_Angular;
+    // PID
+    struct vc_pid
+    {
+        float32_t    kp;
+        float32_t    ki;
+        float32_t    kd;
+    }PID_Angular;
 
-	struct vc_pid PID_Linear;
+    struct vc_pid PID_Linear;
 
 }VC_DEF;
 
 /*----------------------------------------------------------------------------*/
-/* Class declaration	                                                      */
+/* Class declaration                                                          */
 /*----------------------------------------------------------------------------*/
 
 /**
@@ -72,92 +78,174 @@ namespace MotionControl
          * @return VelocityLoop instance
          * @return BrushlessMotor instance
          */
-        static VelocityControl* GetInstance();
+        static VelocityControl* GetInstance(bool standalone = true);
 
         /**
          * @brief Return instance name
          */
         std::string Name()
         {
-        	return this->name;
+            return this->name;
         }
 
         /**
          * @brief Set angular velocity setpoint
          */
         void SetAngularVelocity(float32_t velocity)
-		{
-			this->angularVelocity = velocity;
+        {
+        	if( xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE )
+        	{
+				this->angularVelocity = velocity;
+				xSemaphoreGive(this->xMutex);
+        	}
         }
 
         /**
          * @brief Get angular velocity setpoint
          */
         float32_t GetAngularVelocity()
-		{
-			return this->angularVelocity;
+        {
+        	float32_t r = 0.0;
+        	if( xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE )
+        	{
+				r = this->angularVelocity;
+				xSemaphoreGive(this->xMutex);
+        	}
+            return r;
         }
 
         /**
          * @brief Set linear velocity setpoint
          */
         void SetLinearVelocity(float32_t velocity)
-		{
-			this->linearVelocity = velocity;
+        {
+            this->linearVelocity = velocity;
+        }
+
+        /**
+         * @brief Get linear velocity setpoint
+         */
+        float32_t GetLinearVelocity()
+        {
+            return this->linearVelocity;
+        }
+
+        /**
+         * @brief Get angular speed
+         */
+        float32_t GetAngularSpeed()
+        {
+            return this->angularSpeed;
+        }
+
+        /**
+         * @brief Get linear speed
+         */
+        float32_t GetLinearSpeed()
+        {
+            return this->linearSpeed;
         }
 
         /**
          * @brief Get left speed
          */
         float32_t GetLeftSpeed()
-		{
-			return this->leftSpeed;
+        {
+            return this->leftSpeed;
         }
 
         /**
          * @brief Get right speed
          */
         float32_t GetRightSpeed()
-		{
-			return this->rightSpeed;
+        {
+            return this->rightSpeed;
         }
 
         /**
          * @brief Set Angular Kp
          */
         void SetAngularKp(float32_t Kp)
-		{
-        	this->def.PID_Angular.kp = Kp;
-        	this->pid_angular.SetKp(Kp);
+        {
+            this->def.PID_Angular.kp = Kp;
+            this->pid_angular.SetKp(Kp);
         }
 
         /**
          * @brief Set Angular Ki
          */
         void SetAngularKi(float32_t Ki)
-		{
-        	this->def.PID_Angular.ki = Ki;
-        	this->pid_angular.SetKi(Ki);
+        {
+            this->def.PID_Angular.ki = Ki;
+            this->pid_angular.SetKi(Ki);
         }
 
         /**
          * @brief Set Linear Kp
          */
         void SetLinearKp(float32_t Kp)
-		{
-        	this->def.PID_Linear.kp = Kp;
-        	this->pid_linear.SetKp(Kp);
+        {
+            this->def.PID_Linear.kp = Kp;
+            this->pid_linear.SetKp(Kp);
         }
 
         /**
          * @brief Set Linear Ki
          */
         void SetLinearKi(float32_t Ki)
-		{
-        	this->def.PID_Linear.ki = Ki;
-        	this->pid_linear.SetKp(Ki);
+        {
+            this->def.PID_Linear.ki = Ki;
+            this->pid_linear.SetKi(Ki);
         }
 
+
+        void Brake()
+        {
+            leftMotor->Brake();
+            rightMotor->Brake();
+        }
+
+        void Stop()
+        {
+            this->stop = true;
+            leftMotor->Brake();
+            rightMotor->Brake();
+        }
+
+        void Start()
+        {
+            pid_angular.Reset();
+            pid_linear.Reset();
+
+            this->stop = false;
+            leftMotor->Move();
+            rightMotor->Move();
+        }
+
+        void Enable()
+        {
+            if(this->enable == false)
+            {
+                //pid_angular.Reset();
+                //pid_linear.Reset();
+
+                leftMotor->Move();
+                rightMotor->Move();
+
+                this->enable = true;
+            }
+        }
+
+        void Disable()
+        {
+            if(this->enable == true)
+            {
+                leftMotor->Freewheel();
+                rightMotor->Freewheel();
+
+                this->enable = false;
+            }
+        }
 
         /**
          * @brief Compute robot velocity
@@ -170,7 +258,7 @@ namespace MotionControl
          * @protected
          * @brief Private constructor
          */
-        VelocityControl();
+        VelocityControl(bool standalone);
 
         /**
          * @protected
@@ -182,18 +270,18 @@ namespace MotionControl
          * @protected
          * @brief angular velocity PID controller
          */
-        Utils::PID	pid_angular;
+        Utils::PID    pid_angular;
 
         /**
          * @protected
          * @brief linear velocity PID controller
          */
-        Utils::PID	pid_linear;
+        Utils::PID    pid_linear;
 
         /**
          * @protected
-		 * @brief Coef definitions
-		 */
+         * @brief Coef definitions
+         */
         VC_DEF def;
 
         /**
@@ -228,6 +316,18 @@ namespace MotionControl
 
         /**
          * @protected
+         * @brief angular speed
+         */
+        float32_t angularSpeed;
+
+        /**
+         * @protected
+         * @brief right speed
+         */
+        float32_t linearSpeed;
+
+        /**
+         * @protected
          * @brief left speed
          */
         float32_t leftSpeed;
@@ -238,20 +338,39 @@ namespace MotionControl
          */
         float32_t rightSpeed;
 
-		/**
-         * @protected
-		 * @brief OS Task handle
-		 *
-		 * Used by speed control loop
-		 */
-		TaskHandle_t taskHandle;
 
-		/**
+        /**
          * @protected
-		 * @brief Speed control loop task handler
-		 * @param obj : Always NULL
-		 */
-		void taskHandler (void* obj);
+         * @brief enable/disable
+         */
+        bool enable;
+
+        /**
+         * @protected
+         * @brief emergency stop
+         */
+        bool stop;
+
+        /**
+         * @protected
+         * @brief OS Task handle
+         *
+         * Used by speed control loop
+         */
+        TaskHandle_t taskHandle;
+
+        /**
+         * @protected
+         * @brief Mutex on variable data
+         */
+        SemaphoreHandle_t xMutex;
+
+        /**
+         * @protected
+         * @brief Speed control loop task handler
+         * @param obj : Always NULL
+         */
+        void taskHandler (void* obj);
     };
 }
 

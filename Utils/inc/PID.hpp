@@ -119,7 +119,7 @@ namespace Utils
 		 *
 		 * The filter output is normalized to the setpoint :
 		 * - 0.0 means 0% of the setpoint
-		 * - 1.0 means 100% of the sepoint
+		 * - 1.0 means 100% of the setpoint
 		 *
 		 * This is usefull to controll processes in duty cycle
 		 *
@@ -134,7 +134,7 @@ namespace Utils
 		 *
 		 * The filter output is normalized to the setpoint :
 		 * - 0.0 means 0% of the setpoint
-		 * - 1.0 means 100% of the sepoint
+		 * - 1.0 means 100% of the setpoint
 		 *
 		 * This is usefull to controll processes in duty cycle
 		 *
