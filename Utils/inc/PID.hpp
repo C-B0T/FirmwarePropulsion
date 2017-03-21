@@ -57,6 +57,54 @@ namespace Utils
 		void Reset();
 
 		/**
+		 * @brief Set kp term
+		 */
+		void SetKp(float32_t kp)
+		{
+			this->kp = kp;
+		}
+
+		/**
+		 * @brief Set ki term
+		 */
+		void SetKi(float32_t ki)
+		{
+			this->ki = ki;
+		}
+
+		/**
+		 * @brief Set kd term
+		 */
+		void SetKd(float32_t kd)
+		{
+			this->kd = kd;
+		}
+
+		/**
+		 * @brief Get kp term
+		 */
+		float32_t GetKp()
+		{
+			return this->kp;
+		}
+
+		/**
+		 * @brief Get ki term
+		 */
+		float32_t GetKi()
+		{
+			return this->ki;
+		}
+
+		/**
+		 * @brief Get kd term
+		 */
+		float32_t GetKd()
+		{
+			return this->kd;
+		}
+
+		/**
 		 * @brief Update setpoint
 		 */
 		void SetSetpoint (float32_t setpoint)
@@ -71,7 +119,7 @@ namespace Utils
 		 *
 		 * The filter output is normalized to the setpoint :
 		 * - 0.0 means 0% of the setpoint
-		 * - 1.0 means 100% of the sepoint
+		 * - 1.0 means 100% of the setpoint
 		 *
 		 * This is usefull to controll processes in duty cycle
 		 *
@@ -86,7 +134,7 @@ namespace Utils
 		 *
 		 * The filter output is normalized to the setpoint :
 		 * - 0.0 means 0% of the setpoint
-		 * - 1.0 means 100% of the sepoint
+		 * - 1.0 means 100% of the setpoint
 		 *
 		 * This is usefull to controll processes in duty cycle
 		 *
