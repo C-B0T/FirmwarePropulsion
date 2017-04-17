@@ -216,8 +216,21 @@ namespace Location
          return ((this->robot.RightVelocity / odo_period) * period) / (TICK_BY_MM * 1000.0);
      }
 
+     void Odometry::SetXYO(float32_t X, float32_t Y, float32_t O)
+     {
+         //TODO: Secure by mutex
+         this->robot.X = X;
+         this->robot.Y = Y;
+         this->robot.O = O;
+
+         this->robot.Xmm = X / TICK_BY_MM;
+         this->robot.Ymm = Y / TICK_BY_MM;
+         this->robot.Odeg = (180.0 * O) / _PI_;
+     }
+
     void Odometry::SetXO(float32_t X, float32_t O)
     {
+        //TODO: Secure by mutex
         this->robot.X = X;
         this->robot.O = O;
 
@@ -228,6 +241,7 @@ namespace Location
 
     void Odometry::SetYO(float32_t Y, float32_t O)
     {
+        //TODO: Secure by mutex
         this->robot.Y = Y;
         this->robot.O = O;
 

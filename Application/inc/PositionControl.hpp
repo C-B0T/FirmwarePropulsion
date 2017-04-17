@@ -93,13 +93,13 @@ namespace MotionControl
          */
         void SetAngularPosition(float32_t position)
         {
-        	if( xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE )
-        	{
-				// Set angular position order
-				this->angularPosition = position;
+            if( xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE )
+            {
+                // Set angular position order
+                this->angularPosition = position;
 
-				xSemaphoreGive(this->xMutex);
-        	}
+                xSemaphoreGive(this->xMutex);
+            }
 
             // Disable brake emergency
             /*if(this->stop == true)
@@ -114,13 +114,13 @@ namespace MotionControl
          */
         float32_t GetAngularPosition()
         {
-        	float32_t r = 0.0;
-        	if( xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE )
-        	{
-				r = this->angularPosition;
+            float32_t r = 0.0;
+            if( xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE )
+            {
+                r = this->angularPosition;
 
-				xSemaphoreGive(this->xMutex);
-			}
+                xSemaphoreGive(this->xMutex);
+            }
             return r;
         }
 
@@ -146,6 +146,22 @@ namespace MotionControl
         float32_t GetLinearPosition()
         {
             return this->linearPosition;
+        }
+
+        /**
+        * @brief Get angular position error
+         */
+        float32_t GetAngularPositionError()
+        {
+            return this->angularPositionError;
+        }
+
+        /**
+        * @brief Get linear position error
+         */
+        float32_t GetLinearPositionError()
+        {
+            return this->linearPositionError;
         }
 
         /**
@@ -315,6 +331,18 @@ namespace MotionControl
          * @brief Linear position setpoint
          */
         float32_t linearPosition;
+
+        /**
+         * @protected
+         * @brief Angular position error
+         */
+        float32_t angularPositionError;
+
+        /**
+         * @protected
+         * @brief Linear position error
+         */
+        float32_t linearPositionError;
 
         /**
          * @protected

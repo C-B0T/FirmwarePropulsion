@@ -82,7 +82,7 @@
          enum Phase
          {
              Zero = 0,    //!< Initial state
-             Acc,	     //!< Acc
+             Acc,         //!< Acc
              ConstVel,    //!< ConstVel
              Dec,         //!< Dec
              AccDec,      //!< AccDec
@@ -153,16 +153,11 @@
          void Compute(float32_t period);
 
          /**
-          * @brief Generate profile control
-          */
-         void Generate(float32_t period);
-
-         /**
           * @brief is angular and linear positioning finished
           */
          bool isPositioningFinished()
          {
-         	return this->Finished;
+             return this->Finished;
          }
 
 
@@ -171,7 +166,7 @@
           */
          uint32_t GetAngularPhase()
          {
-         	return (uint32_t)this->angularPhaseProfile;
+             return (uint32_t)this->angularPhaseProfile;
          }
 
          /**
@@ -179,7 +174,15 @@
           */
          uint32_t GetLinearPhase()
          {
-         	return (uint32_t)this->linearPhaseProfile;
+             return (uint32_t)this->linearPhaseProfile;
+         }
+
+         /**
+          * @brief get safeguard
+          */
+         bool GetSafeguard()
+         {
+             return this->safeguard;
          }
 
      protected:
@@ -189,6 +192,11 @@
           * @brief Private constructor
           */
          ProfileGenerator(bool standalone);
+
+         /**
+          * @brief Generate profile control
+          */
+         void Generate(float32_t period);
 
          /**
           * @protected
@@ -261,6 +269,12 @@
           * @brief Linear position profiled
           */
          float32_t linearPositionProfiled;
+
+         /**
+          * @protected
+          * @brief safeguard flag
+          */
+         bool safeguard;
 
          /**
           * @protected

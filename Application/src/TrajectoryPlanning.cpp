@@ -11,10 +11,37 @@
 
 using namespace MotionControl;
 
+/*----------------------------------------------------------------------------*/
+/* Private Members                                                            */
+/*----------------------------------------------------------------------------*/
+
+static MotionControl::TrajectoryPlanning* _trajectoryPlanning = NULL;
+
+/*----------------------------------------------------------------------------*/
+/* Private Functions                                                          */
+/*----------------------------------------------------------------------------*/
+
 namespace MotionControl
 {
-    TrajectoryPlanning::TrajectoryPlanning()
+    TrajectoryPlanning* TrajectoryPlanning::GetInstance(bool standalone)
     {
+        // If TrajectoryPlanning instance already exists
+        if(_trajectoryPlanning != NULL)
+        {
+            return _trajectoryPlanning;
+        }
+        else
+        {
+            _trajectoryPlanning = new TrajectoryPlanning(standalone);
+            return _trajectoryPlanning;
+        }
+    }
+
+    TrajectoryPlanning::TrajectoryPlanning(bool standalone)
+    {
+        this->name = "TrajectoryPlanning";
+        this->taskHandle = NULL;
+
         this->state = FREE;
         this->step = 0;
 
@@ -22,7 +49,7 @@ namespace MotionControl
 
         this->X[0] = 0.0;
         this->Y[0] = 0.0;
-        this->XYn  = 0.0;
+        this->XYn  = 0;
 
         this->linearSetPoint = 0.0;
         this->linearNextSetPoint = 0.0;
@@ -32,12 +59,19 @@ namespace MotionControl
         this->position = PositionControl::GetInstance();
         this->velocity = VelocityControl::GetInstance();
         this->profile  = ProfileGenerator::GetInstance();
-    }
 
-    TrajectoryPlanning::~TrajectoryPlanning()
-    {
-    }
+        if(standalone)
+        {
+            // Create task
+            xTaskCreate((TaskFunction_t)(&TrajectoryPlanning::taskHandler),
+                        this->name.c_str(),
+                        TP_TASK_STACK_SIZE,
+                        NULL,
+                        TP_TASK_PRIORITY,
+                        NULL);
+        }
 
+    }
     void TrajectoryPlanning::goLinear(float32_t linear) // linear in meters
     {
         this->linearSetPoint = linear;
@@ -208,7 +242,15 @@ namespace MotionControl
         else
         {
             calculateMove();
-            return 0;
+            if(this->profile->GetSafeguard())
+            {
+                // Safeguard has been trigged then stop
+                this->state = FREE;
+                //TODO: Send to Diag an error
+                return -1;
+            }
+            else
+                return 0;
         }
     }
 
@@ -574,6 +616,45 @@ namespace MotionControl
 
     }
 
+    void TrajectoryPlanning::Compute(float32_t period)
+    {
+        this->update();
+    }
+
+    void TrajectoryPlanning::taskHandler(void* obj)
+    {
+        TickType_t xLastWakeTime;
+        TickType_t xFrequency = pdMS_TO_TICKS(TP_TASK_PERIOD_MS);
+
+        TrajectoryPlanning* instance = _trajectoryPlanning;
+        TickType_t prevTick = 0u,  tick = 0u;
+
+        float32_t period = 0.0f;
+
+        // 1. Initialize periodical task
+        xLastWakeTime = xTaskGetTickCount();
+
+        // 2. Get tick count
+        prevTick = xTaskGetTickCount();
+
+        while(1)
+        {
+            // 2. Wait until period elapse
+            vTaskDelayUntil(&xLastWakeTime, xFrequency);
+
+            // 3. Get tick
+            tick = xTaskGetTickCount();
+
+            period = static_cast<float32_t>(tick) -
+                     static_cast<float32_t>(prevTick);
+
+            //4. Compute profile (ProfileGenerator)
+            instance->Compute(period);
+
+            // 5. Set previous tick
+            prevTick = tick;
+        }
+    }
 
     float32_t TrajectoryPlanning::getTime()
     {

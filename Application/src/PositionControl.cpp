@@ -141,6 +141,8 @@ namespace MotionControl
 
         this->enable = true;
 
+        this->stop = false;
+
         if(standalone)
         {
             // Create task
@@ -173,11 +175,16 @@ namespace MotionControl
             currentAngularPosition = odometry->GetAngularPosition();
             currentLinearPosition  = odometry->GetLinearPosition();
 
+            // Compute positions error
+            // TODO : Si l'erreur de position devient trop grande, la couche du dessus doit gerer
+            this->angularPositionError = this->angularPosition - currentAngularPosition;
+            this->linearPositionError  = this->linearPosition  - currentLinearPosition;
+
             if(xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE)
             {
-				this->pid_angular.SetSetpoint(this->angularPosition);
-				this->pid_linear.SetSetpoint(this->linearPosition);
-				xSemaphoreGive(this->xMutex);
+                this->pid_angular.SetSetpoint(this->angularPosition);
+                this->pid_linear.SetSetpoint(this->linearPosition);
+                xSemaphoreGive(this->xMutex);
             }
 
             // Compute PID

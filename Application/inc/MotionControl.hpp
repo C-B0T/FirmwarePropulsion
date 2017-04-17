@@ -15,8 +15,58 @@
  * Contains class such as PositionControl, VelocityControl, MotionProfile, etc.
  */
 
-#include "PositionControl.hpp"
+#include "common.h"
+
+#include "Odometry.hpp"
 #include "VelocityControl.hpp"
-#include "MotionProfile.hpp"
+#include "PositionControl.hpp"
+#include "ProfileGenerator.hpp"
+
+#include "TrajectoryPlanning.hpp"
+
+using namespace Location;
+
+namespace MotionControl
+{
+    /**
+     * @class BlMotionControl
+     * @brief Brushless Motion Controller class
+     *
+     * HOWTO :
+     * -
+     *
+     */
+    class BlMotionControl
+    {
+    public:
+        BlMotionControl();
+        void Update();
+
+    protected:
+        Odometry           *odometry;
+        VelocityControl    *vc;
+        PositionControl    *pc;
+        ProfileGenerator   *pg;
+        TrajectoryPlanning *tp;
+
+    };
+
+    /**
+     * @class SbSMotionControl
+     * @brief Step by Step Motion Controller class
+     *
+     * HOWTO :
+     * -
+     *
+     */
+    class SbSMotionControl
+    {
+    public:
+        SbSMotionControl();
+
+    private:
+
+    };
+}
 
 #endif /* INC_MOTIONCONTROL_HPP_ */

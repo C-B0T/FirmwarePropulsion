@@ -8,6 +8,10 @@
 #ifndef INC_VELOCITYCONTROL_HPP_
 #define INC_VELOCITYCONTROL_HPP_
 
+#include <stdio.h>
+
+#include "common.h"
+
 #include "HAL.hpp"
 #include "Utils.hpp"
 #include "Odometry.hpp"
@@ -93,11 +97,11 @@ namespace MotionControl
          */
         void SetAngularVelocity(float32_t velocity)
         {
-        	if( xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE )
-        	{
-				this->angularVelocity = velocity;
-				xSemaphoreGive(this->xMutex);
-        	}
+            if( xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE )
+            {
+                this->angularVelocity = velocity;
+                xSemaphoreGive(this->xMutex);
+            }
         }
 
         /**
@@ -105,12 +109,12 @@ namespace MotionControl
          */
         float32_t GetAngularVelocity()
         {
-        	float32_t r = 0.0;
-        	if( xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE )
-        	{
-				r = this->angularVelocity;
-				xSemaphoreGive(this->xMutex);
-        	}
+            float32_t r = 0.0;
+            if( xSemaphoreTake( this->xMutex, ( TickType_t ) 4 ) == pdTRUE )
+            {
+                r = this->angularVelocity;
+                xSemaphoreGive(this->xMutex);
+            }
             return r;
         }
 
@@ -247,6 +251,12 @@ namespace MotionControl
             }
         }
 
+        void GetExecTime(float32_t* Moy, uint32_t* Max)
+        {
+            *Moy = this->execMoy;
+            *Max = this->execMax;
+        }
+
         /**
          * @brief Compute robot velocity
          */
@@ -358,6 +368,17 @@ namespace MotionControl
          * Used by speed control loop
          */
         TaskHandle_t taskHandle;
+
+        /**
+         * @protected
+         * @brief Task execution time
+         *
+         * Measure execution time (moy and max)
+         */
+        uint32_t execTime;
+        uint32_t execCnt;
+        float32_t execMoy;
+        uint32_t execMax;
 
         /**
          * @protected

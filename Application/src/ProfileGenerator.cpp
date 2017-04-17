@@ -222,18 +222,30 @@ namespace MotionControl
      */
     void ProfileGenerator::Compute(float32_t period)
     {
-        float32_t currentAngularPosition = 0.0;
-        float32_t currentLinearPosition  = 0.0;
+        float32_t angularPositionError = 0.0;
+        float32_t linearPositionError  = 0.0;
 
         float32_t time = getTime();
 
-        // Get current positions
-        currentAngularPosition = odometry->GetAngularPosition();
-        currentLinearPosition  = odometry->GetLinearPosition();
+        // Safeguard
+        // TODO: Avant de générer le prochain point de profile
+        //       s'assurer que l'erreur n'est pas trop grande sinon
+        //       ca veut dire que le système n'arrive pas à suivre.
+        //       Il faut donc soit informer la couche du dessus
+        //       soit stopper le profile soit ajuster les
+        //       paramètres max des profiles ou un mixe de tout ca.
+        angularPositionError = this->positionControl->GetAngularPositionError();
+        linearPositionError  = this->positionControl->GetLinearPositionError();
+
+        // TODO: A améliorer pour faire un pourcentage
+        this->safeguard = false;
+        if(angularPositionError > 0.17)    // ~10°
+            this->safeguard = true;
+        if(linearPositionError > 0.1)       // 10cm
+            this->safeguard = true;
 
         // Generate profile
         this->Generate(period);
-
 
         positionControl->SetAngularPosition(this->angularPositionProfiled);
         positionControl->SetLinearPosition(this->linearPositionProfiled);
@@ -287,7 +299,7 @@ namespace MotionControl
                 break;
 
             case AccDec:
-            	this->angularProfile.SetPoint(this->angularPosition);
+                this->angularProfile.SetPoint(this->angularPosition);
                 if(this->angularProfile.isFinished())
                 {
                     this->angularPhaseProfile = Zero;
@@ -305,7 +317,7 @@ namespace MotionControl
                 break;
 
             case Acc:
-            	if(this->linearProfile.isFinished())
+                if(this->linearProfile.isFinished())
                 {
                     this->linearPhaseProfile = ConstVel;
                     this->linearProfile.SetProfile(MotionProfile::LINEAR);
@@ -337,7 +349,7 @@ namespace MotionControl
                 break;
 
             case Dec:
-            	this->linearProfile.SetPoint(this->linearPosition);
+                this->linearProfile.SetPoint(this->linearPosition);
                 if(this->linearProfile.isFinished())
                 {
                     this->linearPhaseProfile = Zero;
@@ -345,7 +357,7 @@ namespace MotionControl
                 break;
 
             case AccDec:
-            	this->linearProfile.SetPoint(this->linearPosition);
+                this->linearProfile.SetPoint(this->linearPosition);
                 if(this->linearProfile.isFinished())
                 {
                     this->linearPhaseProfile = Zero;

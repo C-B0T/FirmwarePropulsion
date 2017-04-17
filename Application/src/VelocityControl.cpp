@@ -8,9 +8,6 @@
  */
 
 #include "VelocityControl.hpp"
-#include "common.h"
-
-#include <stdio.h>
 
 using namespace HAL;
 using namespace Utils;
@@ -235,6 +232,14 @@ namespace MotionControl
 
             // 5. Set previous tick
             prevTick = tick;
+
+            // 6. Execution time measure
+            period = xTaskGetTickCount() - tick;
+            this->execTime += period;
+            this->execCnt++;
+            this->execMoy = (float32_t)this->execTime / (float32_t)this->execCnt;
+            if(period > this->execMax)
+                this->execMax = period;
         }
     }
 }

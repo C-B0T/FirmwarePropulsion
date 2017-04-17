@@ -145,6 +145,14 @@ namespace Location
          float32_t GetRightVelocity(float32_t period = 1000.0);
 
          /**
+          * @brief Set coordinate X, Y and O (force XYO)
+          * @param X : X cartesian coordinate (X plane)
+          * @param Y : Y cartesian coordinate (Y plane)
+          * @param O : O polar coordinate (pole)
+          */
+         void SetXYO(float32_t X, float32_t Y, float32_t O);
+
+         /**
           * @brief Set coordinate X and O during stall
           * @param X : X cartesian coordinate (X plane)
           * @param O : O polar coordinate (pole)

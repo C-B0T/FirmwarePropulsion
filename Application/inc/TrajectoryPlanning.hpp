@@ -9,15 +9,25 @@
 #ifndef INC_TRAJECTORYPLANNING_H_
 #define INC_TRAJECTORYPLANNING_H_
 
+#include <stdio.h>
+
 #include "common.h"
 
+// For std::string
+#include <algorithm>
+
 #include "Odometry.hpp"
-#include "MotionControl.hpp"
-//#include "ProfileControl.hpp"
+#include "PositionControl.hpp"
+#include "VelocityControl.hpp"
 #include "ProfileGenerator.hpp"
 
+// FreeRTOS
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include "task.h"
+#include "timers.h"
+
 using namespace Location;
-using namespace MotionControl;
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
@@ -25,6 +35,12 @@ using namespace MotionControl;
 
 #define _PI_        3.14159265358979323846
 #define _2_PI_      6.28318530717958647692  // 2*PI
+
+
+#define TP_TASK_STACK_SIZE          (512u)
+#define TP_TASK_PRIORITY            (configMAX_PRIORITIES-6)
+
+#define TP_TASK_PERIOD_MS           (100u)
 
 /*----------------------------------------------------------------------------*/
 /* Class declaration                                                          */
@@ -46,8 +62,25 @@ namespace MotionControl
     class TrajectoryPlanning
     {
     public:
-        TrajectoryPlanning();
-        ~TrajectoryPlanning();
+        /**
+         * @brief Get instance method
+         * @return Trajectory planning loop instance
+         */
+        static TrajectoryPlanning* GetInstance(bool standalone = true);
+
+        /**
+         * @brief Return instance name
+         */
+        std::string Name()
+        {
+            return this->name;
+        }
+
+        /**
+         * @brief Compute robot trajectory planning
+         */
+        void Compute(float32_t period);
+
 
         //Orders:
         void goLinear(float32_t linear);     // linear in meters
@@ -71,17 +104,7 @@ namespace MotionControl
     protected:
         enum state_t {FREE=0, LINEAR, ANGULAR, STOP, KEEP, LINEARPLAN, CURVEPLAN, STALLX, STALLY, DRAWPLAN};
 
-        /**
-         * @protected
-         * @brief get absolute value from a float32_t
-         */
-        float32_t abs(float32_t val);
-
-        /**
-         * @protected
-         * @brief get current time in second
-         */
-        float32_t getTime();
+        TrajectoryPlanning(bool standalone);
 
         void calculateFree();
         void calculateMove();
@@ -127,6 +150,40 @@ namespace MotionControl
         PositionControl *position;
         VelocityControl *velocity;
         ProfileGenerator *profile;
+
+
+        /**
+         * @protected
+         * @brief Instance name
+         */
+        std::string name;
+
+        /**
+         * @protected
+         * @brief OS Task handle
+         *
+         * Used by position Trajectory planning loop
+         */
+        TaskHandle_t taskHandle;
+
+        /**
+         * @protected
+         * @brief Trajectory planning loop task handler
+         * @param obj : Always NULL
+         */
+        void taskHandler (void* obj);
+
+        /**
+         * @protected
+         * @brief get absolute value from a float32_t
+         */
+        float32_t abs(float32_t val);
+
+        /**
+         * @protected
+         * @brief get current time in second
+         */
+        float32_t getTime();
     };
 }
 
