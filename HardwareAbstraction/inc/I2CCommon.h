@@ -1,10 +1,8 @@
 /**
  * @file	I2CCommon.h
- * @author	kevin.wysocki
+ * @author	Kevin Wysocki
  * @date	20 avr. 2017
- * @brief	
- *
- *
+ * @brief	Some I2C Master/Slave common definitions, types, etc.
  */
 
 #ifndef INC_I2CCOMMON_H_
