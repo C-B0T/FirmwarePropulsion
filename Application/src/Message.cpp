@@ -243,6 +243,7 @@ namespace Communication
 			case MSG_TYPE_SET_ANGLE:
 			case MSG_TYPE_DISABLE_POS_CONTROL:
 			case MSG_TYPE_ENABLE_POS_CONTROL:
+			default:
 				rval = MSG_ERROR_NO_ANSWER_NEEDED;
 				break;
 			}
@@ -274,6 +275,7 @@ namespace Communication
 			case MSG_TYPE_SET_ANGLE:
 			case MSG_TYPE_DISABLE_POS_CONTROL:
 			case MSG_TYPE_ENABLE_POS_CONTROL:
+			default:
 				rval = MSG_ERROR_NO_ANSWER_NEEDED;
 				break;
 			}

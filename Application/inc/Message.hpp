@@ -12,6 +12,7 @@
 #define INC_MESSAGE_HPP_
 
 #include "common.h"
+#include "I2CCommon.h"
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */

@@ -308,8 +308,6 @@ namespace HAL
 				this->buffer.wrIndex++;
 				this->buffer.frame[this->buffer.wrIndex].Type 	=	(I2C_FRAME_TYPE)((uint32_t)data & (uint32_t)I2C_FRAME_TYPE_MASK);
 				this->buffer.frame[this->buffer.wrIndex].Length = 	0u;
-				this->buffer.frame[this->buffer.wrIndex].Error	=	0u;
-
 			}
 			else
 			{
