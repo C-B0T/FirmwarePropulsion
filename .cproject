@@ -112,7 +112,7 @@
 					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.1099276278.1880686853" name="PositionControl.hpp" rcbsApplicability="disable" resourcePath="Application/inc/PositionControl.hpp" toolsToInvoke=""/>
 					<fileInfo id="fr.ac6.managedbuild.config.gnu.cross.exe.debug.1099276278.244580194" name="VelocityControl.hpp" rcbsApplicability="disable" resourcePath="Application/inc/VelocityControl.hpp" toolsToInvoke=""/>
 					<sourceEntries>
-						<entry excluding="inc/MotionProfile.h|inc/TrajectoryPlanning.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Application"/>
+						<entry excluding="src/Communication.cpp|inc/MotionProfile.h|inc/TrajectoryPlanning.h" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Application"/>
 						<entry excluding="src/memmang/heap_5.c|src/memmang/heap_3.c|src/memmang/heap_2.c|src/memmang/heap_1.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FreeRTOS"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="HardwareAbstraction"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="STM32_Driver"/>
@@ -216,7 +216,7 @@
 					<sourceEntries>
 						<entry excluding="inc|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Application"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Application/inc"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Application/src"/>
+						<entry excluding="Communication.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Application/src"/>
 						<entry excluding="src/memmang/heap_5.c|src/memmang/heap_3.c|src/memmang/heap_2.c|src/memmang/heap_1.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="FreeRTOS"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="HardwareAbstraction"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="STM32_Driver"/>
