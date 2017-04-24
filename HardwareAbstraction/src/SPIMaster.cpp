@@ -1,11 +1,10 @@
 /**
  * @file	SPIMaster.cpp
- * @author	kevin.wysocki
+ * @author	Kevin WYSOCKI
  * @date	24 avr. 2017
- * @brief	
- *
- *
+ * @brief	SPI master abstraction class
  */
+
 
 #include <stddef.h>
 #include <SPIMaster.hpp>
