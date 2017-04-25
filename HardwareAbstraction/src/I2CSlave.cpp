@@ -58,7 +58,7 @@ static I2C_DEF _getI2CStruct (enum I2CSlave::ID id)
 
 	switch(id)
 	{
-	case I2CSlave::I2C_SLAVE_MAX:
+	case I2CSlave::I2C_SLAVE0:
 		// SCL Pin
 		i2c.SCL.PORT			=	I2C0_SCL_PORT;
 		i2c.SCL.PIN				=	I2C0_SCL_PIN;
@@ -110,8 +110,8 @@ static void _hardwareInit (enum I2CSlave::ID id)
 
 	GPIOStruct.GPIO_Pin		=	i2c.SDA.PIN;
 
-	GPIO_PinAFConfig(i2c.SCL.PORT, i2c.SCL.PINSOURCE, i2c.SCL.AF);
-	GPIO_Init(i2c.SCL.PORT, &GPIOStruct);
+	GPIO_PinAFConfig(i2c.SDA.PORT, i2c.SDA.PINSOURCE, i2c.SDA.AF);
+	GPIO_Init(i2c.SDA.PORT, &GPIOStruct);
 
 	// I2C Init
 	I2CStruct.I2C_Mode					=	I2C_Mode_I2C;
@@ -123,7 +123,7 @@ static void _hardwareInit (enum I2CSlave::ID id)
 
 	I2C_Init(i2c.I2C.BUS, &I2CStruct);
 
-	I2C_ITConfig(i2c.I2C.BUS, I2C_IT_EVT | I2C_IT_ERR, ENABLE);
+	I2C_ITConfig(i2c.I2C.BUS, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, ENABLE);
 	I2C_GeneralCallCmd(i2c.I2C.BUS, ENABLE);
 	I2C_Cmd(i2c.I2C.BUS, ENABLE);
 
@@ -272,7 +272,7 @@ namespace HAL
 
 		assert(frame != NULL);
 
-		if(this->buffer.rdIndex >= this->buffer.wrIndex)
+		if(this->buffer.wrIndex >= this->buffer.rdIndex)
 		{
 			memcpy(frame, &this->buffer.frame[this->buffer.rdIndex], sizeof(this->buffer.frame[this->buffer.rdIndex]));
 
@@ -301,13 +301,22 @@ namespace HAL
 		{
 		// Address matched, store a new frame
 		case I2C_FLAG_ADDR:
-			data = I2C_ReceiveData(this->def.I2C.BUS);
-
 			if(this->buffer.wrIndex < (I2C_MAX_BUFFER_SIZE - 1u))
 			{
-				this->buffer.wrIndex++;
-				this->buffer.frame[this->buffer.wrIndex].Type 	=	(I2C_FRAME_TYPE)((uint32_t)data & (uint32_t)I2C_FRAME_TYPE_MASK);
+				this->buffer.frame[this->buffer.wrIndex].Type 	=	(I2C_GetFlagStatus(this->def.I2C.BUS, I2C_FLAG_TRA) == SET ? I2C_FRAME_TYPE_READ : I2C_FRAME_TYPE_WRITE);
 				this->buffer.frame[this->buffer.wrIndex].Length = 	0u;
+
+				if(this->buffer.frame[this->buffer.wrIndex].Type == I2C_FRAME_TYPE_READ)
+				{
+					I2C_ITConfig(this->def.I2C.BUS, I2C_IT_BUF, DISABLE);
+
+					this->DataRequest();
+				}
+				else
+				{
+					I2C_ITConfig(this->def.I2C.BUS, I2C_IT_BUF, ENABLE);
+				}
+
 			}
 			else
 			{
@@ -316,7 +325,7 @@ namespace HAL
 			break;
 
 		// Data received, store it
-		case I2C_FLAG_BTF:
+		case I2C_FLAG_RXNE:
 			data = I2C_ReceiveData(this->def.I2C.BUS);
 
 			if(this->buffer.wrIndex < (I2C_MAX_BUFFER_SIZE - 1u))
@@ -335,13 +344,11 @@ namespace HAL
 		case I2C_FLAG_STOPF:
 			if(this->buffer.wrIndex < (I2C_MAX_BUFFER_SIZE - 1u))
 			{
-				if(this->buffer.frame[this->buffer.wrIndex].Type == I2C_FRAME_TYPE_WRITE)
+				this->buffer.wrIndex++;
+
+				if(this->buffer.frame[this->buffer.wrIndex - 1u].Type == I2C_FRAME_TYPE_WRITE)
 				{
 					this->DataReceived();
-				}
-				else
-				{
-					this->DataRequest();
 				}
 			}
 			else
@@ -383,9 +390,9 @@ extern "C"
 		}
 
 		// Byte transfer finished
-		if(I2C_GetFlagStatus(I2C3, I2C_FLAG_BTF) == SET)
+		if(I2C_GetFlagStatus(I2C3, I2C_FLAG_RXNE) == SET)
 		{
-			instance->INTERNAL_InterruptCallback(I2C_FLAG_BTF);
+			instance->INTERNAL_InterruptCallback(I2C_FLAG_RXNE);
 		}
 
 		// Stop bit received
