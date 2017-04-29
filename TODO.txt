@@ -1,14 +1,17 @@
 Todo list:
  OK Safeguard in Position controller
-    real cli debug
+    real cli debug & traces
     period dependency
  OK task time consumption (moy, max, ...)
     communication class
     i2c driver
     uart driver write/read via memory buffer or dma
-    fix gpio_led crash
+ OK fix gpio_led crash
     add non volatile configuration
     secure shared variable by mutex
  OK Transform "TrajectoryPlanning" class to task class
  OK Add Force coordinate in Odometry
     Diagnostic class
+ OK Go backward
+    Add status getter and setter
+    Refactoring Stop/Brake/Enable/Disable in xControl

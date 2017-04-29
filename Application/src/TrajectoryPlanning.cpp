@@ -12,6 +12,15 @@
 using namespace MotionControl;
 
 /*----------------------------------------------------------------------------*/
+/* Definitions                                                                */
+/*----------------------------------------------------------------------------*/
+
+#define TP_TASK_STACK_SIZE          (512u)
+#define TP_TASK_PRIORITY            (configMAX_PRIORITIES-6)
+
+#define TP_TASK_PERIOD_MS           (100u)
+
+/*----------------------------------------------------------------------------*/
 /* Private Members                                                            */
 /*----------------------------------------------------------------------------*/
 
@@ -55,6 +64,8 @@ namespace MotionControl
         this->linearNextSetPoint = 0.0;
         this->angularSetPoint = 0.0;
 
+        this->safeguard = true;
+
         this->odometry = Odometry::GetInstance();
         this->position = PositionControl::GetInstance();
         this->velocity = VelocityControl::GetInstance();
@@ -74,7 +85,9 @@ namespace MotionControl
     }
     void TrajectoryPlanning::goLinear(float32_t linear) // linear in meters
     {
-        this->linearSetPoint = linear;
+        float32_t Lm = this->odometry->GetLinearPosition();
+
+    	this->linearSetPoint = Lm + linear;
 
         this->state = LINEAR;
         this->step  = 1;
@@ -242,7 +255,7 @@ namespace MotionControl
         else
         {
             calculateMove();
-            if(this->profile->GetSafeguard())
+            if(this->safeguard && this->profile->GetSafeguard())
             {
                 // Safeguard has been trigged then stop
                 this->state = FREE;

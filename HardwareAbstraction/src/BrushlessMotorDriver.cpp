@@ -186,10 +186,15 @@ namespace HAL
 		}
 	}
 
-	void BrushlessMotorDriver::Brake()
+	void BrushlessMotorDriver::Brake(float32_t percent)
 	{
+		if(percent < 0.0f)
+			percent = 0.0f;
+		else if(percent > 1.0f)
+			percent = 1.0f;
+
 		// Make sure the ENABLE pin is high, unless H-Bridge is disabled
-		this->enablePin->SetDutyCycle(1.0f);
+		this->enablePin->SetDutyCycle(percent);
 		this->enablePin->SetState(PWM::ENABLED);
 
 		// Turn on all high-side MOSFET

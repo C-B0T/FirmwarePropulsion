@@ -18,10 +18,10 @@ using namespace Location;
 /*----------------------------------------------------------------------------*/
 
 //#define ANGULAR_VEL_MAX             (1.57f)
-//#define ANGULAR_VEL_MAX             (3.14f)
-#define ANGULAR_VEL_MAX             (12.0f)
-//#define ANGULAR_ACC_MAX             (3.14f)
-#define ANGULAR_ACC_MAX             (18.0f)
+#define ANGULAR_VEL_MAX             (3.14f)
+//#define ANGULAR_VEL_MAX             (12.0f)
+#define ANGULAR_ACC_MAX             (3.14f)
+//#define ANGULAR_ACC_MAX             (18.0f)
 #define ANGULAR_PROFILE             (MotionProfile::PROFILE::POLY5)
 
 //#define LINEAR_VEL_MAX              (0.2f)
@@ -189,14 +189,17 @@ namespace MotionControl
         this->linearPosition = position;
 
         // Get current position and time
-        currentLinearPosition  = odometry->GetLinearPosition();
+        currentLinearPosition = odometry->GetLinearPosition();
         time = getTime();
 
-        // Calculate min distance
-        d = this->linearProfile.GetMinDist(MotionProfile::POLY5_P1);
+        // Calculate min distance (sign preserved)
+        if(this->linearPosition >= currentLinearPosition)
+            d = this->linearProfile.GetMinDist(MotionProfile::POLY5_P1);
+        else
+            d = - this->linearProfile.GetMinDist(MotionProfile::POLY5_P1);
 
         // Choose profile type
-        if(abs(this->linearPosition - currentLinearPosition) <= 2.0*d)
+        if(abs(this->linearPosition - currentLinearPosition) <= 2.0*abs(d))
         {
             // Set profile type
             this->linearPhaseProfile = AccDec;
@@ -239,7 +242,7 @@ namespace MotionControl
 
         // TODO: A améliorer pour faire un pourcentage
         this->safeguard = false;
-        if(angularPositionError > 0.17)    // ~10°
+        if(angularPositionError > 0.34)    // ~20°
             this->safeguard = true;
         if(linearPositionError > 0.1)       // 10cm
             this->safeguard = true;

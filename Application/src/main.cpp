@@ -19,8 +19,7 @@
 
 #include "MotionControl.hpp"
 
-
-#include "TrajectoryPlanning.hpp"
+#include "Diag.hpp"
 #include "Cli.hpp"
 
 #include "../../STM32_Driver/inc/stm32f4xx_it.h"
@@ -125,27 +124,23 @@ static void HardwareInit (void)
 void TASKHANDLER_Test (void * obj)
 {
     TickType_t xLastWakeTime;
-    const TickType_t xFrequency = pdMS_TO_TICKS(500);
+    const TickType_t xFrequency = pdMS_TO_TICKS(167);
 
     // Get instances
-    HAL::GPIO *led1 = HAL::GPIO::GetInstance(HAL::GPIO::GPIO6);
+    //HAL::GPIO *led1 = HAL::GPIO::GetInstance(HAL::GPIO::GPIO6);
 
-    TrajectoryPlanning *tp = TrajectoryPlanning::GetInstance();
+    //TrajectoryPlanning *tp = TrajectoryPlanning::GetInstance();
 
     vTaskDelay(3000);
 
     //tp->goLinear(1.0);
-    Utils::CLI cli = Utils::CLI();
-    cli.Start();
 
     xLastWakeTime = xTaskGetTickCount();
 
     while(1)
     {
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
-
-        led1->Toggle();
-
+        //led1->Toggle();
     }
 }
 
@@ -161,13 +156,24 @@ int main(void)
 
     // Start (Led init and set up led1)
     HAL::GPIO *led1 = HAL::GPIO::GetInstance(HAL::GPIO::GPIO6);
-    led1->Set(HAL::GPIO::State::Low);
+    HAL::GPIO *led2 = HAL::GPIO::GetInstance(HAL::GPIO::GPIO7);
+    HAL::GPIO *led3 = HAL::GPIO::GetInstance(HAL::GPIO::GPIO8);
+    HAL::GPIO *led4 = HAL::GPIO::GetInstance(HAL::GPIO::GPIO9);
+    led1->Set(HAL::GPIO::State::High);
+    led2->Set(HAL::GPIO::State::High);
+    led3->Set(HAL::GPIO::State::High);
+    led4->Set(HAL::GPIO::State::High);
 
     // Serial init
     HAL::Serial *serial0 = HAL::Serial::GetInstance(HAL::Serial::SERIAL0);
 
-    // MotionContro init (Init Odometry and asserv)
-    MotionControl::BlMotionControl mc = MotionControl::BlMotionControl();
+    // FeedbackMotionControl init (Init Odometry and asserv)
+    MotionControl::FBMotionControl *mc = MotionControl::FBMotionControl::GetInstance();
+
+    // Diag and Cli
+    Diag *diag = Diag::GetInstance();
+    CLI  *cli  = CLI::GetInstance();
+
 
     // Welcome
     printf("\r\n\r\nS/0 CarteProp Firmware V0.1 (" __DATE__ " - " __TIME__ ")\r\n");
@@ -175,7 +181,7 @@ int main(void)
     // Create Test task
     xTaskCreate(&TASKHANDLER_Test,
                 "Test Task",
-                128,
+                256,
                 NULL,
                 3,
                 NULL);

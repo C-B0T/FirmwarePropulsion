@@ -209,6 +209,12 @@ namespace MotionControl
             rightMotor->Brake();
         }
 
+        void Brake(float32_t percent)
+        {
+            leftMotor->Brake(percent);
+            rightMotor->Brake(percent);
+        }
+
         void Stop()
         {
             this->stop = true;
@@ -222,21 +228,20 @@ namespace MotionControl
             pid_linear.Reset();
 
             this->stop = false;
-            leftMotor->Move();
-            rightMotor->Move();
+            leftMotor->SetMotorSpeed(0.0);
+            rightMotor->SetMotorSpeed(0.0);
         }
 
         void Enable()
         {
             if(this->enable == false)
             {
-                //pid_angular.Reset();
-                //pid_linear.Reset();
-
-                leftMotor->Move();
-                rightMotor->Move();
-
-                this->enable = true;
+            	if (this->stop == false)
+            	{
+					leftMotor->SetMotorSpeed(0.0);
+					rightMotor->SetMotorSpeed(0.0);
+	                this->enable = true;
+            	}
             }
         }
 
@@ -244,9 +249,8 @@ namespace MotionControl
         {
             if(this->enable == true)
             {
-                leftMotor->Freewheel();
-                rightMotor->Freewheel();
-
+                leftMotor->SetMotorSpeed(0.0);
+                rightMotor->SetMotorSpeed(0.0);
                 this->enable = false;
             }
         }

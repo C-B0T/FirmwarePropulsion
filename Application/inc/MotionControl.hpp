@@ -17,56 +17,89 @@
 
 #include "common.h"
 
+// For std::string
+#include <algorithm>
+
+
 #include "Odometry.hpp"
 #include "VelocityControl.hpp"
 #include "PositionControl.hpp"
 #include "ProfileGenerator.hpp"
-
 #include "TrajectoryPlanning.hpp"
+
+// FreeRTOS
+#include "FreeRTOS.h"
+#include "semphr.h"
+#include "task.h"
+#include "timers.h"
 
 using namespace Location;
 
+
 namespace MotionControl
 {
+
     /**
-     * @class BlMotionControl
-     * @brief Brushless Motion Controller class
+     * @class FBMotionControl
+     * @brief Feedback Controller class
      *
      * HOWTO :
      * -
      *
      */
-    class BlMotionControl
+    class FBMotionControl
     {
     public:
-        BlMotionControl();
-        void Update();
+        /**
+         * @brief Get instance method
+         * @return VelocityLoop instance
+         */
+        static FBMotionControl* GetInstance();
+
+        /**
+         * @brief Return instance name
+         */
+        std::string Name()
+        {
+            return this->name;
+        }
 
     protected:
+        FBMotionControl();
+
+        /**
+         * @protected
+         * @brief Instance name
+         */
+        std::string name;
+
         Odometry           *odometry;
         VelocityControl    *vc;
         PositionControl    *pc;
         ProfileGenerator   *pg;
         TrajectoryPlanning *tp;
 
+        /**
+         * @brief Compute motion control
+         */
+        void Compute(float32_t period);
+
+        /**
+         * @protected
+         * @brief OS Task handle
+         *
+         * Used by speed control loop
+         */
+        TaskHandle_t taskHandle;
+
+        /**
+         * @protected
+         * @brief Speed control loop task handler
+         * @param obj : Always NULL
+         */
+        void taskHandler (void* obj);
     };
 
-    /**
-     * @class SbSMotionControl
-     * @brief Step by Step Motion Controller class
-     *
-     * HOWTO :
-     * -
-     *
-     */
-    class SbSMotionControl
-    {
-    public:
-        SbSMotionControl();
-
-    private:
-
-    };
 }
 
 #endif /* INC_MOTIONCONTROL_HPP_ */

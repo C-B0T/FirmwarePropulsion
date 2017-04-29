@@ -37,11 +37,6 @@ using namespace Location;
 #define _2_PI_      6.28318530717958647692  // 2*PI
 
 
-#define TP_TASK_STACK_SIZE          (512u)
-#define TP_TASK_PRIORITY            (configMAX_PRIORITIES-6)
-
-#define TP_TASK_PERIOD_MS           (100u)
-
 /*----------------------------------------------------------------------------*/
 /* Class declaration                                                          */
 /*----------------------------------------------------------------------------*/
@@ -101,6 +96,23 @@ namespace MotionControl
         	return (uint32_t)this->step;
         }
 
+        void DisableSafeguard()
+        {
+        	this->safeguard = true;
+        }
+        void EnableSafeguard()
+        {
+        	this->safeguard = false;
+        }
+        void ToggleSafeguard()
+        {
+        	this->safeguard = !this->safeguard;
+        }
+        bool GetSafeguard()
+        {
+        	return this->safeguard;
+        }
+
     protected:
         enum state_t {FREE=0, LINEAR, ANGULAR, STOP, KEEP, LINEARPLAN, CURVEPLAN, STALLX, STALLY, DRAWPLAN};
 
@@ -151,6 +163,7 @@ namespace MotionControl
         VelocityControl *velocity;
         ProfileGenerator *profile;
 
+        bool safeguard;
 
         /**
          * @protected

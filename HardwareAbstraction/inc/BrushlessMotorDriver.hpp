@@ -103,7 +103,7 @@ namespace HAL
 		/**
 		 * @brief Brake motor
 		 */
-		void Brake ();
+		void Brake (float32_t percent = 1.0f);
 
 		/**
 		 * @brief Move motor
