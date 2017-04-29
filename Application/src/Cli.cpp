@@ -158,9 +158,10 @@ void CLI::Compute(float32_t period)
             printf(" - &            \tEmergency stop\r\n");
             printf(" - (            \tToggle traces\r\n");
             printf(" Command:\r\n");
-            printf(" - golin <l>    \tGo Linear\r\n");
-            printf(" - goang <a>    \tGo Angular\r\n");
-            printf(" - goto <x> <y> \tGo to X,Y\r\n");
+            printf(" - golin <l>          \tGo Linear\r\n");
+            printf(" - goang <a>          \tGo Angular\r\n");
+            printf(" - goto <x> <y>       \tGo to X,Y\r\n");
+            printf(" - setodo <x> <y> <o> \tSet odometry X,Y,O\r\n");
             //printf(" - stop <%%>     \tStop %% Brake\r\n");
         }
         else if(strcmp(pch,"golin") == 0)
@@ -195,6 +196,7 @@ void CLI::Compute(float32_t period)
                 x = strtof(pch, NULL);
             else
                 x = 0.0;
+            pch = strtok (NULL, " ");
             if(pch != NULL)
                 y = strtof(pch, NULL);
             else
@@ -202,6 +204,29 @@ void CLI::Compute(float32_t period)
 
             printf("\r\ngoto %.3f %.3f", x, y);
             tp->gotoXY(x,y);
+        }
+        else if(strcmp(pch,"setodo") == 0)
+        {
+            float x, y, o;
+
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                x = strtof(pch, NULL);
+            else
+                x = 0.0;
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                y = strtof(pch, NULL);
+            else
+                y = 0.0;
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                o = strtof(pch, NULL);
+            else
+                o = 0.0;
+
+            printf("\r\nsetodo %.3f %.3f %.3f", x, y, o);
+            odometry->SetXYO(x,y,o);
         }
         else if(strcmp(pch,"stop") == 0)
         {

@@ -22,6 +22,9 @@
 #include "PositionControl.hpp"
 #include "VelocityControl.hpp"
 
+// LED
+#include "GPIO.hpp"
+
 // FreeRTOS
 #include "FreeRTOS.h"
 #include "semphr.h"
@@ -30,6 +33,7 @@
 
 using namespace Location;
 using namespace MotionControl;
+using namespace HAL;
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
@@ -96,6 +100,11 @@ typedef void (*FunctionFunc)();
         ProfileGenerator   *pg;
         TrajectoryPlanning *tp;
         FBMotionControl    *mc;
+
+        GPIO *led1;
+        GPIO *led2;
+        GPIO *led3;
+        GPIO *led4;
 
 
         void Traces();

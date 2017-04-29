@@ -219,22 +219,24 @@ namespace Location
      void Odometry::SetXYO(float32_t X, float32_t Y, float32_t O)
      {
          //TODO: Secure by mutex
-         this->robot.X = X;
-         this->robot.Y = Y;
+         this->robot.X = X * 1000.0 * TICK_BY_MM;
+         this->robot.Y = Y * 1000.0 * TICK_BY_MM;
          this->robot.O = O;
+         //this->robot.L = ???;
 
-         this->robot.Xmm = X / TICK_BY_MM;
-         this->robot.Ymm = Y / TICK_BY_MM;
+         this->robot.Xmm = X * 1000.0;
+         this->robot.Ymm = Y * 1000.0;
          this->robot.Odeg = (180.0 * O) / _PI_;
      }
 
     void Odometry::SetXO(float32_t X, float32_t O)
     {
         //TODO: Secure by mutex
-        this->robot.X = X;
+        this->robot.X = X * 1000.0 * TICK_BY_MM;
         this->robot.O = O;
+        //this->robot.L = ???;
 
-        this->robot.Xmm = X / TICK_BY_MM;
+        this->robot.Xmm = X * 1000.0;
         this->robot.Odeg = (180.0 * O) / _PI_;
     }
 
@@ -242,10 +244,11 @@ namespace Location
     void Odometry::SetYO(float32_t Y, float32_t O)
     {
         //TODO: Secure by mutex
-        this->robot.Y = Y;
+        this->robot.Y = Y * 1000.0 * TICK_BY_MM;
         this->robot.O = O;
+        //this->robot.L = ???;
 
-        this->robot.Ymm = Y / TICK_BY_MM;
+        this->robot.Ymm = Y * 1000.0;
         this->robot.Odeg = (180.0 * O) / _PI_;
     }
 

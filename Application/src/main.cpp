@@ -176,7 +176,7 @@ int main(void)
 
 
     // Welcome
-    printf("\r\n\r\nS/0 CarteProp Firmware V0.1 (" __DATE__ " - " __TIME__ ")\r\n");
+    printf("\r\n\r\nA/0 CarteProp Firmware V0.1 (" __DATE__ " - " __TIME__ ")\r\n");
 
     // Create Test task
     xTaskCreate(&TASKHANDLER_Test,

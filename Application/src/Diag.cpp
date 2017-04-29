@@ -66,24 +66,71 @@ Diag::Diag()
     this->tp = TrajectoryPlanning::GetInstance();
     this->mc = FBMotionControl::GetInstance();
 
+    this->led1 = GPIO::GetInstance(GPIO::GPIO6);
+    this->led2 = GPIO::GetInstance(GPIO::GPIO7);
+    this->led3 = GPIO::GetInstance(GPIO::GPIO8);
+    this->led4 = GPIO::GetInstance(GPIO::GPIO9);
+
 }
 
 void Diag::Traces()
 {
-    
+    robot_t r;
+
+    this->odometry->GetRobot(&r);
+
+    //printf("%.3f\t%.3f\t%.3f\r\n", r.X, r.Y, r.O);
+    printf("%ld\t%ld\t%.1f\r\n",r.Xmm, r.Ymm, r.Odeg);
 }
 
 void Diag::Led()
 {
+	static uint32_t localTime = 0;
+	static uint32_t LedId = 4;
+
+	localTime += (uint32_t)DIAG_TASK_PERIOD_MS;
+
+	switch(LedId)
+	{
+	case 1:
+		this->led1->Toggle();
+		break;
+	case 2:
+		this->led2->Toggle();
+		break;
+	case 3:
+		this->led3->Toggle();
+		break;
+	case 4:
+		this->led4->Toggle();
+		break;
+	default:
+		break;
+	}
+
+	LedId--;
+	if(LedId < 1)
+		LedId = 4;
 
 }
 
 void Diag::Compute(float32_t period)
 {
-	this->Led();
+	static uint32_t localTime = 0;
 
-	if(this->enable)
-		this->Traces();
+	localTime += (uint32_t)DIAG_TASK_PERIOD_MS;
+
+
+	if((localTime % 100) == 0)
+	{
+		this->Led();
+	}
+
+	if((localTime % 10) == 0)
+	{
+		if(this->enable)
+			this->Traces();
+	}
 }
 
 void Diag::taskHandler (void* obj)
