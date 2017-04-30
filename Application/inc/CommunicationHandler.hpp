@@ -2,7 +2,7 @@
  * @file	Communication.hpp
  * @author	Kevin WYSOCKI
  * @date	20 avr. 2017
- * @brief	
+ * @brief	Communication Handler class
  */
 
 #ifndef INC_COMMUNICATIONHANDLER_HPP_
@@ -23,27 +23,66 @@
 
 namespace Communication
 {
+	/**
+	 * @brief Communication Handler class
+	 */
 	class CommunicationHandler
 	{
 	public :
+
+		/**
+		 * @brief Return CommunicationHandler instance
+		 */
 		static CommunicationHandler * GetInstance ();
 
+		/**
+		 * @brief Send data after a data request
+		 * @param msg : Message to send
+		 * @return Nb of data bytes sent if >= 0, error if < 0
+		 */
 		int32_t Write (Message * msg);
 
+		/**
+		 * @brief Retrieve last received message
+		 * @param msg : Last received message
+		 */
 		void GetLastMessage (Message * msg);
 
+		/**
+		 * @brief Message received event
+		 */
 		Utils::Event MessageReceived;
 
+		/**
+		 * @private
+		 * @brief Communication task handler
+		 */
 		void TaskHandler (void);
 
 	private :
 
+		/**
+		 * @private
+		 * @brief Private constructor
+		 */
 		CommunicationHandler();
 
+		/**
+		 * @private
+		 * @brief Current message
+		 */
 		Message msg;
 
+		/**
+		 * @private
+		 * @brief Current frame
+		 */
 		I2C_FRAME frame;
 
+		/**
+		 * @private
+		 * @brief I2C bus
+		 */
 		HAL::I2CSlave * bus;
 	};
 }

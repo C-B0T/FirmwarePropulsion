@@ -1,10 +1,8 @@
 /**
  * @file	Communication.cpp
- * @author	kevin.wysocki
- * @date	21 avr. 2017
- * @brief	
- *
- *
+ * @author	Kevin WYSOCKI
+ * @date	20 avr. 2017
+ * @brief	Communication Handler class
  */
 
 #include <CommunicationHandler.hpp>
