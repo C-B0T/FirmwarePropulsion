@@ -93,10 +93,11 @@ void CLI::Compute(float32_t period)
     }
     else if(c == '(')
     {
-        this->diag->Toggle();
+        this->diag->Toggle(0);
     }
     else if(c == '_')
     {
+        this->diag->Toggle(1);
     	putchar(c);
     }
     else if(c == ')')
@@ -118,10 +119,20 @@ void CLI::Compute(float32_t period)
     else if(c == ':')
     {
     	putchar(c);
+        pg->SetAngularVelMax(12.0);
+        pg->SetAngularAccMax(18.0);
+        pg->SetLinearVelMax(1.0);
+        pg->SetLinearAccMax(2.0);
+        printf("\r\nAngVel=12.0 AngAcc=18.0 LinVel=1.0 LinAcc=2.0\r\n");
     }
     else if(c == '!')
     {
     	putchar(c);
+        pg->SetAngularVelMax(3.14);
+        pg->SetAngularAccMax(3.14);
+        pg->SetLinearVelMax(0.4);
+        pg->SetLinearAccMax(1.0);
+        printf("\r\nAngVel=3.14 AngAcc=3.14 LinVel=0.4 LinAcc=1.0\r\n");
     }
     else if( ((c >= '0') && (c <= '9')) ||
         ((c >= 'a') && (c <= 'z')) ||
@@ -163,6 +174,10 @@ void CLI::Compute(float32_t period)
             printf(" - goang <a>          \tGo Angular\r\n");
             printf(" - goto <x> <y>       \tGo to X,Y\r\n");
             printf(" - setodo <x> <y> <o> \tSet odometry X,Y,O\r\n");
+            printf(" - setvellin <v>      \tSet velocity linear\r\n");
+            printf(" - setvelang <v>      \tSet velocity angular\r\n");
+            printf(" - setacclin <a>      \tSet acceleration linear\r\n");
+            printf(" - setaccang <a>      \tSet acceleration angular\r\n");
             //printf(" - stop <%%>     \tStop %% Brake\r\n");
         }
         else if(strcmp(pch,"golin") == 0)
@@ -280,6 +295,54 @@ void CLI::Compute(float32_t period)
                 printf("\r\nmc enable");
                 mc->Enable();
             }
+        }
+        else if(strcmp(pch,"setvellin") == 0)
+        {
+            float v;
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                v = strtof(pch, NULL);
+            else
+                v = 0.0;
+
+            printf("\r\nsetvellin %.3f", v);
+            pg->SetLinearVelMax(v);
+        }
+        else if(strcmp(pch,"setvelang") == 0)
+        {
+            float v;
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                v = strtof(pch, NULL);
+            else
+                v = 0.0;
+
+            printf("\r\nsetvelang %.3f", v);
+            pg->SetAngularVelMax(v);
+        }
+        else if(strcmp(pch,"setacclin") == 0)
+        {
+            float a;
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                a = strtof(pch, NULL);
+            else
+                a = 0.0;
+
+            printf("\r\nsetacclin %.3f", a);
+            pg->SetLinearAccMax(a);
+        }
+        else if(strcmp(pch,"setaccang") == 0)
+        {
+            float a;
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                a = strtof(pch, NULL);
+            else
+                a = 0.0;
+
+            printf("\r\nsetaccang %.3f", a);
+            pg->SetAngularAccMax(a);
         }
         else
         {

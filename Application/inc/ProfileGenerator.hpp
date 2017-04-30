@@ -168,6 +168,26 @@
              return this->angularPositionProfiled;
          }
 
+         void SetLinearVelMax(float32_t velMax)
+         {
+        	 this->linearProfile.SetVelMax(velMax);
+         }
+
+         void SetLinearAccMax(float32_t accMax)
+         {
+        	 this->linearProfile.SetAccMax(accMax);
+         }
+
+         void SetAngularVelMax(float32_t velMax)
+         {
+        	 this->angularProfile.SetVelMax(velMax);
+         }
+
+         void SetAngularAccMax(float32_t accMax)
+         {
+        	 this->angularProfile.SetAccMax(accMax);
+         }
+
          /**
           * @brief Compute profile control
           */

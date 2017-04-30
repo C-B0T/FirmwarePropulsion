@@ -75,9 +75,9 @@ typedef void (*FunctionFunc)();
             return this->name;
         }
 
-        void Toggle()
+        void Toggle(uint16_t i = 0)
         {
-        	this->enable = ! this->enable;
+        	this->enable[i] = ! this->enable[i];
         }
 
     protected:
@@ -92,7 +92,7 @@ typedef void (*FunctionFunc)();
          */
         std::string name;
 
-        bool enable;
+        bool enable[5];
 
         Odometry           *odometry;
         VelocityControl    *vc;
@@ -107,7 +107,8 @@ typedef void (*FunctionFunc)();
         GPIO *led4;
 
 
-        void Traces();
+        void TracesMC();
+        void TracesOD();
         void Led();
 
         /**

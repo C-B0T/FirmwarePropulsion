@@ -49,7 +49,11 @@ Diag::Diag()
     this->name = "Diag";
     this->taskHandle = NULL;
 
-    this->enable = false;
+    this->enable[0] = false;
+    this->enable[1] = false;
+    this->enable[2] = false;
+    this->enable[3] = false;
+    this->enable[4] = false;
 
     // Create task
     xTaskCreate((TaskFunction_t)(&Diag::taskHandler),
@@ -73,16 +77,23 @@ Diag::Diag()
 
 }
 
-void Diag::Traces()
+void Diag::TracesMC()
+{
+    robot_t r;
+
+    this->odometry->GetRobot(&r);
+
+    printf("%ld\t%ld\t%.3f\t%.3f\t%.3f\t%.3f\r\n", tp->GetStep(), pg->GetLinearPhase(), pg->GetLinearPositionProfiled(), pc->GetLinearPosition(), vc->GetLinearVelocity(), vc->GetLinearSpeed());
+}
+
+void Diag::TracesOD()
 {
     robot_t r;
 
     this->odometry->GetRobot(&r);
 
     //printf("%.3f\t%.3f\t%.3f\r\n", r.X, r.Y, r.O);
-    //printf("%ld\t%ld\t%.1f\r\n", r.Xmm, r.Ymm, r.Odeg);
-
-    printf("%ld\t%ld\t%.3f\t%.3f\t%.3f\t%.3f\r\n", tp->GetStep(), pg->GetLinearPhase(), pg->GetLinearPositionProfiled(), pc->GetLinearPosition(), vc->GetLinearVelocity(), vc->GetLinearSpeed());
+    printf("%ld\t%ld\t%.1f\r\n", r.Xmm, r.Ymm, r.Odeg);
 }
 
 void Diag::Led()
@@ -130,8 +141,10 @@ void Diag::Compute(float32_t period)
 
 	if((localTime % 10) == 0)
 	{
-		if(this->enable)
-			this->Traces();
+		if(this->enable[0])
+			this->TracesMC();
+		if(this->enable[1])
+			this->TracesOD();
 	}
 }
 
