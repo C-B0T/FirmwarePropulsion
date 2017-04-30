@@ -29,7 +29,7 @@ using namespace HAL;
 #define I2C0_BUS				(I2C3)
 #define I2C0_INT_EVENT_CHANNEL	(I2C3_EV_IRQn)
 #define I2C0_INT_ERROR_CHANNEL	(I2C3_ER_IRQn)
-#define I2C0_INT_PRIORITY		(0u)
+#define I2C0_INT_PRIORITY		(8u)
 
 #define I2C_TIMEOUT				(10000u)
 
@@ -125,6 +125,7 @@ static void _hardwareInit (enum I2CSlave::ID id)
 
 	I2C_ITConfig(i2c.I2C.BUS, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, ENABLE);
 	I2C_GeneralCallCmd(i2c.I2C.BUS, ENABLE);
+	I2C_CalculatePEC(i2c.I2C.BUS, ENABLE);
 	I2C_Cmd(i2c.I2C.BUS, ENABLE);
 
 	// NVIC Init - Event interrupt
@@ -346,9 +347,25 @@ namespace HAL
 			{
 				this->buffer.wrIndex++;
 
-				if(this->buffer.frame[this->buffer.wrIndex - 1u].Type == I2C_FRAME_TYPE_WRITE)
+				// Get CRC value
+				data = I2C_GetPEC(this->def.I2C.BUS);
+
+				// Last byte transfered is supposed to be the CRC byte so
+				// If data == 0 => Packet check is OK, else, set Packet Error
+				if(data != 0)
 				{
-					this->DataReceived();
+					this->error = I2C_ERROR_PACKET_ERROR;
+
+					this->ErrorOccurred();
+				}
+				else
+				{
+					this->error = NO_ERROR;
+
+					if(this->buffer.frame[this->buffer.wrIndex - 1u].Type == I2C_FRAME_TYPE_WRITE)
+					{
+						this->DataReceived();
+					}
 				}
 			}
 			else
