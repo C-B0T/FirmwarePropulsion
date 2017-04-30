@@ -5,6 +5,7 @@
  * @brief   Main
  */
 
+#include <CommunicationHandler.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -20,13 +21,13 @@
 #include "PositionControl.hpp"
 #include "ProfileGenerator.hpp"
 #include "TrajectoryPlanning.hpp"
-
 #include "../../STM32_Driver/inc/stm32f4xx_it.h"
 
 using namespace HAL;
 using namespace Utils;
 using namespace Location;
 using namespace MotionControl;
+using namespace Communication;
 
 
 
@@ -51,21 +52,21 @@ extern "C" void hard_fault_handler_c(unsigned int * hardfault_args)
       stacked_pc = ((unsigned long) hardfault_args[6]);
       stacked_psr = ((unsigned long) hardfault_args[7]);
 
-      printf ("\r\n\r\n[Hard fault handler - all numbers in hex]\r\n");
-      printf ("R0 = %x\r\n", stacked_r0);
-      printf ("R1 = %x\r\n", stacked_r1);
-      printf ("R2 = %x\r\n", stacked_r2);
-      printf ("R3 = %x\r\n", stacked_r3);
-      printf ("R12 = %x\r\n", stacked_r12);
-      printf ("LR [R14] = %x  subroutine call return address\r\n", stacked_lr);
-      printf ("PC [R15] = %x  program counter\r\n", stacked_pc);
-      printf ("PSR = %x\r\n", stacked_psr);
-      printf ("BFAR = %x\r\n", (*((volatile unsigned long *)(0xE000ED38))));
-      printf ("CFSR = %x\r\n", (*((volatile unsigned long *)(0xE000ED28))));
-      printf ("HFSR = %x\r\n", (*((volatile unsigned long *)(0xE000ED2C))));
-      printf ("DFSR = %x\r\n", (*((volatile unsigned long *)(0xE000ED30))));
-      printf ("AFSR = %x\r\n", (*((volatile unsigned long *)(0xE000ED3C))));
-      printf ("SCB_SHCSR = %x\r\n", SCB->SHCSR);
+//      printf ("\r\n\r\n[Hard fault handler - all numbers in hex]\r\n");
+//      printf ("R0 = %x\r\n", stacked_r0);
+//      printf ("R1 = %x\r\n", stacked_r1);
+//      printf ("R2 = %x\r\n", stacked_r2);
+//      printf ("R3 = %x\r\n", stacked_r3);
+//      printf ("R12 = %x\r\n", stacked_r12);
+//      printf ("LR [R14] = %x  subroutine call return address\r\n", stacked_lr);
+//      printf ("PC [R15] = %x  program counter\r\n", stacked_pc);
+//      printf ("PSR = %x\r\n", stacked_psr);
+//      printf ("BFAR = %x\r\n", (*((volatile unsigned long *)(0xE000ED38))));
+//      printf ("CFSR = %x\r\n", (*((volatile unsigned long *)(0xE000ED28))));
+//      printf ("HFSR = %x\r\n", (*((volatile unsigned long *)(0xE000ED2C))));
+//      printf ("DFSR = %x\r\n", (*((volatile unsigned long *)(0xE000ED30))));
+//      printf ("AFSR = %x\r\n", (*((volatile unsigned long *)(0xE000ED3C))));
+//      printf ("SCB_SHCSR = %x\r\n", SCB->SHCSR);
 
       while (1);
 }
@@ -123,6 +124,9 @@ static void HardwareInit (void)
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
     RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
 
+    // Enable I2C Clock
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1 | RCC_APB1Periph_I2C2 | RCC_APB1Periph_I2C3, ENABLE);
+
 }
 
 /**
@@ -133,8 +137,10 @@ void TASKHANDLER_Test (void * obj)
     TickType_t xLastWakeTime;
     const TickType_t xFrequency = pdMS_TO_TICKS(100);
 
+    CommunicationHandler * comHandler = CommunicationHandler::GetInstance();
+
     // Get instances
-    GPIO *led1 = GPIO::GetInstance(GPIO::GPIO6);
+//    GPIO *led1 = GPIO::GetInstance(GPIO::GPIO6);
 
     xLastWakeTime = xTaskGetTickCount();
 
@@ -142,7 +148,7 @@ void TASKHANDLER_Test (void * obj)
     {
         vTaskDelayUntil(&xLastWakeTime, xFrequency);
 
-        led1->Toggle();
+//        led1->Toggle();
 
     }
 }
@@ -156,15 +162,15 @@ int main(void)
     HardwareInit();
 
     // Start (Led init and set up led1)
-    GPIO *led1 = GPIO::GetInstance(GPIO::GPIO6);
-    led1->Set(GPIO::State::Low);
+//    GPIO *led1 = GPIO::GetInstance(GPIO::GPIO6);
+//    led1->Set(GPIO::State::Low);
 
     // Serial init
-    Serial *serial0 = Serial::GetInstance(Serial::SERIAL0);
+//    Serial *serial0 = Serial::GetInstance(Serial::SERIAL0);
 
 
     // Welcome
-    printf("\r\n\r\nS/0 CarteProp Firmware V0.1 (" __DATE__ " - " __TIME__ ")\r\n");
+//    printf("\r\n\r\nS/0 CarteProp Firmware V0.1 (" __DATE__ " - " __TIME__ ")\r\n");
 
     // Create Test task
     xTaskCreate(&TASKHANDLER_Test,
