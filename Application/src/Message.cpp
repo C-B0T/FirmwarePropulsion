@@ -324,47 +324,47 @@ namespace Communication
 			switch(this->Type)
 			{
 			case MSG_TYPE_RESET:
-				if(frame->Length != MSG_NB_DATA_DECODE_RESET)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_RESET)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 			case MSG_TYPE_BOOT_MODE:
-				if(frame->Length != MSG_NB_DATA_DECODE_BOOT_MODE)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_BOOT_MODE)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 			case MSG_TYPE_PING:
-				if(frame->Length != MSG_NB_DATA_DECODE_PING)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PING)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 			case MSG_TYPE_CHANGE_ADDR:
-				if(frame->Length != MSG_NB_DATA_DECODE_CHANGE_ADDR)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_CHANGE_ADDR)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 			case MSG_TYPE_CHECKUP:
-				if(frame->Length != MSG_NB_DATA_DECODE_CHECKUP)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_CHECKUP)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 			case MSG_TYPE_GET_DISTANCE:
-				if(frame->Length != MSG_NB_DATA_DECODE_GET_DISTANCE)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_GET_DISTANCE)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 			case MSG_TYPE_GET_POSITION:
-				if(frame->Length != MSG_NB_DATA_DECODE_GET_POSITION)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_GET_POSITION)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 			case MSG_TYPE_GOTO:
-				if(frame->Length != MSG_NB_DATA_DECODE_GOTO)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_GOTO)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 			case MSG_TYPE_SET_ANGLE:
-				if(frame->Length != MSG_NB_DATA_DECODE_SET_ANGLE)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_SET_ANGLE)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 			case MSG_TYPE_DISABLE_POS_CONTROL:
-				if(frame->Length != MSG_NB_DATA_DECODE_DISABLE_POS_CONTROL)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_DISABLE_POS_CONTROL)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 			case MSG_TYPE_ENABLE_POS_CONTROL:
-				if(frame->Length != MSG_NB_DATA_DECODE_ENABLE_POS_CONTROL)
+				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_ENABLE_POS_CONTROL)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 				break;

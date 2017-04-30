@@ -5,8 +5,8 @@
  * @brief	
  */
 
-#ifndef INC_COMMUNICATION_HPP_
-#define INC_COMMUNICATION_HPP_
+#ifndef INC_COMMUNICATIONHANDLER_HPP_
+#define INC_COMMUNICATIONHANDLER_HPP_
 
 #include "common.h"
 #include "I2CSlave.hpp"
@@ -23,10 +23,10 @@
 
 namespace Communication
 {
-	class Communication
+	class CommunicationHandler
 	{
 	public :
-		static Communication * GetInstance ();
+		static CommunicationHandler * GetInstance ();
 
 		int32_t Write (Message * msg);
 
@@ -34,11 +34,11 @@ namespace Communication
 
 		Utils::Event MessageReceived;
 
+		void TaskHandler (void);
+
 	private :
 
-		Communication();
-
-		void TaskHandler (void * obj);
+		CommunicationHandler();
 
 		Message msg;
 
@@ -48,4 +48,4 @@ namespace Communication
 	};
 }
 
-#endif /* INC_COMMUNICATION_HPP_ */
+#endif /* INC_COMMUNICATIONHANDLER_HPP_ */

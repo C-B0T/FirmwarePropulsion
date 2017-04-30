@@ -7,7 +7,7 @@
  *
  */
 
-#include "Communication.hpp"
+#include <CommunicationHandler.hpp>
 #include <string.h>
 
 // FreeRTOS API
@@ -28,9 +28,10 @@
 /* Private Members                                                            */
 /*----------------------------------------------------------------------------*/
 
-static Communication::Communication * _instance = NULL;
+static Communication::CommunicationHandler * _instance = NULL;
 
 static EventGroupHandle_t _eventHandle;
+static TaskHandle_t _taskHandle = NULL;
 
 /*----------------------------------------------------------------------------*/
 /* Private Functions                                                          */
@@ -38,12 +39,23 @@ static EventGroupHandle_t _eventHandle;
 
 static void _onDataReceived (void * obj)
 {
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
+	xEventGroupSetBitsFromISR(_eventHandle, COM_EVENT_DATA_RECEIVED, &xHigherPriorityTaskWoken);
 }
 
 static void _onDataRequested (void * obj)
 {
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
+	xEventGroupSetBitsFromISR(_eventHandle, COM_EVENT_DATA_REQUESTED, &xHigherPriorityTaskWoken);
+}
+
+static void _taskHandler (void * obj)
+{
+	Communication::CommunicationHandler* comHandler = static_cast<Communication::CommunicationHandler*>(obj);
+
+	comHandler->TaskHandler();
 }
 
 /*----------------------------------------------------------------------------*/
@@ -52,11 +64,11 @@ static void _onDataRequested (void * obj)
 
 namespace Communication
 {
-	Communication * Communication::GetInstance()
+	CommunicationHandler * CommunicationHandler::GetInstance()
 	{
 		if(_instance == NULL)
 		{
-			_instance = new Communication();
+			_instance = new CommunicationHandler();
 
 			return _instance;
 		}
@@ -66,7 +78,7 @@ namespace Communication
 		}
 	}
 
-	Communication::Communication()
+	CommunicationHandler::CommunicationHandler()
 	{
 		// Create I2C bus
 		this->bus = HAL::I2CSlave::GetInstance(HAL::I2CSlave::I2C_SLAVE0);
@@ -74,19 +86,19 @@ namespace Communication
 		this->bus->DataReceived += _onDataReceived;
 		this->bus->DataRequest += _onDataRequested;
 
-		// Create Communication task
-		xTaskCreate((TaskFunction_t)&Communication::TaskHandler,
-					"Communication Task",
-					128,
-					NULL,
-					configMAX_PRIORITIES - 1u,		// Communication must be higher priority task to avoid bus overrun
-					NULL);
-
 		// Create event
 		_eventHandle = xEventGroupCreate();
+
+		// Create Communication task
+		xTaskCreate((TaskFunction_t)_taskHandler,
+					"Communication Task",
+					128,
+					(void*)this,
+					configMAX_PRIORITIES - 1u,		// Communication must be higher priority task to avoid bus overrun
+					&_taskHandle);
 	}
 
-	int32_t Communication::Write (Message * msg)
+	int32_t CommunicationHandler::Write (Message * msg)
 	{
 		int32_t rval = NO_ERROR;
 
@@ -105,12 +117,12 @@ namespace Communication
 		return rval;
 	}
 
-	void Communication::GetLastMessage (Message * msg)
+	void CommunicationHandler::GetLastMessage (Message * msg)
 	{
 		memcpy(msg, &this->msg, sizeof(Message));
 	}
 
-	void Communication::TaskHandler(void * obj)
+	void CommunicationHandler::TaskHandler(void)
 	{
 		EventBits_t events = 0u;
 		int32_t error = NO_ERROR;
