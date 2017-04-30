@@ -4,8 +4,6 @@
  * @date    8 nov. 2016
  * @brief   Main
  */
-
-#include <CommunicationHandler.hpp>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -22,6 +20,10 @@
 #include "ProfileGenerator.hpp"
 #include "TrajectoryPlanning.hpp"
 #include "../../STM32_Driver/inc/stm32f4xx_it.h"
+
+#include "CommunicationHandler.hpp"
+#include "Controller.hpp"
+
 
 using namespace HAL;
 using namespace Utils;
@@ -137,7 +139,8 @@ void TASKHANDLER_Test (void * obj)
     TickType_t xLastWakeTime;
     const TickType_t xFrequency = pdMS_TO_TICKS(100);
 
-    CommunicationHandler * comHandler = CommunicationHandler::GetInstance();
+//    CommunicationHandler * comHandler = CommunicationHandler::GetInstance();
+    Controller * controller = Controller::GetInstance();
 
     // Get instances
 //    GPIO *led1 = GPIO::GetInstance(GPIO::GPIO6);
