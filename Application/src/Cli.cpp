@@ -158,6 +158,7 @@ void CLI::Compute(float32_t period)
             printf(" - &            \tEmergency stop\r\n");
             printf(" - (            \tToggle traces\r\n");
             printf(" Command:\r\n");
+            printf(" - status             \tGet modules status\r\n");
             printf(" - golin <l>          \tGo Linear\r\n");
             printf(" - goang <a>          \tGo Angular\r\n");
             printf(" - goto <x> <y>       \tGo to X,Y\r\n");
@@ -236,7 +237,6 @@ void CLI::Compute(float32_t period)
                 bk = strtof(pch, NULL);
             printf("\r\nstop (%.1f Brake)", bk);
             tp->stop();
-            //vc->Brake(bk);	/* Brake is overwritten somewhere */
         }
         else if(strcmp(pch,"checkup") == 0)
         {
@@ -245,8 +245,41 @@ void CLI::Compute(float32_t period)
         }
         else if(strcmp(pch,"safeguard") == 0)
         {
-            tp->ToggleSafeguard();
-            printf("\r\nsafeguard=%u", tp->GetSafeguard());
+            mc->ToggleSafeguard();
+            printf("\r\nsafeguard=%d", mc->GetSafeguard());
+        }
+        else if(strcmp(pch,"status") == 0)
+        {
+            printf("\r\nStatus:\r\n");
+            printf(" safeguard:%d\r\n", mc->GetSafeguard());
+            printf(" mc:0x%04x\r\n", mc->GetStatus());
+            printf(" tp:0x%04x\r\n", tp->GetStatus());
+            printf(" pg:0x%04x\r\n", pg->GetStatus());
+            printf(" pc:0x%04x\r\n", pc->GetStatus());
+            printf(" vc:0x%04x\r\n", vc->GetStatus());
+            printf(" od:0x%04x\r\n", odometry->GetStatus());
+        }
+        else if(strcmp(pch,"mc") == 0)
+        {
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+            {
+            	if(strcmp(pch,"dis") == 0)
+            	{
+                    printf("\r\nmc disable");
+                    mc->Disable();
+            	}
+            	else
+            	{
+                    printf("\r\nmc enable");
+                    mc->Enable();
+            	}
+            }
+            else
+            {
+                printf("\r\nmc enable");
+                mc->Enable();
+            }
         }
         else
         {

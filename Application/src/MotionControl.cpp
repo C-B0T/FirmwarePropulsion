@@ -52,6 +52,15 @@ namespace MotionControl
         this->name = "MotionControl";
         this->taskHandle = NULL;
 
+        // Set 16 Flags Status
+        this->status = 0x0000;
+
+        // MotionControl is enabled by default
+        this->enable = true;
+
+        // MotionControl Safeguard is enabled by default
+        this->safeguard = true;
+
         // Odometry instance created in standalone mode
         this->odometry = Odometry::GetInstance(true);
 
@@ -70,20 +79,59 @@ namespace MotionControl
                     NULL);
     }
 
+    void FBMotionControl::Enable()
+    {
+    	this->enable = true;
+    	this->vc->Enable();
+    	this->pc->Enable();
+    }
+
+    void FBMotionControl::Disable()
+    {
+    	this->enable = false;
+    	this->pc->Disable();
+    	this->vc->Disable();
+    }
+
+
     void FBMotionControl::Compute(float32_t period)
     {
         static uint32_t localTime = 0;
 
+        if(this->enable)
+        	this->status |= (1<<0);
+        else
+        	this->status &= ~(1<<0);
+
+        if(this->safeguard)
+        	this->status |= (1<<1);
+        else
+        	this->status &= ~(1<<1);
+
+
         localTime += MC_TASK_PERIOD_MS;
 
-        if( (localTime % TP_TASK_PERIOD_MS) == 0)
+        if((localTime % TP_TASK_PERIOD_MS) == 0)
             this->tp->Compute((period * TP_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
-        if( (localTime % PG_TASK_PERIOD_MS) == 0)
+        if((localTime % PG_TASK_PERIOD_MS) == 0)
             this->pg->Compute((period * PG_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
-        if( (localTime % PC_TASK_PERIOD_MS) == 0)
+        if((localTime % PC_TASK_PERIOD_MS) == 0)
             this->pc->Compute((period * PC_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
-        if( (localTime % VC_TASK_PERIOD_MS) == 0)
+        if((localTime % VC_TASK_PERIOD_MS) == 0)
             this->vc->Compute((period * VC_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
+
+        if((localTime % TP_TASK_PERIOD_MS) == 0)
+		{
+            if(this->pg->GetSafeguardFlag())
+            	this->status |= (1<<9);
+            else
+            	this->status &= ~(1<<9);
+
+            if(this->safeguard && this->pg->GetSafeguardFlag())
+        	{
+        		tp->stop();
+        	}
+		}
 
     }
 

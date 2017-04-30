@@ -103,6 +103,8 @@ namespace MotionControl
         this->name = "VelocityControl";
         this->taskHandle = NULL;
 
+        this->status = 0x0000;
+
         // Init Angular velocity control
         this->def = _getDefStructure(VelocityControl::ANGULAR);
         this->pid_angular = PID(this->def.PID_Angular.kp,
@@ -165,6 +167,8 @@ namespace MotionControl
 
         if(this->enable == true)
         {
+        	this->status |= (1<<0);
+
             // Get current velocities
             currentAngularVelocity = odometry->GetAngularVelocity();
             currentLinearVelocity  = odometry->GetLinearVelocity();
@@ -197,6 +201,10 @@ namespace MotionControl
                 leftMotor->SetMotorSpeed(this->leftSpeed);
                 rightMotor->SetMotorSpeed(this->rightSpeed);
             }
+        }
+        else
+        {
+        	this->status &= ~(1<<0);
         }
     }
 

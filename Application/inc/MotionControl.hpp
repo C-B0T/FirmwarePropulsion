@@ -64,8 +64,37 @@ namespace MotionControl
             return this->name;
         }
 
+        uint16_t GetStatus()
+        {
+        	return this->status;
+        }
+
+        void Enable();
+
+        void Disable();
+
+        void DisableSafeguard()
+        {
+        	this->safeguard = true;
+        }
+        void EnableSafeguard()
+        {
+        	this->safeguard = false;
+        }
+        void ToggleSafeguard()
+        {
+        	this->safeguard = !this->safeguard;
+        }
+        bool GetSafeguard()
+        {
+        	return this->safeguard;
+        }
+
     protected:
         FBMotionControl();
+
+        // 16 Flags Status
+        uint16_t status;
 
         /**
          * @protected
@@ -78,6 +107,11 @@ namespace MotionControl
         PositionControl    *pc;
         ProfileGenerator   *pg;
         TrajectoryPlanning *tp;
+
+
+        bool enable;
+
+        bool safeguard;
 
         /**
          * @brief Compute motion control

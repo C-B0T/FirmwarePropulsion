@@ -54,6 +54,9 @@ namespace MotionControl
         this->state = FREE;
         this->step = 0;
 
+        // Set down 16 Flags Status
+        this->status = 0x0000;
+
         this->stallMode = 0;
 
         this->X[0] = 0.0;
@@ -63,8 +66,6 @@ namespace MotionControl
         this->linearSetPoint = 0.0;
         this->linearNextSetPoint = 0.0;
         this->angularSetPoint = 0.0;
-
-        this->safeguard = true;
 
         this->odometry = Odometry::GetInstance();
         this->position = PositionControl::GetInstance();
@@ -101,11 +102,15 @@ namespace MotionControl
         this->step  = 1;
     }
 
+    void TrajectoryPlanning::freewheel()
+    {
+        this->state = FREE;
+        this->step  = 1;
+    }
+
     void TrajectoryPlanning::stop()
     {
-        this->position->Stop();
-
-        //TODO: To prepare S-curve deceleration (to discuss)
+        //TODO: Deceleration
 
         this->state = STOP;
         this->step  = 1;
@@ -201,7 +206,12 @@ namespace MotionControl
 
     float32_t TrajectoryPlanning::update()
     {
-        switch(state)
+        if( (this->state != FREE) && (this->state != STOP) )
+        {
+            calculateMove();
+        }
+
+    	switch(state)
         {
             // Simple mouvements
             case LINEAR:
@@ -211,6 +221,10 @@ namespace MotionControl
             case ANGULAR:
                 calculateGoAngular();
                 break;
+
+            case FREE:
+            	calculateFree();
+            	break;
 
             case STOP:
                 calculateStop();
@@ -247,37 +261,7 @@ namespace MotionControl
                 break;
         }
 
-        if(this->state == FREE)
-        {
-            calculateFree();
-            return 1;
-        }
-        else
-        {
-            calculateMove();
-            if(this->safeguard && this->profile->GetSafeguard())
-            {
-                // Safeguard has been trigged then stop
-                this->state = FREE;
-                //TODO: Send to Diag an error
-                return -1;
-            }
-            else
-                return 0;
-        }
-    }
-
-    void TrajectoryPlanning::calculateFree()
-    {
-        this->position->Disable();
-        this->velocity->Disable();
-        this->position->Stop();
-    }
-
-    void TrajectoryPlanning::calculateMove()
-    {
-        this->position->Enable();
-        this->velocity->Enable();
+		return 0;
     }
 
     void TrajectoryPlanning::calculateGoLinear()
@@ -326,14 +310,28 @@ namespace MotionControl
         }
     }
 
+    void TrajectoryPlanning::calculateFree()
+    {
+        this->position->Disable();
+        this->velocity->Disable();
+    }
+
+    void TrajectoryPlanning::calculateMove()
+    {
+        this->position->Enable();
+        this->velocity->Enable();
+    }
+
     void TrajectoryPlanning::calculateStop()
     {
-        //TODO: calculate stop (brake)
+        this->position->Disable();
+        this->velocity->Disable();
+        this->velocity->Brake();
     }
 
     void TrajectoryPlanning::calculateKeepPosition()
     {
-        //TODO: calculate keep position
+        //Do nothing else => Keeping position and velocity calculation on preview order
     }
 
     void TrajectoryPlanning::calculateLinearPlan()
@@ -631,6 +629,8 @@ namespace MotionControl
 
     void TrajectoryPlanning::Compute(float32_t period)
     {
+        this->status |= (1<<0);
+
         this->update();
     }
 

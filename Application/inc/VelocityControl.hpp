@@ -92,6 +92,11 @@ namespace MotionControl
             return this->name;
         }
 
+        uint16_t GetStatus()
+        {
+        	return this->status;
+        }
+
         /**
          * @brief Set angular velocity setpoint
          */
@@ -236,6 +241,8 @@ namespace MotionControl
         {
             if(this->enable == false)
             {
+                this->pid_angular.Reset();
+                this->pid_linear.Reset();
             	if (this->stop == false)
             	{
 					leftMotor->SetMotorSpeed(0.0);
@@ -279,6 +286,12 @@ namespace MotionControl
          * @brief Instance name
          */
         std::string name;
+
+        /**
+         * @protected
+         * @brief 16 Flags Status
+         */
+        uint16_t status;
 
         /**
          * @protected

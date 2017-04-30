@@ -95,6 +95,11 @@ namespace Location
             return this->name;
         }
 
+        uint16_t GetStatus()
+        {
+        	return this->status;
+        }
+
         /**
          * @brief Init coordinates
          * @param X : X cartesian coordinate (X plane)
@@ -196,6 +201,12 @@ namespace Location
          * @brief Instance name
          */
         std::string name;
+
+        /**
+         * @protected
+         * @brief 16 Flags Status
+         */
+        uint16_t status;
 
         /**
          * @protected

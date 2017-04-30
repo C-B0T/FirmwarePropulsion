@@ -73,6 +73,8 @@ namespace Location
         this->name = "ODOMETRY";
         this->taskHandle = NULL;
 
+        this->status = 0x0000;
+
         // Init members
         this->robot.X = 0.0;
         this->robot.Y = 0.0;
@@ -266,6 +268,8 @@ namespace Location
 
         float32_t dlf = 0.0;
         float32_t drf = 0.0;
+
+        this->status |= (1<<0);
 
         dl = +  leftEncoder->GetRelativeValue();
         dr = - rightEncoder->GetRelativeValue();

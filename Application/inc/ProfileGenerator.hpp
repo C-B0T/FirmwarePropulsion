@@ -103,6 +103,11 @@
              return this->name;
          }
 
+         uint16_t GetStatus()
+         {
+         	return this->status;
+         }
+
          /**
           * @brief Get linear position setpoint
           */
@@ -180,9 +185,9 @@
          /**
           * @brief get safeguard
           */
-         bool GetSafeguard()
+         bool GetSafeguardFlag()
          {
-             return this->safeguard;
+             return this->safeguardFlag;
          }
 
      protected:
@@ -209,6 +214,12 @@
           * @brief Instance name
           */
          std::string name;
+
+         /**
+          * @protected
+          * @brief 16 Flags Status
+          */
+         uint16_t status;
 
          /**
           * @protected
@@ -274,7 +285,7 @@
           * @protected
           * @brief safeguard flag
           */
-         bool safeguard;
+         bool safeguardFlag;
 
          /**
           * @protected

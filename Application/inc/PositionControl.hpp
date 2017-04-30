@@ -88,6 +88,11 @@ namespace MotionControl
             return this->name;
         }
 
+        uint16_t GetStatus()
+        {
+        	return this->status;
+        }
+
         /**
          * @brief Set angular position setpoint
          */
@@ -100,13 +105,6 @@ namespace MotionControl
 
                 xSemaphoreGive(this->xMutex);
             }
-
-            // Disable brake emergency
-            /*if(this->stop == true)
-            {
-                this->velocityControl->Start();
-                this->stop = false;
-            }*/
         }
 
         /**
@@ -131,13 +129,6 @@ namespace MotionControl
         {
             // Set linear position order
             this->linearPosition = position;
-
-            // Disable brake emergency
-            /*if(this->stop == true)
-            {
-                this->velocityControl->Start();
-                this->stop = false;
-            }*/
         }
 
         /**
@@ -241,6 +232,8 @@ namespace MotionControl
         {
             if(this->enable == false)
             {
+                this->pid_angular.Reset();
+                this->pid_linear.Reset();
                 this->enable = true;
             }
         }
@@ -254,15 +247,6 @@ namespace MotionControl
             {
                 this->enable = false;
             }
-        }
-
-        /**
-         * @brief Stop
-         */
-        void Stop()
-        {
-            this->velocityControl->Brake();
-            this->stop = true;
         }
 
         /**
@@ -289,6 +273,12 @@ namespace MotionControl
          * @brief Instance name
          */
         std::string name;
+
+        /**
+         * @protected
+         * @brief 16 Flags Status
+         */
+        uint16_t status;
 
         /**
          * @protected
@@ -361,12 +351,6 @@ namespace MotionControl
          * @brief enable/disable
          */
         bool enable;
-
-        /**
-         * @protected
-         * @brief emergency stop
-         */
-        bool stop;
 
         /**
          * @protected

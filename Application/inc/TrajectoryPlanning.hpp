@@ -71,6 +71,11 @@ namespace MotionControl
             return this->name;
         }
 
+        uint16_t GetStatus()
+        {
+        	return this->status;
+        }
+
         /**
          * @brief Compute robot trajectory planning
          */
@@ -80,6 +85,7 @@ namespace MotionControl
         //Orders:
         void goLinear(float32_t linear);     // linear in meters
         void goAngular(float32_t angular);   // angular in radian
+        void freewheel();
         void stop();
         void gotoXY(float32_t X, float32_t Y);   // X,Y in meters
         void pushXY(float32_t X[], float32_t Y[], uint32_t n);   // X,Y in meters
@@ -94,23 +100,6 @@ namespace MotionControl
         uint32_t GetStep()
         {
         	return (uint32_t)this->step;
-        }
-
-        void DisableSafeguard()
-        {
-        	this->safeguard = true;
-        }
-        void EnableSafeguard()
-        {
-        	this->safeguard = false;
-        }
-        void ToggleSafeguard()
-        {
-        	this->safeguard = !this->safeguard;
-        }
-        bool GetSafeguard()
-        {
-        	return this->safeguard;
         }
 
     protected:
@@ -131,6 +120,9 @@ namespace MotionControl
         void calculateStallY(int32_t mode);
 
         void updateXYtoLA(uint32_t n);
+
+        // 16 Flags Status
+        uint16_t status;
 
         int32_t state;
         int32_t step;
@@ -162,8 +154,6 @@ namespace MotionControl
         PositionControl *position;
         VelocityControl *velocity;
         ProfileGenerator *profile;
-
-        bool safeguard;
 
         /**
          * @protected

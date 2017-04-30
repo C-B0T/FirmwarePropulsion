@@ -103,6 +103,8 @@ namespace MotionControl
         this->name = "ProfileGenerator";
         this->taskHandle = NULL;
 
+        this->status = 0x0000;
+
         this->Finished = false;
 
         // Init Angular motion profile generator
@@ -230,6 +232,8 @@ namespace MotionControl
 
         float32_t time = getTime();
 
+        this->status |= (1<<0);
+
         // Safeguard
         // TODO: Avant de générer le prochain point de profile
         //       s'assurer que l'erreur n'est pas trop grande sinon
@@ -241,11 +245,11 @@ namespace MotionControl
         linearPositionError  = this->positionControl->GetLinearPositionError();
 
         // TODO: A améliorer pour faire un pourcentage
-        this->safeguard = false;
+        this->safeguardFlag = false;
         if(angularPositionError > 0.34)    // ~20°
-            this->safeguard = true;
+            this->safeguardFlag = true;
         if(linearPositionError > 0.1)       // 10cm
-            this->safeguard = true;
+            this->safeguardFlag = true;
 
         // Generate profile
         this->Generate(period);

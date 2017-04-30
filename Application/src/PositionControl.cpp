@@ -110,6 +110,8 @@ namespace MotionControl
         this->name = "PositionControl";
         this->taskHandle = NULL;
 
+        this->status = 0x0000;
+
         // Init Angular velocity control
         this->def = _getDefStructure(PositionControl::ANGULAR);
         this->pid_angular = PID(this->def.PID_Angular.kp,
@@ -141,8 +143,6 @@ namespace MotionControl
 
         this->enable = true;
 
-        this->stop = false;
-
         if(standalone)
         {
             // Create task
@@ -171,6 +171,8 @@ namespace MotionControl
 
         if(this->enable == true)
         {
+        	this->status |= (1<<0);
+
             // Get current positions
             currentAngularPosition = odometry->GetAngularPosition();
             currentLinearPosition  = odometry->GetLinearPosition();
@@ -197,6 +199,10 @@ namespace MotionControl
 
             velocityControl->SetAngularVelocity(this->angularVelocity);
             velocityControl->SetLinearVelocity(this->linearVelocity);
+        }
+        else
+        {
+        	this->status &= ~(1<<0);
         }
     }
 

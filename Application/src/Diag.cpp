@@ -86,10 +86,11 @@ void Diag::Traces()
 void Diag::Led()
 {
 	static uint32_t localTime = 0;
-	static uint32_t LedId = 4;
 
 	localTime += (uint32_t)DIAG_TASK_PERIOD_MS;
 
+	// Led direction
+	static uint32_t LedId = 4;
 	switch(LedId)
 	{
 	case 1:
@@ -107,7 +108,6 @@ void Diag::Led()
 	default:
 		break;
 	}
-
 	LedId--;
 	if(LedId < 1)
 		LedId = 4;
