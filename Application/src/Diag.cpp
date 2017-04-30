@@ -80,7 +80,9 @@ void Diag::Traces()
     this->odometry->GetRobot(&r);
 
     //printf("%.3f\t%.3f\t%.3f\r\n", r.X, r.Y, r.O);
-    printf("%ld\t%ld\t%.1f\r\n",r.Xmm, r.Ymm, r.Odeg);
+    //printf("%ld\t%ld\t%.1f\r\n", r.Xmm, r.Ymm, r.Odeg);
+
+    printf("%ld\t%ld\t%.3f\t%.3f\t%.3f\t%.3f\r\n", tp->GetStep(), pg->GetLinearPhase(), pg->GetLinearPositionProfiled(), pc->GetLinearPosition(), vc->GetLinearVelocity(), vc->GetLinearSpeed());
 }
 
 void Diag::Led()

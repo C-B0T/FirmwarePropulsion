@@ -170,6 +170,8 @@ namespace MotionControl
         currentAngularPosition = odometry->GetAngularPosition();
         time = getTime();
 
+        this->safeguardFlag = false;
+
         // Set profile type
         this->angularPhaseProfile = AccDec;
         this->angularProfile.SetProfile(MotionProfile::POLY5);
@@ -186,6 +188,8 @@ namespace MotionControl
         float32_t currentLinearPosition  = 0.0;
         float32_t time = 0.0;
         float32_t d = 0.0;
+
+        this->safeguardFlag = false;
 
         // Set linear position order
         this->linearPosition = position;
@@ -217,7 +221,8 @@ namespace MotionControl
             this->linearProfile.SetProfile(MotionProfile::POLY5_P1);
 
             // Start profile
-            this->linearProfile.SetSetPoint(this->linearPositionProfiled+d, currentLinearPosition, time);
+            // 30/04/2017 : Remplacement de this->linearPositionProfiled par currentLinearPosition
+            this->linearProfile.SetSetPoint(currentLinearPosition+d, currentLinearPosition, time);
         }
     }
 

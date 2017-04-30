@@ -153,6 +153,22 @@
          }
 
          /**
+          * @brief Get linear position setpoint
+          */
+         float32_t GetLinearPositionProfiled()
+         {
+             return this->linearPositionProfiled;
+         }
+
+         /**
+          * @brief Get angular position setpoint
+          */
+         float32_t GetAngularPositionProfiled()
+         {
+             return this->angularPositionProfiled;
+         }
+
+         /**
           * @brief Compute profile control
           */
          void Compute(float32_t period);
