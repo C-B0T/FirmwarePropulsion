@@ -9,6 +9,8 @@
 #include <stddef.h>
 #include <string.h>
 
+#include "FreeRTOS.h"
+
 using namespace std;
 using namespace HAL;
 
@@ -31,7 +33,7 @@ using namespace HAL;
 #define I2C0_INT_ERROR_CHANNEL	(I2C3_ER_IRQn)
 #define I2C0_INT_PRIORITY		(8u)
 
-#define I2C_TIMEOUT				(10000u)
+#define I2C_TIMEOUT				(0xFFFFu)
 
 #define I2C_EVENT_START_OK							(I2C_EVENT_MASTER_MODE_SELECT)
 #define I2C_EVENT_SLAVE_ACK_ADDR_READY_TO_TRANSMIT	(I2C_EVENT_MASTER_TRANSMITTER_MODE_SELECTED)
@@ -231,38 +233,53 @@ namespace HAL
 
 		assert(frame != NULL);
 
+		portENTER_CRITICAL();
+
 		// Disable I2C interrupt to avoid ACK failure interrupt when master will NAK at the end of the transaction
-		I2C_ITConfig(this->def.I2C.BUS, I2C_IT_ERR, DISABLE);
+		I2C_ITConfig(this->def.I2C.BUS, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, DISABLE);
 
-		for(i=0u; i < frame->Length; )
+		// Wait read event
+		if(_waitEvent(this->def.I2C.BUS, I2C_EVENT_SLAVE_TRANSMITTER_ADDRESS_MATCHED)!= SUCCESS)
 		{
-			// Send a byte
-			I2C_SendData(this->def.I2C.BUS, frame->Data[i]);
+			rval = I2C_ERROR_TIMEOUT;
+		}
 
-			// Wait byte transmitted event
-			if(_waitEvent(this->def.I2C.BUS, I2C_EVENT_SLAVE_BYTE_TRANSMITTED) != SUCCESS)
+		if(rval == NO_ERROR)
+		{
+			for(i=0u; i < frame->Length; )
 			{
-				rval = I2C_ERROR_SLAVE_SEND_DATA_FAILED;
-				break;
-			}
-			else
-			{
-				i++;	// Byte has been transmitted
-			}
+				// Send a byte
+				I2C_SendData(this->def.I2C.BUS, frame->Data[i]);
 
-			// If master NAKed
-			if(_waitEvent(this->def.I2C.BUS, I2C_EVENT_SLAVE_ACK_FAILURE) == SUCCESS)
-			{
-				rval = i;	// i = bytes sent
-				break;
-			}
+				// Wait byte transmitted event
+				if(_waitEvent(this->def.I2C.BUS, I2C_EVENT_SLAVE_BYTE_TRANSMITTED) != SUCCESS)
+				{
+					rval = I2C_ERROR_SLAVE_SEND_DATA_FAILED;
+					break;
+				}
+				else
+				{
+					i++;	// Byte has been transmitted
 
-			rval = i;
+					// If last byte, transmit CRC
+					if(i == frame->Length)
+					{
+						I2C_TransmitPEC(this->def.I2C.BUS, ENABLE);
+
+						// Wait NAK
+						_waitEvent(this->def.I2C.BUS, I2C_EVENT_SLAVE_ACK_FAILURE);
+					}
+				}
+
+				rval = i;
+			}
 		}
 
 		// Clear AF bit and re-enable error interrupt
 		I2C_ClearFlag(this->def.I2C.BUS, I2C_FLAG_AF);
-		I2C_ITConfig(this->def.I2C.BUS, I2C_IT_ERR, ENABLE);
+		I2C_ITConfig(this->def.I2C.BUS, I2C_IT_EVT | I2C_IT_BUF | I2C_IT_ERR, ENABLE);
+
+		portEXIT_CRITICAL();
 
 		return rval;
 	}
