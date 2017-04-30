@@ -112,48 +112,33 @@ static void _encode_Ping (I2C_FRAME * frame, MESSAGE_PARAM * param)
 	assert(frame != NULL);
 	assert(param != NULL);
 
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 0u]	=	(uint8_t)(param->Ping.key & 0x000000FFu);
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 1u]	=	(uint8_t)((param->Ping.key >> 8u) & 0x000000FFu);
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 2u]	=	(uint8_t)((param->Ping.key >> 16u) & 0x000000FFu);
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 3u]	=	(uint8_t)((param->Ping.key >> 24u) & 0x000000FFu);
-	frame->Length++;
+	frame->Data[frame->Length++]	=	(uint8_t)(param->Ping.key & 0x000000FFu);
+	frame->Data[frame->Length++]	=	(uint8_t)((param->Ping.key >> 8u) & 0x000000FFu);
+	frame->Data[frame->Length++]	=	(uint8_t)((param->Ping.key >> 16u) & 0x000000FFu);
+	frame->Data[frame->Length++]	=	(uint8_t)((param->Ping.key >> 24u) & 0x000000FFu);
 }
 
 static void _encode_Checkup(I2C_FRAME * frame, MESSAGE_PARAM * param)
 {
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 0u]	=	param->Checkup.cmdStatus;
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 1u]	=	param->Checkup.cmdStatus;
-	frame->Length++;
+	frame->Data[frame->Length++]	=	param->Checkup.cmdStatus;
+	frame->Data[frame->Length++]	=	param->Checkup.cmdStatus;
 }
 
 static void _encode_GetDistance (I2C_FRAME * frame, MESSAGE_PARAM * param)
 {
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 0u]	=	(uint8_t)(param->GetDistance.distance & 0x00FFu);
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 1u]	=	(uint8_t)((param->GetDistance.distance >> 8u) & 0x00FFu);
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 2u]	=	param->GetDistance.status;
-	frame->Length++;
+	frame->Data[frame->Length++]	=	(uint8_t)(param->GetDistance.distance & 0x00FFu);
+	frame->Data[frame->Length++]	=	(uint8_t)((param->GetDistance.distance >> 8u) & 0x00FFu);
+	frame->Data[frame->Length++]	=	param->GetDistance.status;
 }
 
 static void _encode_GetPosition (I2C_FRAME * frame, MESSAGE_PARAM * param)
 {
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 0u]	=	(uint8_t)(param->GetPosition.posX & 0x00FFu);
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 1u]	=	(uint8_t)((param->GetPosition.posX >> 8u) & 0x00FFu);
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 2u]	=	(uint8_t)(param->GetPosition.posY & 0x00FFu);
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 3u]	=	(uint8_t)((param->GetPosition.posY >> 8u) & 0x00FFu);
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 4u]	=	(uint8_t)(param->GetPosition.angle & 0x00FFu);
-	frame->Length++;
-	frame->Data[MSG_FRAME_INDEX_FIRST_DATA + 5u]	=	(uint8_t)((param->GetPosition.angle >> 8u) & 0x00FFu);
-	frame->Length++;
+	frame->Data[frame->Length++]	=	(uint8_t)(param->GetPosition.posX & 0x00FFu);
+	frame->Data[frame->Length++]	=	(uint8_t)((param->GetPosition.posX >> 8u) & 0x00FFu);
+	frame->Data[frame->Length++]	=	(uint8_t)(param->GetPosition.posY & 0x00FFu);
+	frame->Data[frame->Length++]	=	(uint8_t)((param->GetPosition.posY >> 8u) & 0x00FFu);
+	frame->Data[frame->Length++]	=	(uint8_t)(param->GetPosition.angle & 0x00FFu);
+	frame->Data[frame->Length++]	=	(uint8_t)((param->GetPosition.angle >> 8u) & 0x00FFu);
 }
 
 /*----------------------------------------------------------------------------*/
@@ -204,8 +189,8 @@ namespace Communication
 		{
 			if(this->Type != MSG_TYPE_UNKNOWN)
 			{
-				frame->Data[MSG_FRAME_INDEX_OPCODE]	=	(uint8_t)this->Type;
-				frame->Length++;
+				frame->Length = MSG_FRAME_INDEX_OPCODE;
+				frame->Data[frame->Length++]	=	(uint8_t)this->Type;
 			}
 			else
 			{
@@ -219,20 +204,16 @@ namespace Communication
 			switch(this->Type)
 			{
 			case MSG_TYPE_PING:
-				frame->Data[MSG_FRAME_INDEX_NB_DATA]=	MSG_NB_DATA_ENCODE_PING;
-				frame->Length++;
+				frame->Data[frame->Length++]=	MSG_NB_DATA_ENCODE_PING;
 				break;
 			case MSG_TYPE_CHECKUP:
-				frame->Data[MSG_FRAME_INDEX_NB_DATA]=	MSG_NB_DATA_ENCODE_CHECKUP;
-				frame->Length++;
+				frame->Data[frame->Length++]=	MSG_NB_DATA_ENCODE_CHECKUP;
 				break;
 			case MSG_TYPE_GET_DISTANCE:
-				frame->Data[MSG_FRAME_INDEX_NB_DATA]=	MSG_NB_DATA_ENCODE_GET_DISTANCE;
-				frame->Length++;
+				frame->Data[frame->Length++]=	MSG_NB_DATA_ENCODE_GET_DISTANCE;
 				break;
 			case MSG_TYPE_GET_POSITION:
-				frame->Data[MSG_FRAME_INDEX_NB_DATA]=	MSG_NB_DATA_ENCODE_GET_POSITION;
-				frame->Length++;
+				frame->Data[frame->Length++]=	MSG_NB_DATA_ENCODE_GET_POSITION;
 				break;
 
 			// These command doesn't need an answer
