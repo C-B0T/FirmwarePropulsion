@@ -128,6 +128,18 @@ namespace HAL
 		 * @brief Received frame buffer
 		 */
 		I2C_FRAMEBUFFERR buffer;
+
+		/**
+		 * @private
+		 * @brief Previous CRC value
+		 */
+		uint8_t prevCRC;
+
+		/**
+		 * @private
+		 * @brief Current CRC value
+		 */
+		uint8_t curCRC;
 	};
 }
 

@@ -78,6 +78,7 @@ typedef struct
 	I2C_FRAME_TYPE	Type;						/**< Frame Type */
 	uint32_t		Length;						/**< Frame Length (excluding CRC) */
 	uint8_t			Data[I2C_MAX_FRAME_SIZE];	/**< Frame Data (excluding CRC) */
+	uint8_t			CRCval;						/**< CRC-8 value */
 }I2C_FRAME;
 
 /**

@@ -302,6 +302,8 @@ namespace HAL
 				this->buffer.rdIndex = 0u;
 				this->buffer.wrIndex = 0u;
 			}
+
+			this->error = NO_ERROR;
 		}
 		else
 		{
@@ -323,6 +325,9 @@ namespace HAL
 			{
 				this->buffer.frame[this->buffer.wrIndex].Type 	=	(I2C_GetFlagStatus(this->def.I2C.BUS, I2C_FLAG_TRA) == SET ? I2C_FRAME_TYPE_READ : I2C_FRAME_TYPE_WRITE);
 				this->buffer.frame[this->buffer.wrIndex].Length = 	0u;
+
+				this->prevCRC = 0u;
+				this->curCRC = I2C_GetPEC(this->def.I2C.BUS);
 
 				if(this->buffer.frame[this->buffer.wrIndex].Type == I2C_FRAME_TYPE_READ)
 				{
@@ -351,6 +356,9 @@ namespace HAL
 				this->buffer.frame[this->buffer.wrIndex].Data[this->buffer.frame[this->buffer.wrIndex].Length] = data;
 
 				this->buffer.frame[this->buffer.wrIndex].Length++;
+
+				this->prevCRC = this->curCRC;
+				this->curCRC = I2C_GetPEC(this->def.I2C.BUS);
 			}
 			else
 			{
@@ -362,27 +370,14 @@ namespace HAL
 		case I2C_FLAG_STOPF:
 			if(this->buffer.wrIndex < (I2C_MAX_BUFFER_SIZE - 1u))
 			{
+				this->buffer.frame[this->buffer.wrIndex].CRCval = this->prevCRC;
 				this->buffer.wrIndex++;
 
-				// Get CRC value
-				data = I2C_GetPEC(this->def.I2C.BUS);
+				this->error = NO_ERROR;
 
-				// Last byte transfered is supposed to be the CRC byte so
-				// If data == 0 => Packet check is OK, else, set Packet Error
-				if(data != 0)
+				if(this->buffer.frame[this->buffer.wrIndex - 1u].Type == I2C_FRAME_TYPE_WRITE)
 				{
-					this->error = I2C_ERROR_PACKET_ERROR;
-
-					this->ErrorOccurred();
-				}
-				else
-				{
-					this->error = NO_ERROR;
-
-					if(this->buffer.frame[this->buffer.wrIndex - 1u].Type == I2C_FRAME_TYPE_WRITE)
-					{
-						this->DataReceived();
-					}
+					this->DataReceived();
 				}
 			}
 			else
