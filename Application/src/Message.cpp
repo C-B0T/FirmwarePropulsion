@@ -169,7 +169,20 @@ namespace Communication
 			rval = this->GetType(frame);
 		}
 
-		// 2. Get param
+		// 2. Verify CRC
+		if(rval == NO_ERROR)
+		{
+			// If frame contains a CRC
+			if(frame->Length > MSG_FRAME_INDEX_NB_DATA)
+			{
+				if(frame->Data[frame->Length - 1u] != frame->CRCval)
+				{
+					rval = SMG_ERROR_WRONG_CRC;
+				}
+			}
+		}
+
+		// 3. Get param
 		if(rval == NO_ERROR)
 		{
 			rval = this->GetParam(frame);
@@ -324,14 +337,6 @@ namespace Communication
 				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_CHECKUP)
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
-			case MSG_TYPE_GET_DISTANCE:
-				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_GET_DISTANCE)
-					rval = MSG_ERROR_WRONG_NB_DATA;
-				break;
-			case MSG_TYPE_GET_POSITION:
-				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_GET_POSITION)
-					rval = MSG_ERROR_WRONG_NB_DATA;
-				break;
 			case MSG_TYPE_GOTO:
 				if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_GOTO)
 					rval = MSG_ERROR_WRONG_NB_DATA;
@@ -349,6 +354,12 @@ namespace Communication
 					rval = MSG_ERROR_WRONG_NB_DATA;
 				break;
 				break;
+
+			// No Nb data field needed
+			case MSG_TYPE_GET_DISTANCE:
+			case MSG_TYPE_GET_POSITION:
+				break;
+
 			default:
 				rval = MSG_ERROR_UNKNOWN_TYPE;
 				break;

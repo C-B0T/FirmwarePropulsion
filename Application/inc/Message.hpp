@@ -21,6 +21,7 @@
 #define MSG_ERROR_UNKNOWN_TYPE		(-1)
 #define MSG_ERROR_WRONG_NB_DATA		(-2)
 #define MSG_ERROR_NO_ANSWER_NEEDED	(-3)
+#define SMG_ERROR_WRONG_CRC			(-4)
 
 /**
  * @brief Message type list
