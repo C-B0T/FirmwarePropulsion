@@ -36,6 +36,18 @@ namespace Communication
 		static CommunicationHandler * GetInstance ();
 
 		/**
+		 * @brief Return current error;
+		 */
+		int32_t GetError()
+		{
+			int32_t error = this->error;
+
+			this->error = NO_ERROR;
+
+			return error;
+		}
+
+		/**
 		 * @brief Send data after a data request
 		 * @param msg : Message to send
 		 * @return Nb of data bytes sent if >= 0, error if < 0
@@ -52,6 +64,11 @@ namespace Communication
 		 * @brief Message received event
 		 */
 		Utils::Event MessageReceived;
+
+		/**
+		 * @brief Error occured event
+		 */
+		Utils::Event ErrorOccured;
 
 		/**
 		 * @private
@@ -72,6 +89,8 @@ namespace Communication
 		 * @brief Current message
 		 */
 		Message msg;
+
+		int32_t error;
 
 		/**
 		 * @private

@@ -19,8 +19,10 @@
 
 #define COM_EVENT_DATA_RECEIVED		(0x01u)
 #define COM_EVENT_DATA_REQUESTED	(0x02u)
-#define COM_EVENT_MASK				(COM_EVENT_DATA_RECEIVED | \
-									 COM_EVENT_DATA_REQUESTED)
+#define COM_EVENT_ERROR_OCCURED		(0x04u)
+#define COM_EVENT_MASK				(COM_EVENT_DATA_RECEIVED 	| \
+									 COM_EVENT_DATA_REQUESTED	| \
+									 COM_EVENT_ERROR_OCCURED)
 
 /*----------------------------------------------------------------------------*/
 /* Private Members                                                            */
@@ -47,6 +49,13 @@ static void _onDataRequested (void * obj)
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 	xEventGroupSetBitsFromISR(_eventHandle, COM_EVENT_DATA_REQUESTED, &xHigherPriorityTaskWoken);
+}
+
+static void _onError (void * obj)
+{
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+	xEventGroupSetBitsFromISR(_eventHandle, COM_EVENT_ERROR_OCCURED, &xHigherPriorityTaskWoken);
 }
 
 static void _taskHandler (void * obj)
@@ -78,11 +87,14 @@ namespace Communication
 
 	CommunicationHandler::CommunicationHandler()
 	{
+		this->error = NO_ERROR;
+
 		// Create I2C bus
 		this->bus = HAL::I2CSlave::GetInstance(HAL::I2CSlave::I2C_SLAVE0);
 
 		this->bus->DataReceived += _onDataReceived;
 		this->bus->DataRequest += _onDataRequested;
+		this->bus->ErrorOccurred += _onError;
 
 		// Create event
 		_eventHandle = xEventGroupCreate();
@@ -123,7 +135,6 @@ namespace Communication
 	void CommunicationHandler::TaskHandler(void)
 	{
 		EventBits_t events = 0u;
-		int32_t error = NO_ERROR;
 
 		while(1)
 		{
@@ -138,26 +149,31 @@ namespace Communication
 				((events & COM_EVENT_DATA_REQUESTED) == COM_EVENT_DATA_REQUESTED) )
 			{
 				// Get I2C frame
-				if(error == NO_ERROR)
+				if(this->error == NO_ERROR)
 				{
-					error = this->bus->Read(&this->frame);
+					this->error = this->bus->Read(&this->frame);
 				}
 
 				// Decode message
-				if(error == NO_ERROR)
+				if(this->error == NO_ERROR)
 				{
-					error = this->msg.Decode(&this->frame);
+					this->error = this->msg.Decode(&this->frame);
 				}
 
 				// Notify
-				if(error == NO_ERROR)
+				if(this->error == NO_ERROR)
 				{
 					this->MessageReceived();
 				}
+				else
+				{
+					this->ErrorOccured();
+				}
 			}
-
-			error = NO_ERROR;
+			else if((events & COM_EVENT_ERROR_OCCURED) == COM_EVENT_ERROR_OCCURED)
+			{
+				this->bus->Read(&this->frame);
+			}
 		}
-
 	}
 }

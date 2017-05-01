@@ -19,7 +19,9 @@
 /*----------------------------------------------------------------------------*/
 
 #define CONTROLLER_EVENT_MSG_RECEIVED		(0x01u)
-#define CONTROLLER_EVENT_MASK				(CONTROLLER_EVENT_MSG_RECEIVED)
+#define CONTROLLER_EVENT_MSG_ERROR			(0x02u)
+#define CONTROLLER_EVENT_MASK				(CONTROLLER_EVENT_MSG_RECEIVED | \
+											 CONTROLLER_EVENT_MSG_ERROR)
 
 #define CONTROLLER_UNLOCK_KEY				(0x5AA555AAu)
 
@@ -41,6 +43,13 @@ static void _onMessageReceive (void * obj)
 	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
 	xEventGroupSetBitsFromISR(_eventHandle, CONTROLLER_EVENT_MSG_RECEIVED, &xHigherPriorityTaskWoken);
+}
+
+static void _onMessageError (void * obj)
+{
+	BaseType_t xHigherPriorityTaskWoken = pdFALSE;
+
+	xEventGroupSetBitsFromISR(_eventHandle, CONTROLLER_EVENT_MSG_ERROR, &xHigherPriorityTaskWoken);
 }
 
 static void _taskHandler (void * obj)
@@ -73,6 +82,7 @@ Controller::Controller ()
 	// Create communication handler
 	this->comHandler = Communication::CommunicationHandler::GetInstance();
 	this->comHandler->MessageReceived += _onMessageReceive;
+	this->comHandler->ErrorOccured += _onMessageError;
 
 	// Create event
 	_eventHandle = xEventGroupCreate();
@@ -147,6 +157,21 @@ void Controller::TaskHandler (void)
 					break;
 				}
 			}
+		}
+		else if((events & CONTROLLER_EVENT_MSG_ERROR) == CONTROLLER_EVENT_MSG_ERROR)
+		{
+			// 1. get message
+			if(error == NO_ERROR)
+			{
+				this->comHandler->GetLastMessage(&this->msg);
+			}
+
+			if(error == NO_ERROR)
+			{
+				this->comHandler->GetError();
+			}
+
+			/** @todo Do something with error and message */
 		}
 
 		error = NO_ERROR;
