@@ -55,7 +55,7 @@ namespace Utils
 {
     ConfigParams::ConfigParams()
     {
-    	/*
+        /*
         // 1- Check if ConfigParams hasn't been initialized
         if(*(__IO uint32_t *) (BKPSRAM_BASE + 0x00) != CONFIGPARAMS_MAGIC)
         {
@@ -70,7 +70,7 @@ namespace Utils
                 this->Reset();
             }
         }
-     	*/
+         */
     }
 
     void ConfigParams::Upgrade()
@@ -81,7 +81,7 @@ namespace Utils
 
     void ConfigParams::Reset()
     {
-    	/*
+        /*
         *(__IO uint32_t *) (BKPSRAM_BASE + 0x00) = CONFIGPARAMS_MAGIC;
         *(__IO uint32_t *) (BKPSRAM_BASE + 0x04) = CONFIGPARAMS_VERSION;
         *(__IO uint32_t *) (BKPSRAM_BASE + 0x08) = 0x55555555;
