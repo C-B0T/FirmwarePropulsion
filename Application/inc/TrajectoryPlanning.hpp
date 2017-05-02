@@ -97,6 +97,11 @@ namespace MotionControl
         float32_t getSuggestedLinearPosition();
         float32_t getSuggestedAngularPosition();
 
+        bool isFinished()
+        {
+        	return this->finished;
+        }
+
         uint32_t GetStep()
         {
         	return (uint32_t)this->step;
@@ -123,6 +128,8 @@ namespace MotionControl
 
         // 16 Flags Status
         uint16_t status;
+
+        bool finished;
 
         int32_t state;
         int32_t step;

@@ -178,6 +178,11 @@ void CLI::Compute(float32_t period)
             printf(" - setvelang <v>      \tSet velocity angular\r\n");
             printf(" - setacclin <a>      \tSet acceleration linear\r\n");
             printf(" - setaccang <a>      \tSet acceleration angular\r\n");
+            printf(" = \r\n");
+            printf(" - GoLin <l>          \tGo Linear\r\n");
+            printf(" - GoAng <a>          \tGo Angular\r\n");
+            printf(" - Goto <x> <y>       \tGo to X,Y\r\n");
+            printf(" - Stop               \tStop motion \r\n");
             //printf(" - stop <%%>     \tStop %% Brake\r\n");
         }
         else if(strcmp(pch,"golin") == 0)
@@ -192,6 +197,18 @@ void CLI::Compute(float32_t period)
             printf("\r\ngolin %.3f", l);
             tp->goLinear(l);
         }
+        else if(strcmp(pch,"GoLin") == 0)
+        {
+            int16_t d;
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                d = strtol(pch, NULL, 10);
+            else
+                d = 0;
+
+            printf("\r\nGoLin %d", d);
+            mc->GoLin(d);
+        }
         else if(strcmp(pch,"goang") == 0)
         {
             float a;
@@ -203,6 +220,18 @@ void CLI::Compute(float32_t period)
 
             printf("\r\ngoang %.3f", a);
             tp->goAngular(a);
+        }
+        else if(strcmp(pch,"GoAng") == 0)
+        {
+            int16_t a;
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                a = strtol(pch, NULL, 10);
+            else
+                a = 0;
+
+            printf("\r\nGoAng %d", a);
+            mc->GoAng(a);
         }
         else if(strcmp(pch,"goto") == 0)
         {
@@ -220,6 +249,23 @@ void CLI::Compute(float32_t period)
 
             printf("\r\ngoto %.3f %.3f", x, y);
             tp->gotoXY(x,y);
+        }
+        else if(strcmp(pch,"Goto") == 0)
+        {
+            int16_t x, y;
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                x = strtol(pch, NULL, 10);
+            else
+                x = 0;
+            pch = strtok (NULL, " ");
+            if(pch != NULL)
+                y = strtol(pch, NULL, 10);
+            else
+                y = 0;
+
+            printf("\r\nGoto %d %d", x, y);
+            mc->Goto(x,y);
         }
         else if(strcmp(pch,"setodo") == 0)
         {
@@ -252,6 +298,11 @@ void CLI::Compute(float32_t period)
                 bk = strtof(pch, NULL);
             printf("\r\nstop (%.1f Brake)", bk);
             tp->stop();
+        }
+        else if(strcmp(pch,"Stop") == 0)
+        {
+            printf("\r\nStop");
+            mc->Stop();
         }
         else if(strcmp(pch,"checkup") == 0)
         {

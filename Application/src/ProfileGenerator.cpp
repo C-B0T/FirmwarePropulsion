@@ -251,10 +251,20 @@ namespace MotionControl
 
         // TODO: A améliorer pour faire un pourcentage
         this->safeguardFlag = false;
-        if(angularPositionError > 0.34)    // ~20°
+        if(angularPositionError > 0.34) {   // ~20°
+            this->status |= (1<<8);
             this->safeguardFlag = true;
-        if(linearPositionError > 0.1)       // 10cm
+        }
+        else {
+            this->status &= ~(1<<8);
+        }
+        if(linearPositionError > 0.1) {       // 10cm
+            this->status |= (1<<9);
             this->safeguardFlag = true;
+        }
+        else {
+            this->status &= ~(1<<9);
+        }
 
         // Generate profile
         this->Generate(period);

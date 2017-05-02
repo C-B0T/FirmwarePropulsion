@@ -77,6 +77,10 @@ namespace MotionControl
                     NULL,
                     MC_TASK_PRIORITY,
                     NULL);
+
+        this->mutex = xSemaphoreCreateMutex();
+
+        this->Qorders = xQueueCreate(10, sizeof(cmd_t));
     }
 
     void FBMotionControl::Enable()
@@ -97,7 +101,9 @@ namespace MotionControl
     void FBMotionControl::Compute(float32_t period)
     {
         static uint32_t localTime = 0;
+        cmd_t cmd;
 
+        // Update status
         if(this->enable)
         	this->status |= (1<<0);
         else
@@ -109,30 +115,49 @@ namespace MotionControl
         	this->status &= ~(1<<1);
 
 
+        // Schedule MotionControl
         localTime += MC_TASK_PERIOD_MS;
 
         if((localTime % TP_TASK_PERIOD_MS) == 0)
+        {
+            // 1- Pull orders
+            //@todo execute order
+            if(this->tp->isFinished())
+            {
+                if(xQueueReceive(this->Qorders, &cmd, 0) == pdTRUE)
+                {
+                    switch (cmd.id)
+                    {
+                    case CMD_ID_GOLIN:
+                        this->tp->goLinear(cmd.data.d);
+                        break;
+                    case CMD_ID_GOANG:
+                        this->tp->goAngular(cmd.data.a);
+                        break;
+                    case CMD_ID_GOTO:
+                        this->tp->gotoXY(cmd.data.xy.x, cmd.data.xy.y);
+                        break;
+                    default:
+                        break;
+                    }
+                }
+            }
+            // 2- Compute TrajectoryPlanning
             this->tp->Compute((period * TP_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
+            // 3- Check safeguard flag
+            if(this->pg->GetSafeguardFlag())
+            	this->status |= (1<<9);
+            else
+            	this->status &= ~(1<<9);
+            if(this->safeguard && this->pg->GetSafeguardFlag())
+        		tp->stop();
+        }
         if((localTime % PG_TASK_PERIOD_MS) == 0)
             this->pg->Compute((period * PG_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
         if((localTime % PC_TASK_PERIOD_MS) == 0)
             this->pc->Compute((period * PC_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
         if((localTime % VC_TASK_PERIOD_MS) == 0)
             this->vc->Compute((period * VC_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
-
-        if((localTime % TP_TASK_PERIOD_MS) == 0)
-		{
-            if(this->pg->GetSafeguardFlag())
-            	this->status |= (1<<9);
-            else
-            	this->status &= ~(1<<9);
-
-            if(this->safeguard && this->pg->GetSafeguardFlag())
-        	{
-        		tp->stop();
-        	}
-		}
-
     }
 
 

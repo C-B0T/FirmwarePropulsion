@@ -51,6 +51,8 @@ namespace MotionControl
         this->name = "TrajectoryPlanning";
         this->taskHandle = NULL;
 
+        this->finished = true;
+
         this->state = FREE;
         this->step = 0;
 
@@ -208,7 +210,14 @@ namespace MotionControl
     {
         if( (this->state != FREE) && (this->state != STOP) )
         {
+        	this->status |= (1<<8);
+            this->finished = false;
             calculateMove();
+        }
+        else
+        {
+            this->status &= ~(1<<8);
+            this->finished = true;
         }
 
     	switch(state)
