@@ -116,6 +116,9 @@ static void HardwareInit (void)
     // Enable USART clock
 	//RCC_APB1PeriphClockCmd(RCC_APB1Periph_USART3, ENABLE);
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
+
+    // Enable I2C Clock
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_I2C1 | RCC_APB1Periph_I2C2 | RCC_APB1Periph_I2C3, ENABLE);
 }
 
 /**
@@ -176,7 +179,7 @@ int main(void)
 
 
     // Welcome
-    printf("\r\n\r\nA/0 CarteProp Firmware V0.1 (" __DATE__ " - " __TIME__ ")\r\n");
+    printf("\r\n\r\nSirius[A] FirmwarePropulsion V1.0 (" __DATE__ " - " __TIME__ ")\r\n");
 
     // Create Test task
     xTaskCreate(&TASKHANDLER_Test,
