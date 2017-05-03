@@ -150,6 +150,11 @@ namespace MotionControl
 
         this->xMutex = NULL;
         this->xMutex = xSemaphoreCreateMutex();
+
+        this->execCnt  = 0;
+        this->execMax  = 0;
+        this->execTime = 0;
+        this->execMoy  = 0.0;
     }
 
     /**

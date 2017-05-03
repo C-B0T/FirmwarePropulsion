@@ -138,6 +138,9 @@ namespace MotionControl
         this->angularPosition = currentAngularPosition;
         this->linearPosition  = currentLinearPosition;
 
+        this->angularPositionError = 0.0;
+        this->linearPositionError  = 0.0;
+
         this->angularVelocity = 0.0f;
         this->linearVelocity  = 0.0f;
 

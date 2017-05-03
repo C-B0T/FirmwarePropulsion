@@ -69,6 +69,14 @@ namespace MotionControl
         this->linearNextSetPoint = 0.0;
         this->angularSetPoint = 0.0;
 
+        this->startTime = 0.0;
+        this->startLinearPosition  = 0.0;
+        this->startAngularPosition = 0.0;
+
+        this->endLinearPosition = 0.0;
+        this->endAngularPosition = 0.0;
+
+
         this->odometry = Odometry::GetInstance();
         this->position = PositionControl::GetInstance();
         this->velocity = VelocityControl::GetInstance();

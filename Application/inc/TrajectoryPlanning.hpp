@@ -147,12 +147,6 @@ namespace MotionControl
         float32_t endLinearPosition;     // Linear Position Target
         float32_t endAngularPosition;    // Linear Angular Target
 
-        float32_t linearSign;
-        float32_t angularSign;
-
-        float32_t suggestedLinearPosition;
-        float32_t suggestedAngularPosition;
-
         float32_t X[10];
         float32_t Y[10];
         uint32_t  XYn;

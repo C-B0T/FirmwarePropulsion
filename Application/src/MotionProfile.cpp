@@ -33,6 +33,8 @@ namespace MotionControl
         this->maxVel = maxVel;
         this->maxAcc = maxAcc;
 
+        this->tf = 1.0;
+
         this->finished = false;
     }
 

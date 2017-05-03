@@ -118,21 +118,21 @@ void CLI::Compute(float32_t period)
     }
     else if(c == ':')
     {
-    	putchar(c);
-        pg->SetAngularVelMax(12.0);
-        pg->SetAngularAccMax(18.0);
-        pg->SetLinearVelMax(1.0);
-        pg->SetLinearAccMax(2.0);
-        printf("\r\nAngVel=12.0 AngAcc=18.0 LinVel=1.0 LinAcc=2.0\r\n");
-    }
-    else if(c == '!')
-    {
-    	putchar(c);
+        putchar(c);
         pg->SetAngularVelMax(3.14);
         pg->SetAngularAccMax(3.14);
         pg->SetLinearVelMax(0.4);
         pg->SetLinearAccMax(1.0);
         printf("\r\nAngVel=3.14 AngAcc=3.14 LinVel=0.4 LinAcc=1.0\r\n");
+    }
+    else if(c == '!')
+    {
+        putchar(c);
+        pg->SetAngularVelMax(12.0);
+        pg->SetAngularAccMax(18.0);
+        pg->SetLinearVelMax(1.0);
+        pg->SetLinearAccMax(2.0);
+        printf("\r\nAngVel=12.0 AngAcc=18.0 LinVel=1.0 LinAcc=2.0\r\n");
     }
     else if( ((c >= '0') && (c <= '9')) ||
         ((c >= 'a') && (c <= 'z')) ||
@@ -394,6 +394,14 @@ void CLI::Compute(float32_t period)
 
             printf("\r\nsetaccang %.3f", a);
             pg->SetAngularAccMax(a);
+        }
+        else if(strcmp(pch,"test") == 0)
+        {
+            printf("\r\ntest");
+            mc->GoLin(500);
+            mc->GoAng(1800);
+            mc->GoLin(500);
+            mc->GoAng(0);
         }
         else
         {

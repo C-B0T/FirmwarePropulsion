@@ -105,6 +105,8 @@ namespace MotionControl
 
         this->status = 0x0000;
 
+        this->safeguardFlag = false;
+
         this->Finished = false;
 
         // Init Angular motion profile generator
