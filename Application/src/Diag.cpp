@@ -20,6 +20,9 @@
 
 #define DIAG_TASK_PERIOD_MS           (10u)
 
+#define DIAG_TRACES_PERIOD_MS         (10u)
+#define DIAG_LED_PERIOD_MS            (10u)
+
 /*----------------------------------------------------------------------------*/
 /* Private Members                                                            */
 /*----------------------------------------------------------------------------*/
@@ -99,11 +102,12 @@ void Diag::TracesOD()
 void Diag::Led()
 {
 	static uint32_t localTime = 0;
+	uint16_t status = 0;
 
-	localTime += (uint32_t)DIAG_TASK_PERIOD_MS;
+	localTime += (uint32_t)DIAG_LED_PERIOD_MS;
 
-	// Led direction
-	static uint32_t LedId = 4;
+	// # Led direction
+	/*static uint32_t LedId = 4;
 	switch(LedId)
 	{
 	case 1:
@@ -124,7 +128,26 @@ void Diag::Led()
 	LedId--;
 	if(LedId < 1)
 		LedId = 4;
+	*/
 
+    // # Led status
+	if((localTime % 500) == 0)
+	    this->led1->Toggle();   // Blinking alive
+
+	status = this->mc->GetStatus();
+
+	if(status & (1<<8)) // Ready
+        this->led2->Set(HAL::GPIO::Low);
+    else
+        this->led2->Set(HAL::GPIO::High);
+
+    if(status & (1<<9)) // Safeguard Flag
+    {
+        if((localTime % 100) == 0)
+            this->led4->Toggle();
+    }
+    else
+	    this->led4->Set(HAL::GPIO::High);
 }
 
 void Diag::Compute(float32_t period)
@@ -134,12 +157,12 @@ void Diag::Compute(float32_t period)
 	localTime += (uint32_t)DIAG_TASK_PERIOD_MS;
 
 
-	if((localTime % 100) == 0)
+	if((localTime % DIAG_LED_PERIOD_MS) == 0)
 	{
 		this->Led();
 	}
 
-	if((localTime % 10) == 0)
+	if((localTime % DIAG_TRACES_PERIOD_MS) == 0)
 	{
 		if(this->enable[0])
 			this->TracesMC();

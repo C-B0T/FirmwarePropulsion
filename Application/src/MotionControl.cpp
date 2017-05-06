@@ -103,7 +103,7 @@ namespace MotionControl
         static uint32_t localTime = 0;
         cmd_t cmd;
 
-        // Update status
+        // Update configuration & state status
         if(this->enable)
         	this->status |= (1<<0);
         else
@@ -114,14 +114,28 @@ namespace MotionControl
         else
         	this->status &= ~(1<<1);
 
+        if(this->tp->isFinished())
+            this->status |= (1<<8);
+        else
+            this->status &= ~(1<<8);
+
+        if(this->pg->GetSafeguardFlag())
+            this->status |= (1<<9);
+        else
+            this->status &= ~(1<<9);
+
 
         // Schedule MotionControl
         localTime += MC_TASK_PERIOD_MS;
 
+        // If MotionControl is disabled then don't schedule submodules
+        if(this->enable == false)
+            return;
+
+        // #1 Schedule TrajectoryPlanning
         if((localTime % TP_TASK_PERIOD_MS) == 0)
         {
-            // 1- Pull orders
-            //@todo execute order
+            // 1- Pull orders one by one
             if(this->tp->isFinished())
             {
                 if(xQueueReceive(this->Qorders, &cmd, 0) == pdTRUE)
@@ -144,18 +158,23 @@ namespace MotionControl
             }
             // 2- Compute TrajectoryPlanning
             this->tp->Compute((period * TP_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
-            // 3- Check safeguard flag
-            if(this->pg->GetSafeguardFlag())
-            	this->status |= (1<<9);
-            else
-            	this->status &= ~(1<<9);
+            // 3- Check safeguard flag and stop if needed
             if(this->safeguard && this->pg->GetSafeguardFlag())
+            {
         		tp->stop();
+        		xQueueReset(this->Qorders);
+            }
         }
+
+        // #2 Schedule ProfileGenerator
         if((localTime % PG_TASK_PERIOD_MS) == 0)
             this->pg->Compute((period * PG_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
+
+        // #3 Schedule PositionControl
         if((localTime % PC_TASK_PERIOD_MS) == 0)
             this->pc->Compute((period * PC_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
+
+        // #4 Schedule VelocityControl
         if((localTime % VC_TASK_PERIOD_MS) == 0)
             this->vc->Compute((period * VC_TASK_PERIOD_MS) / MC_TASK_PERIOD_MS);
     }

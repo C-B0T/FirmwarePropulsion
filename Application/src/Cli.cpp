@@ -173,17 +173,18 @@ void CLI::Compute(float32_t period)
             printf(" - golin <l>          \tGo Linear\r\n");
             printf(" - goang <a>          \tGo Angular\r\n");
             printf(" - goto <x> <y>       \tGo to X,Y\r\n");
+            printf(" - getodo             \tGet odometry X,Y,O\r\n");
             printf(" - setodo <x> <y> <o> \tSet odometry X,Y,O\r\n");
             printf(" - setvellin <v>      \tSet velocity linear\r\n");
             printf(" - setvelang <v>      \tSet velocity angular\r\n");
             printf(" - setacclin <a>      \tSet acceleration linear\r\n");
             printf(" - setaccang <a>      \tSet acceleration angular\r\n");
+            printf(" - stop <%%>          \tStop %% Brake\r\n");
             printf(" = \r\n");
-            printf(" - GoLin <l>          \tGo Linear\r\n");
-            printf(" - GoAng <a>          \tGo Angular\r\n");
-            printf(" - Goto <x> <y>       \tGo to X,Y\r\n");
-            printf(" - Stop               \tStop motion \r\n");
-            //printf(" - stop <%%>     \tStop %% Brake\r\n");
+            printf(" - GoLin <l>          \tGo Linear (mm)\r\n");
+            printf(" - GoAng <a>          \tGo Angular (1/10deg)\r\n");
+            printf(" - Goto <x> <y>       \tGo to X,Y (mm)\r\n");
+            printf(" - Stop               \tStop motion\r\n");
         }
         else if(strcmp(pch,"golin") == 0)
         {
@@ -266,6 +267,12 @@ void CLI::Compute(float32_t period)
 
             printf("\r\nGoto %d %d", x, y);
             mc->Goto(x,y);
+        }
+        else if(strcmp(pch,"getodo") == 0)
+        {
+            robot_t r;
+            odometry->GetRobot(&r);
+            printf("\r\ngetodo: %ld\t%ld\t%ld", r.Xmm, r.Ymm, (int32_t)(r.Odeg*10.0));
         }
         else if(strcmp(pch,"setodo") == 0)
         {
