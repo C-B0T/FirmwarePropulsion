@@ -181,7 +181,6 @@ namespace MotionControl
             currentLinearPosition  = odometry->GetLinearPosition();
 
             // Compute positions error
-            // TODO : Si l'erreur de position devient trop grande, la couche du dessus doit gerer
             this->angularPositionError = this->angularPosition - currentAngularPosition;
             this->linearPositionError  = this->linearPosition  - currentLinearPosition;
 

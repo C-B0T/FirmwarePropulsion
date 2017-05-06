@@ -106,7 +106,7 @@ void Diag::Led()
 
 	localTime += (uint32_t)DIAG_LED_PERIOD_MS;
 
-	// # Led direction
+	// # Led Direction
 	/*static uint32_t LedId = 4;
 	switch(LedId)
 	{
@@ -130,24 +130,47 @@ void Diag::Led()
 		LedId = 4;
 	*/
 
-    // # Led status
+    // # Led Status
+
+	// Led1
 	if((localTime % 500) == 0)
 	    this->led1->Toggle();   // Blinking alive
 
 	status = this->mc->GetStatus();
 
+    // Led2
 	if(status & (1<<8)) // Ready
         this->led2->Set(HAL::GPIO::Low);
     else
         this->led2->Set(HAL::GPIO::High);
 
+	// Led3
     if(status & (1<<9)) // Safeguard Flag
+    {
+        if((localTime % 100) == 0)
+            this->led3->Toggle();
+    }
+    else
+        this->led3->Set(HAL::GPIO::High);
+
+    // Led4
+    if( ((status & (1<<1)) == 0) && ((status & (1<<0)) == 0) ) // Config
     {
         if((localTime % 100) == 0)
             this->led4->Toggle();
     }
+    else if( (status & (1<<1)) == 0 )   // Safeguard config
+    {
+        if((localTime % 200) == 0)
+            this->led4->Toggle();
+    }
+    else if( (status & (1<<0)) == 0 )   // MC enable config
+    {
+        if((localTime % 300) == 0)
+            this->led4->Toggle();
+    }
     else
-	    this->led4->Set(HAL::GPIO::High);
+        this->led4->Set(HAL::GPIO::High);
 }
 
 void Diag::Compute(float32_t period)

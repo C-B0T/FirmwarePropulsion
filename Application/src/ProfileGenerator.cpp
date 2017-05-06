@@ -180,6 +180,9 @@ namespace MotionControl
 
         // Start profile
         this->angularProfile.SetSetPoint(this->angularPosition, currentAngularPosition, time);
+
+        // Set current position
+        this->angularPositionProfiled = currentAngularPosition;
     }
 
     /**
@@ -226,6 +229,9 @@ namespace MotionControl
             // 30/04/2017 : Remplacement de this->linearPositionProfiled par currentLinearPosition
             this->linearProfile.SetSetPoint(currentLinearPosition+d, currentLinearPosition, time);
         }
+
+        // Set current position
+        this->linearPositionProfiled  = currentLinearPosition;
     }
 
 
@@ -242,14 +248,12 @@ namespace MotionControl
         this->status |= (1<<0);
 
         // Safeguard
-        // TODO: Avant de générer le prochain point de profile
+        //       Avant de générer le prochain point de profile
         //       s'assurer que l'erreur n'est pas trop grande sinon
         //       ca veut dire que le système n'arrive pas à suivre.
-        //       Il faut donc soit informer la couche du dessus
-        //       soit stopper le profile soit ajuster les
-        //       paramètres max des profiles ou un mixe de tout ca.
-        angularPositionError = this->positionControl->GetAngularPositionError();
-        linearPositionError  = this->positionControl->GetLinearPositionError();
+        // Get current positions
+        angularPositionError = this->angularPositionProfiled - this->odometry->GetAngularPosition();
+        linearPositionError  = this->linearPositionProfiled - this->odometry->GetLinearPosition();
 
         // TODO: A améliorer pour faire un pourcentage
         this->safeguardFlag = false;
@@ -271,8 +275,8 @@ namespace MotionControl
         // Generate profile
         this->Generate(period);
 
-        positionControl->SetAngularPosition(this->angularPositionProfiled);
-        positionControl->SetLinearPosition(this->linearPositionProfiled);
+        this->positionControl->SetAngularPosition(this->angularPositionProfiled);
+        this->positionControl->SetLinearPosition(this->linearPositionProfiled);
     }
 
     /**

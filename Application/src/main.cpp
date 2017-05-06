@@ -148,7 +148,7 @@ void TASKHANDLER_Test (void * obj)
 }
 
 
-
+HAL::GPIO *ledSysLoad = NULL;
 
 /**
  * @brief Main
@@ -166,6 +166,8 @@ int main(void)
     led2->Set(HAL::GPIO::State::High);
     led3->Set(HAL::GPIO::State::High);
     led4->Set(HAL::GPIO::State::High);
+
+    ledSysLoad = led2;
 
     // Serial init
     HAL::Serial *serial0 = HAL::Serial::GetInstance(HAL::Serial::SERIAL0);
@@ -218,6 +220,7 @@ void assert_failed(uint8_t* file, uint32_t line)
 void vApplicationTickHook(void)
 {
     // Do something
+//    ledSysLoad->Set(HAL::GPIO::Low);
 }
 
 /**
@@ -234,6 +237,7 @@ void vApplicationIdleHook(void)
     important that vApplicationIdleHook() is permitted to return to its calling
     function, because it is the responsibility of the idle task to clean up
     memory allocated by the kernel to any task that has since been deleted. */
+//    ledSysLoad->Set(HAL::GPIO::High);
 }
 
 /**

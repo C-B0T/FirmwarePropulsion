@@ -170,6 +170,8 @@ void CLI::Compute(float32_t period)
             printf(" - (            \tToggle traces\r\n");
             printf(" Command:\r\n");
             printf(" - status             \tGet modules status\r\n");
+            printf(" - enable             \tEnable motion control\r\n");
+            printf(" - disable            \tDisable motion control\r\n");
             printf(" - golin <l>          \tGo Linear\r\n");
             printf(" - goang <a>          \tGo Angular\r\n");
             printf(" - goto <x> <y>       \tGo to X,Y\r\n");
@@ -179,12 +181,24 @@ void CLI::Compute(float32_t period)
             printf(" - setvelang <v>      \tSet velocity angular\r\n");
             printf(" - setacclin <a>      \tSet acceleration linear\r\n");
             printf(" - setaccang <a>      \tSet acceleration angular\r\n");
+            printf(" - free               \tFreewheel\r\n");
             printf(" - stop <%%>          \tStop %% Brake\r\n");
             printf(" = \r\n");
             printf(" - GoLin <l>          \tGo Linear (mm)\r\n");
             printf(" - GoAng <a>          \tGo Angular (1/10deg)\r\n");
             printf(" - Goto <x> <y>       \tGo to X,Y (mm)\r\n");
             printf(" - Stop               \tStop motion\r\n");
+            printf(" - Test               \tGoLin(500), GoAng(1800), GoLin(500), GoAng(0)\r\n");
+        }
+        else if(strcmp(pch,"enable") == 0)
+        {
+            mc->Enable();
+            printf("\r\nenable");
+        }
+        else if(strcmp(pch,"disable") == 0)
+        {
+            mc->Disable();
+            printf("\r\ndisable");
         }
         else if(strcmp(pch,"golin") == 0)
         {
@@ -297,6 +311,10 @@ void CLI::Compute(float32_t period)
             printf("\r\nsetodo %.3f %.3f %.3f", x, y, o);
             odometry->SetXYO(x,y,o);
         }
+        else if(strcmp(pch,"free") == 0)
+        {
+            tp->freewheel();
+        }
         else if(strcmp(pch,"stop") == 0)
         {
             float bk = 1.0;
@@ -402,7 +420,7 @@ void CLI::Compute(float32_t period)
             printf("\r\nsetaccang %.3f", a);
             pg->SetAngularAccMax(a);
         }
-        else if(strcmp(pch,"test") == 0)
+        else if(strcmp(pch,"Test") == 0)
         {
             printf("\r\ntest");
             mc->GoLin(500);
