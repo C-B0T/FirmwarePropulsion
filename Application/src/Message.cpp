@@ -20,11 +20,11 @@
 #define MSG_FRAME_INDEX_FIRST_DATA	(2u)
 
 // Message nb of data bytes - ENCODE
-#define MSG_NB_DATA_ENCODE_RESET					(0u)
-#define MSG_NB_DATA_ENCODE_BOOT_MODE				(0u)
-#define MSG_NB_DATA_ENCODE_PING						(4u)
-#define MSG_NB_DATA_ENCODE_CHANGE_ADDR				(0u)
-#define MSG_NB_DATA_ENCODE_CHECKUP					(0u)
+#define MSG_NB_DATA_ENCODE_FW_RESET					(0u)
+#define MSG_NB_DATA_ENCODE_FW_BOOT_MODE			    (0u)
+#define MSG_NB_DATA_ENCODE_FW_PING					(4u)
+#define MSG_NB_DATA_ENCODE_FW_CHANGE_ADDR			(0u)
+#define MSG_NB_DATA_ENCODE_FW_CHECKUP				(0u)
 
 #define MSG_NB_DATA_ENCODE_PROP_INIT				(0u)
 #define MSG_NB_DATA_ENCODE_PROP_GET_POSITION		(6u)
@@ -62,11 +62,11 @@
 #define MSG_NB_DATA_ENCODE_BAR_GET_STATUS			(2u)
 
 // Message nb of data bytes - Decode
-#define MSG_NB_DATA_DECODE_RESET					(4u)
-#define MSG_NB_DATA_DECODE_BOOT_MODE				(4u)
-#define MSG_NB_DATA_DECODE_PING						(0u)
-#define MSG_NB_DATA_DECODE_CHANGE_ADDR				(1u)
-#define MSG_NB_DATA_DECODE_CHECKUP					(0u)
+#define MSG_NB_DATA_DECODE_FW_RESET					(4u)
+#define MSG_NB_DATA_DECODE_FW_BOOT_MODE				(4u)
+#define MSG_NB_DATA_DECODE_FW_PING					(0u)
+#define MSG_NB_DATA_DECODE_FW_CHANGE_ADDR			(1u)
+#define MSG_NB_DATA_DECODE_FW_CHECKUP				(0u)
 
 #define MSG_NB_DATA_DECODE_PROP_INIT				(1u)
 #define MSG_NB_DATA_DECODE_PROP_GET_POSITION		(0u)
@@ -487,8 +487,8 @@ namespace Communication
 		{
 			switch(this->Type)
 			{
-			case MSG_TYPE_PING:
-				frame->Data[frame->Length++]=	MSG_NB_DATA_ENCODE_PING;
+			case MSG_TYPE_FW_PING:
+				frame->Data[frame->Length++]=	MSG_NB_DATA_ENCODE_FW_PING;
 				break;
 //			case MSG_TYPE_CHECKUP:
 //				frame->Data[frame->Length++]=	MSG_NB_DATA_ENCODE_CHECKUP;
@@ -537,7 +537,7 @@ namespace Communication
 		{
 			switch(this->Type)
 			{
-			case MSG_TYPE_PING:
+			case MSG_TYPE_FW_PING:
 				_encode_Ping(frame, &this->Param);
 				break;
 //			case MSG_TYPE_CHECKUP:
@@ -593,10 +593,10 @@ namespace Communication
 
 		switch(frame->Data[MSG_FRAME_INDEX_OPCODE])
 		{
-		case MSG_TYPE_RESET:
-		case MSG_TYPE_BOOT_MODE:
-		case MSG_TYPE_PING:
-		case MSG_TYPE_CHANGE_ADDR:
+		case MSG_TYPE_FW_RESET:
+		case MSG_TYPE_FW_BOOT_MODE:
+		case MSG_TYPE_FW_PING:
+		case MSG_TYPE_FW_CHANGE_ADDR:
 		case MSG_TYPE_PROP_INIT:
 		case MSG_TYPE_PROP_GOTOXY:
 		case MSG_TYPE_PROP_GOLINEAR:
@@ -637,99 +637,102 @@ namespace Communication
 		{
 			switch(this->Type)
 			{
-			case MSG_TYPE_RESET:
-				case MSG_TYPE_BOOT_MODE:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_RESET)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_PING:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PING)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_CHANGE_ADDR:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_CHANGE_ADDR)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_PROP_INIT:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_INIT)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_PROP_GOTOXY:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_GOTO_XY)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_PROP_GOLINEAR:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_GO_LINEAR)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_PROP_ROTATE:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_ROTATE)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_PROP_SET_ANGLE:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_SET_ANGLE)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_PROP_SET_POSITION:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_SET_POSITION)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_PROP_STOP:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_STOP)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_PROP_SET_POS_CONTROL:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_SET_POS_CONTROL)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_SERVO_INIT:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_SERVO_INIT)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_SERVO_SET_ANGLE:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_SERVO_SET_ANGLE)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_SERVO_SET_SPEED:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_SERVO_SET_SPEED)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_MPP_INIT:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_MPP_INIT)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_MPP_SET_SPEED:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_MPP_SET_SPEED)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_MPP_SET_STATE:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_MPP_SET_STATE)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_MPP_MOVE:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_MPP_MOVE)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_MPP_RUN:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_MPP_RUN)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_GPIO_INIT:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_GPIO_INIT)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_GPIO_SET_OUTPUT:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_GPIO_SET_OUTPUTS)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_BAR_INIT:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_BAR_INIT)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
-				case MSG_TYPE_BAR_MOVE_INDEX:
-					if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_BAR_MOVE_INDEX)
-						rval = MSG_ERROR_WRONG_NB_DATA;
-					break;
+			case MSG_TYPE_FW_RESET:
+			    if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_FW_RESET)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_FW_BOOT_MODE:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_FW_RESET)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_FW_PING:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_FW_PING)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_FW_CHANGE_ADDR:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_FW_CHANGE_ADDR)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_PROP_INIT:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_INIT)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_PROP_GOTOXY:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_GOTO_XY)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_PROP_GOLINEAR:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_GO_LINEAR)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_PROP_ROTATE:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_ROTATE)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_PROP_SET_ANGLE:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_SET_ANGLE)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_PROP_SET_POSITION:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_SET_POSITION)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_PROP_STOP:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_STOP)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_PROP_SET_POS_CONTROL:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_PROP_SET_POS_CONTROL)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_SERVO_INIT:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_SERVO_INIT)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_SERVO_SET_ANGLE:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_SERVO_SET_ANGLE)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_SERVO_SET_SPEED:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_SERVO_SET_SPEED)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_MPP_INIT:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_MPP_INIT)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_MPP_SET_SPEED:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_MPP_SET_SPEED)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_MPP_SET_STATE:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_MPP_SET_STATE)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_MPP_MOVE:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_MPP_MOVE)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_MPP_RUN:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_MPP_RUN)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_GPIO_INIT:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_GPIO_INIT)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_GPIO_SET_OUTPUT:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_GPIO_SET_OUTPUTS)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_BAR_INIT:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_BAR_INIT)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
+            case MSG_TYPE_BAR_MOVE_INDEX:
+                if(frame->Data[MSG_FRAME_INDEX_NB_DATA] != MSG_NB_DATA_DECODE_BAR_MOVE_INDEX)
+                    rval = MSG_ERROR_WRONG_NB_DATA;
+                break;
 
 
 			default:
@@ -743,13 +746,13 @@ namespace Communication
 		{
 			switch(this->Type)
 			{
-			case MSG_TYPE_RESET:
+			case MSG_TYPE_FW_RESET:
 				_decode_Reset(frame, &this->Param);
 				break;
-			case MSG_TYPE_BOOT_MODE:
+			case MSG_TYPE_FW_BOOT_MODE:
 				_decode_BootMode(frame, &this->Param);
 				break;
-			case MSG_TYPE_CHANGE_ADDR:
+			case MSG_TYPE_FW_CHANGE_ADDR:
 				_decode_ChangeAddr(frame, &this->Param);
 				break;
 			case MSG_TYPE_PROP_INIT:

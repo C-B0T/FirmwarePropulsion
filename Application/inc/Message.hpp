@@ -32,11 +32,11 @@ typedef enum
 {
 	MSG_TYPE_UNKNOWN				=	-1,
 
-	// General purpose messages
-	MSG_TYPE_RESET 					= 	0x00,
-	MSG_TYPE_BOOT_MODE				=	0x01,
-	MSG_TYPE_PING					=	0x02,
-	MSG_TYPE_CHANGE_ADDR			=	0x03,
+	// Firmware messages
+	MSG_TYPE_FW_RESET 				= 	0x00,
+	MSG_TYPE_FW_BOOT_MODE			=	0x01,
+	MSG_TYPE_FW_PING				=	0x02,
+	MSG_TYPE_FW_CHANGE_ADDR			=	0x03,
 	//MSG_TYPE_CHECKUP				=	0x10,
 
 	// Propulsion messages
