@@ -11,6 +11,7 @@
 #include "common.h"
 #include "CommunicationHandler.hpp"
 #include "Message.hpp"
+#include "ModuleManager.hpp"
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
@@ -49,73 +50,9 @@ private:
 
 	/**
 	 * @private
-	 * @brief Handle Reset request
-	 * @return Error code
+	 * @brief Create modules handled by the firmware
 	 */
-	int32_t Reset (void);
-
-	/**
-	 * @private
-	 * @brief Handle Bootloader mode request
-	 * @return Error code
-	 */
-	int32_t Bootloader (void);
-
-	/**
-	 * @private
-	 * @brief Handle Ping request
-	 * @return Error code
-	 */
-	int32_t Ping (void);
-
-	/**
-	 * @private
-	 * @brief Handle Change I2C Address request
-	 * @return Error code
-	 */
-	int32_t ChangeAddress (void);
-
-	/**
-	 * @private
-	 * @brief Handle Checkup request
-	 * @return Error code
-	 */
-	int32_t Checkup (void);
-
-	/**
-	 * @private
-	 * @brief Handle Get Position request
-	 * @return Error code
-	 */
-	int32_t GetPosition (void);
-
-	/**
-	 * @private
-	 * @brief Handle Goto request
-	 * @return Error code
-	 */
-	int32_t Goto (void);
-
-	/**
-	 * @private
-	 * @brief Handle Set Angle request
-	 * @return Error code
-	 */
-	int32_t SetAngle (void);
-
-	/**
-	 * @private
-	 * @brief Handle Disable Position Control request
-	 * @return Error code
-	 */
-	int32_t DisablePosControl (void);
-
-	/**
-	 * @private
-	 * @brief Handle Enable Position Control request
-	 * @return Error code
-	 */
-	int32_t EnablePosControl (void);
+	void CreateModuleList ();
 
 	/**
 	 * @private
@@ -129,8 +66,7 @@ private:
 	 */
 	Communication::Message msg;
 
-	/**@todo Add position control object */
-
+	std::vector<ModuleManager*> moduleList;
 };
 
 #endif /* INC_CONTROLLER_HPP_ */

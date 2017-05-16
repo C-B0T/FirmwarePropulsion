@@ -31,7 +31,7 @@
 
 static Controller * _instance = NULL;
 
-static EventGroupHandle_t _eventHandle;
+static EventGroupHandle_t _eventHandle = NULL;
 static TaskHandle_t _taskHandle = NULL;
 
 /*----------------------------------------------------------------------------*/
@@ -84,6 +84,9 @@ Controller::Controller ()
 	this->comHandler->MessageReceived += _onMessageReceive;
 	this->comHandler->ErrorOccured += _onMessageError;
 
+	// Create modules
+	this->CreateModuleList();
+
 	// Create event
 	_eventHandle = xEventGroupCreate();
 
@@ -94,6 +97,18 @@ Controller::Controller ()
 				(void*)this,
 				0,
 				&_taskHandle);
+}
+
+void Controller::CreateModuleList(void)
+{
+    // General module
+
+
+    // Prop module
+    // Servo module
+    // MPP module
+    // GPIO module
+    // Barillet module
 }
 
 void Controller::TaskHandler (void)
