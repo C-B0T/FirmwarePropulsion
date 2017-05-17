@@ -9,6 +9,7 @@
 #define INC_MODULEFIRMWARE_HPP_
 
 #include "ModuleManager.hpp"
+#include "CommunicationHandler.hpp"
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
@@ -48,6 +49,8 @@ private:
     int32_t Ping ();
 
     int32_t ChangeAddr (uint8_t addr);
+
+    Communication::CommunicationHandler* comHandler;
 
 };
 

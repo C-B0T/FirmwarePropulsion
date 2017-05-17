@@ -22,6 +22,8 @@ using namespace Communication;
 #define MOD_FW_EVENT_HANDLE_MSG     (0x01u)
 #define MOD_FW_EVENT_MASK           (MOD_FW_EVENT_HANDLE_MSG)
 
+#define FW_PING_KEY                 (0x5AA555AAu)
+
 /*----------------------------------------------------------------------------*/
 /* Private Members                                                            */
 /*----------------------------------------------------------------------------*/
@@ -62,6 +64,8 @@ ModuleFirmware* ModuleFirmware::GetInstance()
 
 ModuleFirmware::ModuleFirmware()
 {
+    this->comHandler = CommunicationHandler::GetInstance();
+
     // Create event
     _eventHandle = xEventGroupCreate();
 
@@ -154,6 +158,8 @@ int32_t ModuleFirmware::Reset ()
 {
     int32_t error = NO_ERROR;
 
+    NVIC_SystemReset();
+
     return error;
 }
 
@@ -161,12 +167,21 @@ int32_t ModuleFirmware::BootMode ()
 {
     int32_t error = NO_ERROR;
 
+    /** @todo Jump to bootloader address */
+
     return error;
 }
 
 int32_t ModuleFirmware::Ping ()
 {
     int32_t error = NO_ERROR;
+
+    // 1. Set report
+    this->report = Message(MSG_TYPE_FW_PING);
+    this->report.Param.Ping.key = FW_PING_KEY;
+
+    // 2. Send report
+    error = this->comHandler->Write(&this->report);
 
     return error;
 }
