@@ -78,6 +78,9 @@ typedef enum
 	MSG_TYPE_BAR_INIT				=	0x50,
 	MSG_TYPE_BAR_MOVE_INDEX			=	0x51,
 	MSG_TYPE_BAR_GET_STATUS			=	0x52,
+
+	// Mask
+	MSG_TYPE_MODULE_MASK            =   0xF0,
 }MESSAGE_TYPE;
 
 /**

@@ -7,6 +7,8 @@
 
 #include "Controller.hpp"
 
+#include "ModuleFirmware.hpp"
+
 #include "stm32f4xx.h"
 
 // FreeRTOS API
@@ -22,8 +24,6 @@
 #define CONTROLLER_EVENT_MSG_ERROR			(0x02u)
 #define CONTROLLER_EVENT_MASK				(CONTROLLER_EVENT_MSG_RECEIVED | \
 											 CONTROLLER_EVENT_MSG_ERROR)
-
-#define CONTROLLER_UNLOCK_KEY				(0x5AA555AAu)
 
 /*----------------------------------------------------------------------------*/
 /* Private Members                                                            */
@@ -58,6 +58,7 @@ static void _taskHandler (void * obj)
 
 	controller->TaskHandler();
 }
+
 
 /*----------------------------------------------------------------------------*/
 /* Class Implementation	                                                      */
@@ -101,8 +102,15 @@ Controller::Controller ()
 
 void Controller::CreateModuleList(void)
 {
-    // General module
+    ModuleManager* module = NULL;
 
+    // Firmware module
+    module = ModuleFirmware::GetInstance();
+
+    if(module != NULL)
+    {
+        this->moduleList.push_back(module);
+    }
 
     // Prop module
     // Servo module
@@ -115,6 +123,7 @@ void Controller::TaskHandler (void)
 {
 	EventBits_t events = 0u;
 	int32_t error = NO_ERROR;
+	ModuleManager* module = NULL;
 
 	while(1)
 	{
@@ -133,44 +142,17 @@ void Controller::TaskHandler (void)
 				this->comHandler->GetLastMessage(&this->msg);
 			}
 
-			// Handle message
+			// 2. Handle message
 			if(error == NO_ERROR)
 			{
-				switch(this->msg.Type)
-				{
-//				case MSG_TYPE_RESET :
-//					error = this->Reset();
-//					break;
-//				case MSG_TYPE_BOOT_MODE :
-//					error = this->Bootloader();
-//					break;
-//				case MSG_TYPE_PING :
-//					error = this->Ping();
-//					break;
-//				case MSG_TYPE_CHANGE_ADDR :
-//					error = this->ChangeAddress();
-//					break;
-//				case MSG_TYPE_CHECKUP :
-//					error = this->Checkup();
-//					break;
-//				case MSG_TYPE_GET_POSITION :
-//					error = this->GetPosition();
-//					break;
-//				case MSG_TYPE_GOTO :
-//					error = this->Goto();
-//					break;
-//				case MSG_TYPE_SET_ANGLE :
-//					error = this->SetAngle();
-//					break;
-//				case MSG_TYPE_DISABLE_POS_CONTROL :
-//					error = this->DisablePosControl();
-//					break;
-//				case MSG_TYPE_ENABLE_POS_CONTROL :
-//					error = this->EnablePosControl();
-//					break;
-				default:
-					break;
-				}
+			    // 2.1 Retrieve module
+			    module = this->FindModule((enum ModuleID)(this->msg.Type & MSG_TYPE_MODULE_MASK));
+
+			    // 2.2 If module found, ask for msg handling
+			    if(module != NULL)
+			    {
+			        module->HandleMessage(this->msg);
+			    }
 			}
 		}
 		else if((events & CONTROLLER_EVENT_MSG_ERROR) == CONTROLLER_EVENT_MSG_ERROR)
@@ -191,6 +173,24 @@ void Controller::TaskHandler (void)
 
 		error = NO_ERROR;
 	}
+}
+
+ModuleManager* Controller::FindModule(enum ModuleID moduleID)
+{
+    ModuleManager* module = NULL;
+
+    // 1. Search module in module list with std:find_if and lambda function
+    auto it = std::find_if(this->moduleList.begin(),
+                           this->moduleList.end(),
+                           [moduleID](ModuleManager* obj){return obj->GetID() == (uint32_t)moduleID;} );
+
+    // 2. if module found, return it
+    if(it != this->moduleList.end())
+    {
+        module = *it;
+    }
+
+    return  module;
 }
 
 //int32_t Controller::Reset (void)

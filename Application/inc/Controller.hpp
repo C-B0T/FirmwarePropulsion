@@ -12,6 +12,7 @@
 #include "CommunicationHandler.hpp"
 #include "Message.hpp"
 #include "ModuleManager.hpp"
+#include "ModulesDef.h"
 
 /*----------------------------------------------------------------------------*/
 /* Definitions                                                                */
@@ -53,6 +54,8 @@ private:
 	 * @brief Create modules handled by the firmware
 	 */
 	void CreateModuleList ();
+
+	ModuleManager* FindModule (enum ModuleID moduleID);
 
 	/**
 	 * @private
