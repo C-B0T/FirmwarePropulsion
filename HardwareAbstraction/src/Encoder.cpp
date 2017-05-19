@@ -23,7 +23,7 @@ using namespace HAL;
 #define ENC0_CH_B_PIN			(GPIO_Pin_11)
 #define ENC0_CH_B_PINSOURCE		(GPIO_PinSource11)
 #define ENC0_IO_AF				(GPIO_AF_TIM5)
-#define ENC0_RELOAD_VALUE		(4095)			// Number of steps per encoder turn minus one
+#define ENC0_RELOAD_VALUE		(65535)			// Number of steps per encoder turn minus one
 #define ENC0_TIMER				(TIM5)
 #define ENC0_INT_CHANNEL		(TIM5_IRQn)
 #define ENC0_INT_PRIORITY		(0u)
@@ -36,7 +36,7 @@ using namespace HAL;
 #define ENC1_CH_B_PIN			(GPIO_Pin_6)
 #define ENC1_CH_B_PINSOURCE		(GPIO_PinSource6)
 #define ENC1_IO_AF				(GPIO_AF_TIM8)
-#define ENC1_RELOAD_VALUE		(4095)			// Number of steps per encoder turn minus one
+#define ENC1_RELOAD_VALUE		(65535)			// Number of steps per encoder turn minus one
 #define ENC1_TIMER				(TIM8)
 #define ENC1_INT_CHANNEL		(TIM8_UP_TIM13_IRQn)
 #define ENC1_INT_PRIORITY		(0u)
@@ -147,7 +147,7 @@ static void _hardwareInit (enum Encoder::ID id)
 
 	TIM_Cmd(enc.TIMER.TIMER, DISABLE);
 	TIM_TimeBaseInit(enc.TIMER.TIMER, &TIMBaseStruct);
-	TIM_SetCounter(enc.TIMER.TIMER, 0u);
+	TIM_SetCounter(enc.TIMER.TIMER, enc.TIMER.RELOAD_VAL >> 1u);    // Reset counter to half max value
 
 	TIM_EncoderInterfaceConfig(enc.TIMER.TIMER,
 							   TIM_EncoderMode_TI12,
@@ -194,29 +194,37 @@ namespace HAL
 
 	Encoder::Encoder (Encoder::ID id)
 	{
-		this->turnCounter	=	0;
-		this->prevAbsValue	=	0;
-		this->absolutePos	=	0;
-		this->relativePos	=	0;
-
 		_hardwareInit(id);
 
 		this->def = _getENCStruct(id);
+
+		this->turnCounter   =   0;
+        this->prevAbsValue  =   0;
+        this->absolutePos   =   this->def.TIMER.RELOAD_VAL >> 1; // Start value is half reload value
+        this->relativePos   =   0;
 	}
 
-	int64_t Encoder::GetAbsoluteValue()
-	{
-		this->prevAbsValue	= 	this->absolutePos;
-		this->absolutePos 	= 	(this->def.TIMER.RELOAD_VAL * this->turnCounter) + TIM_GetCounter(this->def.TIMER.TIMER);
-		this->relativePos 	= 	this->absolutePos - this->prevAbsValue;
-
-		return this->absolutePos;
-	}
+//	int64_t Encoder::GetAbsoluteValue()
+//	{
+//	    uint32_t counter = TIM_GetCounter(this->def.TIMER.TIMER);
+//
+//	    TIM_SetCounter(this->def.TIMER.TIMER)
+//
+//		this->prevAbsValue	= 	this->absolutePos;
+//		this->absolutePos 	= 	(this->def.TIMER.RELOAD_VAL * this->turnCounter) + TIM_GetCounter(this->def.TIMER.TIMER);
+//		this->relativePos 	= 	this->absolutePos - this->prevAbsValue;
+//
+//		return this->absolutePos;
+//	}
 
 	int32_t Encoder::GetRelativeValue()
 	{
+	    uint32_t counter = TIM_GetCounter(this->def.TIMER.TIMER);
+
+	    TIM_SetCounter(this->def.TIMER.TIMER, this->def.TIMER.RELOAD_VAL >> 1);    // Reset counter to half max value
+
 		this->prevAbsValue	= 	this->absolutePos;
-		this->absolutePos 	= 	(this->def.TIMER.RELOAD_VAL * this->turnCounter) + TIM_GetCounter(this->def.TIMER.TIMER);
+		this->absolutePos 	= 	(this->def.TIMER.RELOAD_VAL * this->turnCounter) + counter;
 		this->relativePos 	= 	this->absolutePos - this->prevAbsValue;
 
 		return this->relativePos;

@@ -102,7 +102,7 @@ namespace HAL
 		/**
 		 * @brief Return encoder absolute values
 		 */
-		int64_t GetAbsoluteValue ();
+		//int64_t GetAbsoluteValue ();
 
 		/**
 		 * @brief Return encoder value since last retrieval
